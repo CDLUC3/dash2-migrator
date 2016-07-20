@@ -8,6 +8,12 @@ module Dash2
           path = 'spec/data/stash-migrator.yml'
           config = Config.from_file(path)
           expect(config).to be_a(Config)
+
+          expect(config.connection_info).to be_a(Hash)
+
+          indexer = config.indexer
+          expect(indexer).to be_a(Stash::Indexer::Solr::SolrIndexer)
+          expect(indexer.metadata_mapper).to be_a(Stash::Indexer::DataciteGeoblacklight::Mapper)
         end
       end
     end

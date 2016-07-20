@@ -5,19 +5,19 @@ module Dash2
   module Migrator
     class Config
 
-      # The index configuration
-      # @return [IndexConfig] the configuration (as an apporpriate
-      #   subclass of `IndexConfig` for the specified adapter)
-      attr_reader :index_config
+      # The database connection info
+      # @return [Hash] A hash of DB connection info suitable for
+      #   `ActiveRecord::Base.establish_connection`
+      attr_reader :connection_info
 
-      # The metadata mapper
-      # @return [MetadataMapper] the mapper (as an appropriate
-      #   subclass of `MetadataMapper` for the specified mapping)
-      attr_reader :metadata_mapper
-
-      def initialize(index_config:, metadata_mapper:)
+      def initialize(connection_info:, index_config:, metadata_mapper:)
+        @connection_info = connection_info
         @index_config = index_config
         @metadata_mapper = metadata_mapper
+      end
+
+      def indexer
+        @indexer ||= @index_config.create_indexer(@metadata_mapper)
       end
 
       # Reads the specified file and creates a new `Config` from it.
@@ -32,9 +32,10 @@ module Dash2
         rescue IOError
           raise
         rescue => e
-          warn(e)
-          warn(e.backtrace.join("\n")) if e.backtrace
-          raise IOError, "Error parsing specified config file #{path}: #{e.message}"
+          msg = "Error parsing specified config file #{path}: #{e}"
+          backtrace = e.backtrace ? e.backtrace.join("\n") : nil
+          warn(msg, backtrace)
+          raise IOError, msg
         end
       end
 
@@ -43,7 +44,17 @@ module Dash2
       def self.from_env(env)
         index_config = Stash::Indexer::IndexConfig.for_environment(env, :index)
         metadata_mapper = Stash::Indexer::MetadataMapper.for_environment(env, :mapper)
-        Config.new(index_config: index_config, metadata_mapper: metadata_mapper)
+
+        connection_info = nil
+        begin
+          connection_info = YAML.load_file(env.args_for(:db))
+        rescue => e
+          msg = "Error loading database configuration #{env.args_for(:db)}: #{e}"
+          backtrace = e.backtrace ? e.backtrace.join("\n") : nil
+          warn(msg, backtrace)
+        end
+
+        Config.new(connection_info: connection_info, index_config: index_config, metadata_mapper: metadata_mapper)
       end
       private_class_method :from_env
 
