@@ -22,13 +22,14 @@ db/*.sqlite3
 
 /log/
 
-# IntellJ
+# IntelliJ / RubyMine
 
+.idea
+.rakeTasks
 *.iml
 *.ipr
 *.iws
 *.ids
-.rakeTasks
 
 # Emacs
 
