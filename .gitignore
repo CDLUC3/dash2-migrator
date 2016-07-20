@@ -40,3 +40,6 @@ db/*.sqlite3
 
 .DS_Store
 
+# Secrets
+
+config/database.yml

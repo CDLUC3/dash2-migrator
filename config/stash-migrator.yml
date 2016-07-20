@@ -1,6 +1,7 @@
 defaults: &defaults
   mapper:
     metadata_mapping: datacite_geoblacklight
+  db: config/database.yml
 
 test:
   <<: *defaults
@@ -14,11 +15,6 @@ test:
   source:
     protocol: Dash 1 (Atom)
     feed_url: http://example.org/
-  db:
-    adapter: sqlite3
-    database: ':memory:'
-    pool: 5
-    timeout: 5000
 
 development:
   <<: *defaults
@@ -32,10 +28,6 @@ development:
   source:
     protocol: Dash 1 (Atom)
     feed_url: http://example.org/
-  db:
-    adapter: sqlite3
-    database: db/development.sqlite3
-    pool: 5
 
 stage:
   <<: *defaults
@@ -49,10 +41,6 @@ stage:
   source:
     protocol: Dash 1 (Atom)
     feed_url: http://example.org/
-  db:
-    adapter: sqlite3
-    database: db/stage.sqlite3
-    pool: 5
 
 production:
   <<: *defaults
@@ -66,7 +54,3 @@ production:
   source:
     protocol: Dash 1 (Atom)
     feed_url: http://example.org/
-  db:
-    adapter: sqlite3
-    database: db/production.sqlite3
-    pool: 5
