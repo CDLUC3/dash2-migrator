@@ -1,19 +1,20 @@
 require 'spec_helper'
 
+require 'stash/config'
+require 'ar_persistence_config'
+
 module Dash2
   module Migrator
     describe Config do
       describe '#from_file' do
         it 'parses a config file' do
-          path = 'spec/data/stash-migrator.yml'
-          config = Config.from_file(path)
-          expect(config).to be_a(Config)
+          path = 'config/stash-migrator.yml'
+          config = Stash::Config.from_file(path)
+          expect(config).to be_a(Stash::Config)
 
-          expect(config.connection_info).to be_a(Hash)
-
-          indexer = config.indexer
-          expect(indexer).to be_a(Stash::Indexer::Solr::SolrIndexer)
-          expect(indexer.metadata_mapper).to be_a(Stash::Indexer::DataciteGeoblacklight::Mapper)
+          index_config = config.index_config
+          expect(index_config).to be_a(Dash2IndexConfig)
+          expect(index_config.db_config_path).to eq(File.absolute_path('config/database.yml'))
         end
       end
     end
