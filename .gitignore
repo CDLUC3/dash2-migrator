@@ -44,3 +44,5 @@ db/*.sqlite3
 # Secrets
 
 config/database.yml
+config/tenants
+
