@@ -16,4 +16,6 @@ gem 'equivalent-xml', '~> 0.6.0', group: :test
 gem 'rspec', '~> 3.2', group: :test
 gem 'simplecov', '~> 0.9.2', group: :test
 gem 'simplecov-console', '~> 0.2.0', group: :test
+gem 'webmock', '~> 1.24', group: :test
+
 
