@@ -20,7 +20,7 @@ module Dash2
         pages.flat_map do |f|
           f.items
         end.map do |entry|
-          MerrittAtomHarvestedRecord.new(entry)
+          MerrittAtomHarvestedRecord.new(query_uri, entry)
         end
       end
 

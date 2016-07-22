@@ -33,6 +33,8 @@ module Dash2
           expect(a_request(:get, feed_uri)).to have_been_made
         end
 
+        it 'uses basic-auth credentials from the tenant file'
+
         it 'gets all entries' do
           records_array = task.harvest_records.to_a
           expect(records_array.size).to eq(17)
