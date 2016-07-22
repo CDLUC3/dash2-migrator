@@ -16,8 +16,12 @@ module Dash2
       end
 
       def harvest_records
-        feed = RSS::Parser.parse(query_uri, false)
-        enum_for(:pages, query_uri, feed).lazy.flat_map { |f| f.items }
+        pages = enum_for(:pages, query_uri, RSS::Parser.parse(query_uri, false)).lazy
+        pages.flat_map do |f|
+          f.items
+        end.map do |entry|
+          MerrittAtomHarvestedRecord.new(entry)
+        end
       end
 
       private
