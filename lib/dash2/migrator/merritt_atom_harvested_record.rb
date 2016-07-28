@@ -46,7 +46,7 @@ module Dash2
       def parse_mrt_datacite
         bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
         good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
-        datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, regex, good_contrib_replacement)
+        datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, good_contrib_replacement)
 
         resource = Datacite::Mapping::Resource.parse_xml(datacite_xml, mapping: :nonvalidating)
         resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
