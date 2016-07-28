@@ -21,12 +21,21 @@ module Dash2
       def as_wrapper
         @wrapper ||= Stash::Wrapper::StashWrapper.new(
            identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
+           version: Stash::Wrapper::Version.new(number: 1, date: date),
+           license: Stash::Wrapper::License::CC_ZERO,
            descriptive_elements: [datacite_xml]
         )
       end
 
+      private
+
       def doi
         @doi ||= find_doi
+      end
+
+      def date
+        updated = entry.updated
+        updated.content if updated
       end
 
       def mrt_datacite_xml
@@ -40,8 +49,6 @@ module Dash2
       def datacite_xml
         @datacite_xml ||= datacite_resource.save_to_xml
       end
-
-      private
 
       def parse_mrt_datacite
         bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
