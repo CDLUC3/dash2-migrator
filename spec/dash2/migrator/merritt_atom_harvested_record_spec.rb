@@ -5,7 +5,6 @@ require 'webmock/rspec'
 module Dash2
   module Migrator
     describe 'MerrittAtomHarvestedRecord' do
-
       attr_reader :record
       attr_reader :wrapper
 
@@ -42,7 +41,7 @@ module Dash2
 
         it 'extracts the file inventory' do
           pathname = 'A_Zebrafish_Model_for_Studies_on_Esophageal_Epithelial_Biology.PDF'
-          size = 3824823
+          size = 3_824_823
           type = MIME::Type.new('application/pdf')
 
           inventory = wrapper.inventory

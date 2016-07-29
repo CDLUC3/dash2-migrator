@@ -4,7 +4,6 @@ require 'webmock/rspec'
 module Dash2
   module Migrator
     describe MerrittAtomHarvestTask do
-
       attr_reader :feed_uri
       attr_reader :page2_uri
       attr_reader :feed
@@ -71,10 +70,9 @@ module Dash2
             http://n2t.net/ark:/c5146/r3rp4s
           )
 
-          identifiers = records.map {|r| r.identifier }
+          identifiers = records.map(&:identifier)
           expect(identifiers).to eq(expected_identifiers)
         end
-
       end
     end
   end

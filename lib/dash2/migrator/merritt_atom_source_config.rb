@@ -16,10 +16,9 @@ module Dash2
         source_uri
       end
 
-      def create_harvest_task(from_time=nil, until_time=nil)
+      def create_harvest_task(from_time = nil, until_time = nil)
         MerrittAtomHarvestTask.new(config: self, from_time: from_time, until_time: until_time)
       end
-
     end
   end
 end

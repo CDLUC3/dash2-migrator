@@ -4,7 +4,6 @@ require 'stash/harvester'
 module Dash2
   module Migrator
     class MerrittAtomHarvestTask < Stash::Harvester::HarvestTask
-
       def initialize(config:, from_time: nil, until_time: nil)
         super(config: config)
         warn("Ignoring from_time #{from_time}") if from_time
@@ -17,9 +16,7 @@ module Dash2
 
       def harvest_records
         pages = enum_for(:pages, query_uri, RSS::Parser.parse(query_uri, false)).lazy
-        pages.flat_map do |f|
-          f.items
-        end.map do |entry|
+        pages.flat_map(&:items).map do |entry|
           MerrittAtomHarvestedRecord.new(query_uri, entry)
         end
       end
@@ -40,11 +37,10 @@ module Dash2
 
       def links_for(feed)
         %w(self next last).map do |rel|
-          link = feed.links.find {|l| l.rel == rel }
+          link = feed.links.find { |l| l.rel == rel }
           URI(link.href) if link
         end
       end
-
     end
   end
 end

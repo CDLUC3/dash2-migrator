@@ -6,7 +6,6 @@ require 'datacite/mapping'
 module Dash2
   module Migrator
     class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
-
       DOI_PATTERN = %r{10\..+/.+$}
 
       attr_reader :feed_uri
@@ -20,11 +19,11 @@ module Dash2
 
       def as_wrapper
         @wrapper ||= Stash::Wrapper::StashWrapper.new(
-           identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
-           version: Stash::Wrapper::Version.new(number: 1, date: date),
-           license: stash_license,
-           inventory: Stash::Wrapper::Inventory.new(files: stash_files),
-           descriptive_elements: [datacite_xml]
+          identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
+          version: Stash::Wrapper::Version.new(number: 1, date: date),
+          license: stash_license,
+          inventory: Stash::Wrapper::Inventory.new(files: stash_files),
+          descriptive_elements: [datacite_xml]
         )
       end
 
@@ -44,21 +43,11 @@ module Dash2
       end
 
       def datacite_resource
-        @datacite_resource ||= parse_mrt_datacite
+        @datacite_resource ||= Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, doi)
       end
 
       def datacite_xml
         @datacite_xml ||= datacite_resource.save_to_xml
-      end
-
-      def parse_mrt_datacite
-        bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
-        good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
-        datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, good_contrib_replacement)
-
-        resource = Datacite::Mapping::Resource.parse_xml(datacite_xml, mapping: :nonvalidating)
-        resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
-        resource
       end
 
       def find_doi
@@ -103,7 +92,6 @@ module Dash2
         return nil unless uri
         RestClient.get(uri.to_s).body
       end
-
     end
   end
 end

@@ -5,6 +5,7 @@ gem 'rest-client', '2.0.0.rc2'
 
 gem 'stash-wrapper', '~> 0.1', '>= 0.1.10'
 
+gem 'datacite-mapping', path: '../datacite-mapping'
 gem 'stash-harvester', path: '../stash-harvester'
 gem 'stash_engine', path: '../stash_engines/stash_engine'
 gem 'stash_datacite', path: '../stash_engines/stash_datacite'
@@ -20,5 +21,3 @@ gem 'rspec', '~> 3.2', group: :test
 gem 'simplecov', '~> 0.9.2', group: :test
 gem 'simplecov-console', '~> 0.2.0', group: :test
 gem 'webmock', '~> 1.24', group: :test
-
-
