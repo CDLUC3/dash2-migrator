@@ -31,7 +31,6 @@ module Dash2
         it 'extracts the identifier' do
           expect(record.identifier).to eq('http://n2t.net/ark:/c5146/r3rg6g')
         end
-
       end
 
       describe '#stash_wrapper' do
@@ -39,6 +38,23 @@ module Dash2
 
         it 'creates a StashWrapper' do
           expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)
+        end
+
+        it 'extracts the file inventory' do
+          pathname = 'A_Zebrafish_Model_for_Studies_on_Esophageal_Epithelial_Biology.PDF'
+          size = 3824823
+          type = MIME::Type.new('application/pdf')
+
+          inventory = wrapper.inventory
+          expect(inventory).not_to be_nil
+
+          files = inventory.files
+          expect(files.size).to eq(1)
+
+          file = files[0]
+          expect(file.pathname).to eq(pathname)
+          expect(file.size_bytes).to eq(size)
+          expect(file.mime_type).to eq(type)
         end
       end
     end

@@ -23,6 +23,7 @@ module Dash2
            identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
            version: Stash::Wrapper::Version.new(number: 1, date: date),
            license: Stash::Wrapper::License::CC_ZERO,
+           inventory: Stash::Wrapper::Inventory.new(files: stash_files),
            descriptive_elements: [datacite_xml]
         )
       end
@@ -64,6 +65,18 @@ module Dash2
         mrt_mom = content_for('system/mrt-mom.txt')
         match_result = mrt_mom.match(DOI_PATTERN)
         match_result[0]
+      end
+
+      def stash_files
+        @stash_files ||= entry.links.select do |l|
+          title = l.title
+          title && title.start_with?('producer/') && !title.start_with?('producer/mrt-')
+        end.map do |l|
+          pathname = l.title.match(/(?<=\/)(.*)/)[0]
+          size_bytes = l.length.to_i
+          mime_type = l.type
+          Stash::Wrapper::StashFile.new(pathname: pathname, size_bytes: size_bytes, mime_type: mime_type)
+        end
       end
 
       def link_for(title)
