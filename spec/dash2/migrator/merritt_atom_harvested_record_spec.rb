@@ -56,6 +56,10 @@ module Dash2
           expect(file.size_bytes).to eq(size)
           expect(file.mime_type).to eq(type)
         end
+
+        it 'extracts the license' do
+          expect(wrapper.license).to eq(Stash::Wrapper::License::CC_ZERO)
+        end
       end
     end
   end

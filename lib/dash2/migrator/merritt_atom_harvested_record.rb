@@ -22,7 +22,7 @@ module Dash2
         @wrapper ||= Stash::Wrapper::StashWrapper.new(
            identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
            version: Stash::Wrapper::Version.new(number: 1, date: date),
-           license: Stash::Wrapper::License::CC_ZERO,
+           license: stash_license,
            inventory: Stash::Wrapper::Inventory.new(files: stash_files),
            descriptive_elements: [datacite_xml]
         )
@@ -65,6 +65,15 @@ module Dash2
         mrt_mom = content_for('system/mrt-mom.txt')
         match_result = mrt_mom.match(DOI_PATTERN)
         match_result[0]
+      end
+
+      def stash_license
+        rights_list = datacite_resource.rights_list
+        rights = rights_list[0]
+        rights_url = rights.uri.to_s
+        return Stash::Wrapper::License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
+        return Stash::Wrapper::License::CC_BY if rights_url.include?('licenses/by')
+        nil
       end
 
       def stash_files
