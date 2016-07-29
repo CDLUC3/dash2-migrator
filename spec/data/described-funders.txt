@@ -1,0 +1,30 @@
+dataone-ark+=c5146=r3059p-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation, Division of Atmospheric and Geospace Sciences</contributorName></contributor>
+dataone-ark+=c5146=r3201j-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Geographic Society and National Eye Institute, NIH, US.</contributorName></contributor>
+dataone-ark+=c5146=r33w26-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation, Division of Atmospheric and Geospace Sciences</contributorName></contributor>
+dataone-ark+=c5146=r36p4t-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>U.S. Environmental Protection Agency; CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants; CI-Team Grant</contributorName></contributor>
+dataone-ark+=c5146=r39g6f-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation. Office of Cyberinfrastructure</contributorName></contributor>
+dataone-ark+=c5146=r3d59d-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>US Bureau of Reclamation</contributorName></contributor>
+dataone-ark+=c5146=r3f59q-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation. Office of Cyberinfrastructure</contributorName></contributor>
+dataone-ark+=c5146=r3k016-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation. Office of Cyberinfrastructure</contributorName></contributor>
+dataone-ark+=c5146=r3kw2j-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>US Department of Energy</contributorName></contributor>
+dataone-ark+=c5146=r3np4v-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Alexandr Kosenkov</contributorName></contributor>
+ucb-ark+=b6078=d1159q-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation. Division of Behavioral and Cognitive Sciences</contributorName></contributor>
+ucb-ark+=b6078=d1ms3x-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation</contributorName></contributor>
+uci-ark+=b7280=d15k5m-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Institute of Health and National Science Foundation</contributorName></contributor>
+uci-ark+=b7280=d1f30c-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>California Department of Fish and Wildlife</contributorName></contributor>
+uci-ark+=b7280=d1js3b-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation, Schrodinger</contributorName></contributor>
+uci-ark+=b7280=d1pk58-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Institutes of Health. National Institute on Deafness and Other Communication Disorders</contributorName></contributor>
+ucm-ark+=b6071=z7wc73-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation, Division of Earth Sciences, Critical Zone Observatories</contributorName><nameIdentifier nameIdentifierScheme="FundRef" schemeURI="http://data.fundref.org/vocabulary">http://dx.doi.org/10.13039/100000160</nameIdentifier></contributor>
+ucop-ark+=b5060=d8301x-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucop-ark+=b5060=d86p4w-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucop-ark+=b5060=d8bc75-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucop-ark+=b5060=d8g593-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucop-ark+=b5060=d8h59d-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation</contributorName></contributor>
+ucop-ark+=b5060=d8kw2m-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucop-ark+=b5060=d8z59f-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Andrew W. Mellon Foundation</contributorName></contributor>
+ucsc-ark+=b7291=d11592-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Geographic Society</contributorName></contributor>
+ucsc-ark+=b7291=d17p46-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Center for Information Technology Research in the Interest of Society</contributorName></contributor>
+ucsc-ark+=b7291=d1wc74-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Science Foundation. Division of Behavioral and Cognitive Sciences</contributorName></contributor>
+ucsf-ark+=b7272=q6c8276k-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Dept of Veterans Affaits, National Institutes of Health, Western States Affiliate of the American Heart Association</contributorName></contributor>
+ucsf-ark+=b7272=q6ms3qnx-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation. </contributorName></contributor>
+ucsf-ark+=b7272=q6rf5rzx-mrt-datacite.xml	<contributor contributorType="Funder"><contributorName>National Institutes of Health. National Eye Institute</contributorName></contributor>
