@@ -5,7 +5,10 @@ module Datacite
 
     class FundingReference
       def to_description
-        desc_text = "Data were created with funding from the #{name} under grant #{award_number.value}."
+        grant_number = award_number && award_number.value
+        grant_info = " under grant #{grant_number}" if grant_number
+
+        desc_text = "Data were created with funding from #{name}#{grant_info}."
         Description.new(type: DescriptionType::OTHER, value: desc_text)
       end
     end
@@ -23,14 +26,27 @@ module Datacite
       end
 
       def fix_funding!
-        funder_name = self.funder_name
+        funder_contrib = self.funder_contrib
+        return unless funder_contrib
 
-        funding_desc = self.descriptions.find { |desc| desc.type == DescriptionType::OTHER }
-        self.descriptions.delete(funding_desc)
+        funder_name = funder_contrib.name
+        fref = FundingReference.new(name: funder_name)
 
-        fref = FundingReference.new(name: funder_name, award_number: funding_desc.value)
+        funding_desc = self.descriptions.find { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
+        if funding_desc
+          self.descriptions.delete(funding_desc)
+          fref.award_number = funding_desc.value
+        end
+
+        funder_name_id = funder_contrib.identifier
+        if funder_name_id
+          funder_id_scheme = funder_name_id.scheme
+          funder_id_type = FunderIdentifierType.find_by_value_str(funder_id_scheme) || FunderIdentifierType::OTHER
+          funder_id = FunderIdentifier.new(type: funder_id_type, value: funder_name_id.value)
+          fref.identifier = funder_id
+        end
+
         frefs = [fref]
-
         frefs.each do |f|
           self.descriptions << f.to_description
         end

@@ -26,12 +26,27 @@ module Datacite
           expect(others.size).to eq(1)
 
           desc = others[0]
-          expect(desc.value).to eq("Data were created with funding from the #{name} under grant #{award_number}.")
+          expect(desc.value).to eq("Data were created with funding from #{name} under grant #{award_number}.")
         end
 
-        xit 'creates a FundingReference from an OpenAIRE hack' do
+        it 'creates a FundingReference from an identified funder' do
           datacite_xml = File.read('spec/data/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+
+          funding_references = resource.funding_references
+          expect(funding_references.size).to eq(1)
+
+          funding_reference = funding_references[0]
+
+          name = funding_reference.name
+          expect(name).to eq('National Science Foundation, Division of Earth Sciences, Critical Zone Observatories')
+
+          expect(funding_reference.award_number).to be_nil
+
+          id = funding_reference.identifier
+          expect(id).not_to be_nil
+          expect(id.value).to eq('http://dx.doi.org/10.13039/100000160')
+          expect(id.type).to eq(FunderIdentifierType::OTHER)
         end
 
         xit 'creates multiple references for multiple funders' do
