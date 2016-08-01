@@ -49,9 +49,34 @@ module Datacite
           expect(id.type).to eq(FunderIdentifierType::OTHER)
         end
 
-        xit 'creates multiple references for multiple funders' do
-          datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r36p4t-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+        describe 'multiple references for multiple funders' do
+          it 'splits on semicolon' do
+            datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r36p4t-mrt-datacite.xml')
+            resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+
+            expected = {
+                'U.S. Environmental Protection Agency': 'EPA STAR Fellowship 2011',
+                'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants': 'HRD-0734825 and HRD-1242122',
+                'CI-Team Grant': 'OCI-1135525',
+            }
+
+            funding_references = resource.funding_references
+            expect(funding_references.size).to eq(expected.size)
+
+            funding_descriptions = resource.descriptions.select(&:funding?)
+            expect(funding_descriptions.size).to eq(expected.size)
+
+            expected.each_with_index do |name, award_number, index|
+              funding_reference = funding_references[index]
+              expect(funding_reference.name).to eq(name)
+              expect(funding_reference.award_number).to eq(award_number)
+
+              funding_description = funding_descriptions[index]
+              expect(funding_description.value).to eq("Data were created with funding from #{name} under grant #{award_number}.")
+            end
+          end
+
+          it 'handles other delimiters'
         end
 
       end

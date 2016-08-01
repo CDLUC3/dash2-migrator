@@ -14,6 +14,10 @@ module Datacite
     end
 
     class Resource
+      def funder_contribs
+        @funder_contribs ||= contributors.select { |c| c.type == ContributorType::FUNDER }
+      end
+
       def self.parse_mrt_datacite(mrt_datacite_xml, doi)
         bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
         good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
@@ -30,9 +34,10 @@ module Datacite
         return unless funder_contrib
 
         funder_name = funder_contrib.name
+        funding_desc = self.descriptions.find { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
+
         fref = FundingReference.new(name: funder_name)
 
-        funding_desc = self.descriptions.find { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
         if funding_desc
           self.descriptions.delete(funding_desc)
           fref.award_number = funding_desc.value
