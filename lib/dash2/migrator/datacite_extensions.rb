@@ -2,7 +2,6 @@ require 'datacite/mapping'
 
 module Datacite
   module Mapping
-
     class FundingReference
       def to_description
         grant_number = award_number && award_number.value
@@ -18,6 +17,10 @@ module Datacite
         @funder_contribs ||= contributors.select { |c| c.type == ContributorType::FUNDER }
       end
 
+      def funding_descriptions
+        descriptions.select { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
+      end
+
       def self.parse_mrt_datacite(mrt_datacite_xml, doi)
         bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
         good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
@@ -30,33 +33,73 @@ module Datacite
       end
 
       def fix_funding!
-        funder_contrib = self.funder_contrib
-        return unless funder_contrib
+        funder_contribs.zip(funding_descriptions) do |funder_contrib, funding_desc|
+          funder_id = identifier_for(funder_contrib)
 
-        funder_name = funder_contrib.name
-        funding_desc = self.descriptions.find { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
+          funder_contrib_name = funder_contrib.name.strip
+          funding_desc_value = funding_desc.value if funding_desc
 
-        fref = FundingReference.new(name: funder_name)
+          all_names = [funder_contrib_name]
+          all_grants = []
 
-        if funding_desc
-          self.descriptions.delete(funding_desc)
-          fref.award_number = funding_desc.value
+          if funding_desc_value
+            grant_numbers = funding_desc_value.split(';').map(&:strip)
+            funder_names = funder_contrib_name.split(';').map(&:strip)
+            if grant_numbers.size == funder_names.size
+              all_names = funder_names
+              all_grants = grant_numbers
+            else
+              all_grants << funding_desc_value
+            end
+          end
+
+          frefs = all_names.zip(all_grants).map do |funder_name, grant_number|
+            FundingReference.new(name: funder_name, identifier: funder_id, award_number: grant_number)
+          end
+
+          frefs.each do |f|
+            descriptions << f.to_description
+          end
+
+          self.funding_references = frefs
         end
 
+        # funder_contrib = self.funder_contrib
+        # return unless funder_contrib
+        #
+        # funder_name = funder_contrib.name
+        # funding_desc = funding_desc
+        #
+        # fref = FundingReference.new(name: funder_name)
+        #
+        # if funding_desc
+        #   self.descriptions.delete(funding_desc)
+        #   fref.award_number = funding_desc.value
+        # end
+        #
+        # funder_name_id = funder_contrib.identifier
+        # if funder_name_id
+        #   funder_id_scheme = funder_name_id.scheme
+        #   funder_id_type = FunderIdentifierType.find_by_value_str(funder_id_scheme) || FunderIdentifierType::OTHER
+        #   funder_id = FunderIdentifier.new(type: funder_id_type, value: funder_name_id.value)
+        #   fref.identifier = funder_id
+        # end
+        #
+        # frefs = [fref]
+        # frefs.each do |f|
+        #   self.descriptions << f.to_description
+        # end
+        #
+        # self.funding_references = frefs
+      end
+
+      def identifier_for(funder_contrib)
         funder_name_id = funder_contrib.identifier
         if funder_name_id
           funder_id_scheme = funder_name_id.scheme
           funder_id_type = FunderIdentifierType.find_by_value_str(funder_id_scheme) || FunderIdentifierType::OTHER
-          funder_id = FunderIdentifier.new(type: funder_id_type, value: funder_name_id.value)
-          fref.identifier = funder_id
+          FunderIdentifier.new(type: funder_id_type, value: funder_name_id.value)
         end
-
-        frefs = [fref]
-        frefs.each do |f|
-          self.descriptions << f.to_description
-        end
-
-        self.funding_references = frefs
       end
     end
   end

@@ -3,9 +3,7 @@ require 'spec_helper'
 module Datacite
   module Mapping
     describe Resource do
-
       describe '#parse_mrt_datacite' do
-
         it 'fixes bad contributors'
 
         it 'creates a FundingReference from a description' do
@@ -55,21 +53,21 @@ module Datacite
             resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
 
             expected = {
-                'U.S. Environmental Protection Agency': 'EPA STAR Fellowship 2011',
-                'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants': 'HRD-0734825 and HRD-1242122',
-                'CI-Team Grant': 'OCI-1135525',
+              'U.S. Environmental Protection Agency' => 'EPA STAR Fellowship 2011',
+              'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants' => 'HRD-0734825 and HRD-1242122',
+              'CI-Team Grant' => 'OCI-1135525'
             }
 
-            funding_references = resource.funding_references
-            expect(funding_references.size).to eq(expected.size)
+            frefs = resource.funding_references
+            expect(frefs.size).to eq(expected.size)
 
             funding_descriptions = resource.descriptions.select(&:funding?)
             expect(funding_descriptions.size).to eq(expected.size)
 
-            expected.each_with_index do |name, award_number, index|
-              funding_reference = funding_references[index]
+            expected.each_with_index do |(name, award_number), index|
+              funding_reference = frefs[index]
               expect(funding_reference.name).to eq(name)
-              expect(funding_reference.award_number).to eq(award_number)
+              expect(funding_reference.award_number.value).to eq(award_number)
 
               funding_description = funding_descriptions[index]
               expect(funding_description.value).to eq("Data were created with funding from #{name} under grant #{award_number}.")
@@ -79,6 +77,7 @@ module Datacite
           it 'handles other delimiters'
         end
 
+        it 'deletes old grant number descriptions'
       end
 
       # describe 'special cases' do
