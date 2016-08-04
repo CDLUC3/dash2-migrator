@@ -24,7 +24,7 @@ module Datacite
           expect(others.size).to eq(1)
 
           desc = others[0]
-          expect(desc.value).to eq("Data were created with funding from #{name} under grant #{award_number}.")
+          expect(desc.value).to eq("Data were created with funding from the #{name} under grant #{award_number}.")
         end
 
         it 'creates a FundingReference from an identified funder' do
@@ -51,16 +51,22 @@ module Datacite
           it 'splits on semicolon' do
 
             cases = {
-                'dataone-ark+=c5146=r36p4t-mrt-datacite.xml' => {
-                    'U.S. Environmental Protection Agency' => 'EPA STAR Fellowship 2011',
-                    'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants' => 'HRD-0734825 and HRD-1242122',
-                    'CI-Team Grant' => 'OCI-1135525'
-                },
-                'ucsf-ark+=b7272=q6c8276k-mrt-datacite.xml' => {
-                    'Dept of Veterans Affairs' => 'VA BX001970',
-                    'National Institutes of Health' => 'NIH RO1 HL31113',
-                    'Western States Affiliate of the American Heart Association' => nil
-                }
+              'dataone-ark+=c5146=r36p4t-mrt-datacite.xml' => {
+                'U.S. Environmental Protection Agency' => 'EPA STAR Fellowship 2011',
+                'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants' => 'HRD-0734825 and HRD-1242122',
+                'CI-Team Grant' => 'OCI-1135525'
+              },
+              'ucsf-ark+=b7272=q6c8276k-mrt-datacite.xml' => {
+                'Dept of Veterans Affairs' => 'VA BX001970',
+                'National Institutes of Health' => 'NIH RO1 HL31113',
+                'Western States Affiliate of the American Heart Association' => nil
+              },
+              'ucsf-ark+=b7272=q6ms3qnx-mrt-datacite.xml' => [
+                ['Bill & Melinda Gates Foundation', 'OPP1086183'],
+                ['MacArthur Foundation', '05-84956-000-GSS'],
+                ['National Institutes of Health', 'R01HD053129'],
+                ['Bill & Melinda Gates Foundation', '48541']
+              ]
             }
 
             cases.each do |file, expected|

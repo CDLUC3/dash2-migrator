@@ -42,18 +42,22 @@ module Datacite
           all_names.zip(all_grants).each do |funder_name, grant_number|
             award_number = (grant_number == 'nil' ? nil : grant_number)
             fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: award_number)
-            self.funding_references << fref
-            self.descriptions << fref.to_description
+            funding_references << fref
+            descriptions << fref.to_description
           end
         end
       end
 
       def self.fix_special_cases(datacite_xml)
         cases = {
-            Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE) =>
-                "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>",
-            Regexp.new('Affaits, National Institutes of Health,') => 'Affairs; National Institutes of Health;',
-            Regexp.new('NIH RO1 HL31113, VA BX001970') => 'VA BX001970; NIH RO1 HL31113; nil'
+          Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE) =>
+              "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>",
+          'Affaits, National Institutes of Health,' => 'Affairs; National Institutes of Health;',
+          'NIH RO1 HL31113, VA BX001970' => 'VA BX001970; NIH RO1 HL31113; nil',
+          'Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation.' =>
+                'Bill &amp; Melinda Gates Foundation; MacArthur Foundation; National Institutes of Health; Bill &amp; Melinda Gates Foundation',
+          'Current dataset preparation: Bill and Melinda Gates Foundation (OPP1086183). Original data collection: MacArthur Foundation (05-84956-000-GSS), National Institutes of Health (R01HD053129) and Bill and Melinda Gates Foundation (48541).' =>
+                'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541'
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
