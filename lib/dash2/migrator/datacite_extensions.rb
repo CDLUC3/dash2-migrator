@@ -4,11 +4,14 @@ module Datacite
   module Mapping
     class FundingReference
       def to_description
-        grant_number = award_number && award_number.value
         grant_info = grant_number && " under grant #{grant_number}"
 
-        desc_text = "Data were created with funding from #{name}#{grant_info}."
+        desc_text = "Data were created with funding from the #{name}#{grant_info}."
         Description.new(type: DescriptionType::OTHER, value: desc_text)
+      end
+
+      def grant_number
+        award_number && award_number.value
       end
     end
 
@@ -22,9 +25,10 @@ module Datacite
       end
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi)
-        bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
-        good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
-        datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, good_contrib_replacement)
+        # bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
+        # good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
+        # datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, good_contrib_replacement)
+        datacite_xml = fix_special_cases(mrt_datacite_xml)
 
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
         resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
@@ -36,12 +40,27 @@ module Datacite
         funder_contribs.zip(funding_descriptions) do |funder_contrib, funding_desc|
           all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
           all_names.zip(all_grants).each do |funder_name, grant_number|
-            fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: grant_number)
+            award_number = (grant_number == 'nil' ? nil : grant_number)
+            fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: award_number)
             self.funding_references << fref
             self.descriptions << fref.to_description
           end
         end
       end
+
+      def self.fix_special_cases(datacite_xml)
+        cases = {
+            Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE) =>
+                "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>",
+            Regexp.new('Affaits, National Institutes of Health,') => 'Affairs; National Institutes of Health;',
+            Regexp.new('NIH RO1 HL31113, VA BX001970') => 'VA BX001970; NIH RO1 HL31113; nil'
+        }
+        cases.each do |regex, replacement|
+          datacite_xml = datacite_xml.gsub(regex, replacement)
+        end
+        datacite_xml
+      end
+      private_class_method(:fix_special_cases)
 
       private
 

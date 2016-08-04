@@ -49,28 +49,42 @@ module Datacite
 
         describe 'multiple references for multiple funders' do
           it 'splits on semicolon' do
-            datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r36p4t-mrt-datacite.xml')
-            resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
 
-            expected = {
-              'U.S. Environmental Protection Agency' => 'EPA STAR Fellowship 2011',
-              'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants' => 'HRD-0734825 and HRD-1242122',
-              'CI-Team Grant' => 'OCI-1135525'
+            cases = {
+                'dataone-ark+=c5146=r36p4t-mrt-datacite.xml' => {
+                    'U.S. Environmental Protection Agency' => 'EPA STAR Fellowship 2011',
+                    'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants' => 'HRD-0734825 and HRD-1242122',
+                    'CI-Team Grant' => 'OCI-1135525'
+                },
+                'ucsf-ark+=b7272=q6c8276k-mrt-datacite.xml' => {
+                    'Dept of Veterans Affairs' => 'VA BX001970',
+                    'National Institutes of Health' => 'NIH RO1 HL31113',
+                    'Western States Affiliate of the American Heart Association' => nil
+                }
             }
 
-            frefs = resource.funding_references
-            expect(frefs.size).to eq(expected.size)
+            cases.each do |file, expected|
+              datacite_xml = File.read("spec/data/dash1-datacite-xml/#{file}")
+              resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
 
-            funding_descriptions = resource.descriptions.select(&:funding?)
-            expect(funding_descriptions.size).to eq(expected.size)
+              frefs = resource.funding_references
+              expect(frefs.size).to eq(expected.size), "Expected #{frefs} (size #{frefs.size}) to have size #{expected.size}"
 
-            expected.each_with_index do |(name, award_number), index|
-              funding_reference = frefs[index]
-              expect(funding_reference.name).to eq(name)
-              expect(funding_reference.award_number.value).to eq(award_number)
+              funding_descriptions = resource.descriptions.select(&:funding?)
+              expect(funding_descriptions.size).to eq(expected.size)
 
-              funding_description = funding_descriptions[index]
-              expect(funding_description.value).to eq("Data were created with funding from #{name} under grant #{award_number}.")
+              expected.each_with_index do |(name, award_number), index|
+                funding_reference = frefs[index]
+                expect(funding_reference.name).to eq(name)
+                expect(funding_reference.grant_number).to eq(award_number)
+
+                funding_description = funding_descriptions[index]
+                if award_number
+                  expect(funding_description.value).to eq("Data were created with funding from the #{name} under grant #{award_number}.")
+                else
+                  expect(funding_description.value).to eq("Data were created with funding from the #{name}.")
+                end
+              end
             end
           end
 
