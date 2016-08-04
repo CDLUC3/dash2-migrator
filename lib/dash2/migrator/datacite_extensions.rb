@@ -4,9 +4,18 @@ module Datacite
   module Mapping
     class FundingReference
       def to_description
-        grant_info = grant_number && " under grant #{grant_number}"
+        grant_info = grant_number &&
+                     if grant_number.include?('and')
+                       " under grants #{grant_number}"
+                     elsif grant_number.downcase.include?('grant') || grant_number.downcase.include?('agreement')
+                       " under #{grant_number}"
+                     else
+                       " under grant #{grant_number}"
+                     end
 
-        desc_text = "Data were created with funding from the #{name}#{grant_info}."
+        article = 'the ' unless name.downcase.start_with?('the') || name.start_with?('Alexandr Kosenkov')
+
+        desc_text = "Data were created with funding from #{article}#{name}#{grant_info}."
         Description.new(type: DescriptionType::OTHER, value: desc_text)
       end
 
@@ -41,13 +50,18 @@ module Datacite
           descriptions.delete(funding_desc)
           all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
           all_names.zip(all_grants).each do |funder_name, grant_number|
-            award_number = (grant_number && grant_number != 'nil' && grant_number !~ /^\s*$/) ? grant_number.strip : nil
+            award_number = grant_number && grant_number != 'nil' && grant_number !~ /^\s*$/ ? grant_number : nil
             fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: award_number)
             funding_references << fref
             descriptions << fref.to_description
           end
         end
       end
+
+      # <!-- ____________________________________________________________ -->
+      # <!-- uci-ark+=b7280=d15k5m-mrt-datacite.xml -->
+      # <fundingReference><funderName>National Institutes of Health and National Science Foundation</funderName><awardNumber>1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF)</awardNumber></fundingReference>
+      # <description descriptionType='Other' xml:lang='en'>Data were created with funding from the National Institutes of Health and National Science Foundation under grants 1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF).</description>
 
       def self.fix_special_cases(datacite_xml)
         cases = {
@@ -59,7 +73,19 @@ module Datacite
                 'Bill &amp; Melinda Gates Foundation; MacArthur Foundation; National Institutes of Health; Bill &amp; Melinda Gates Foundation',
           'Current dataset preparation: Bill and Melinda Gates Foundation (OPP1086183). Original data collection: MacArthur Foundation (05-84956-000-GSS), National Institutes of Health (R01HD053129) and Bill and Melinda Gates Foundation (48541).' =>
                 'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541',
-          '<description descriptionType="Other"/>' => ''
+          'National Institute of Health' => 'National Institutes of Health',
+          'National Geographic Society and National Eye Institute, NIH, US.' =>
+                'National Geographic Society; National Institutes of Health, National Eye Institute',
+          'NGS W104-10 and NIH EY022087' => 'NGS W104-10; NIH EY022087',
+          'National Institutes of Health and National Science Foundation' => 'National Institutes of Health; National Science Foundation',
+          '1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF)' => '1R01GM108889-01; CHE 1352608 and CHE-0840513',
+          'National Science Foundation. Office' => 'National Science Foundation, Office',
+          'National Science Foundation. Division' => 'National Science Foundation, Division',
+          'National Institutes of Health. National' => 'National Institutes of Health, National',
+          '. Select a sub-organization' => '',
+          'US Bureau of Reclamation Cooperative Agreement' => 'Cooperative Agreement',
+          '<description descriptionType="Other"/>' => '',
+          '<description descriptionType="Other">0</description>' => ''
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
@@ -75,7 +101,9 @@ module Datacite
         funding_desc_value = funding_desc && funding_desc.value
         return [[funder_contrib_name], []] unless funding_desc_value
 
-        grant_numbers = funding_desc_value.split(';').map(&:strip)
+        grant_numbers = funding_desc_value.split(';').map do |s|
+          s.strip.chomp(',')
+        end
         funder_names = funder_contrib_name.split(';').map(&:strip)
         if grant_numbers.size == funder_names.size
           [funder_names, grant_numbers]
