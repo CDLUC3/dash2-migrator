@@ -26,7 +26,7 @@ module Datacite
 
     class Resource
       def funder_contribs
-        @funder_contribs ||= contributors.select { |c| c.type == ContributorType::FUNDER }
+        contributors.select { |c| c.type == ContributorType::FUNDER }
       end
 
       def funding_descriptions
@@ -41,12 +41,14 @@ module Datacite
 
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
         resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
-        resource.fix_funding!
+        resource.convert_funding!
         resource
       end
 
-      def fix_funding!
+      # Converts deprecated funder contributors to FundingReferences
+      def convert_funding!
         funder_contribs.zip(funding_descriptions) do |funder_contrib, funding_desc|
+          contributors.delete(funder_contrib)
           descriptions.delete(funding_desc)
           all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
           all_names.zip(all_grants).each do |funder_name, grant_number|

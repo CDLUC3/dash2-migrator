@@ -87,7 +87,11 @@ module Datacite
 
                 funding_description = funding_descriptions[index]
                 if award_number
-                  expect(funding_description.value).to eq("Data were created with funding from the #{name} under grant #{award_number}.")
+                  if award_number.include?('and')
+                    expect(funding_description.value).to eq("Data were created with funding from the #{name} under grants #{award_number}.")
+                  else
+                    expect(funding_description.value).to eq("Data were created with funding from the #{name} under grant #{award_number}.")
+                  end
                 else
                   expect(funding_description.value).to eq("Data were created with funding from the #{name}.")
                 end
@@ -105,6 +109,9 @@ module Datacite
 
             fdescs = resource.funding_descriptions
             expect(fdescs.size).to eq(frefs.size)
+
+            funder_contribs = resource.funder_contribs
+            expect(funder_contribs).to be_empty, "Expected no funder contributors for #{file.strip}, but got: #{funder_contribs}"
 
             # frefs.zip(fdescs) do |fref, fdesc|
             #   puts '<!-- ____________________________________________________________ -->'
@@ -127,14 +134,9 @@ module Datacite
             expect(fdescs).to be_empty, "Expected no funding descriptions for #{file.strip}, but got: #{fdescs}"
           end
         end
-
-        it 'deletes old grant number descriptions'
-
-        it 'deletes old funders'
-
       end
 
-      describe 'rights and funding' do
+      describe 'rights' do
         it 'handles missing rights information for UCSF'
         it 'handles missing rights information for UC Merced'
         xit 'handles oddball rights information' do
@@ -144,14 +146,6 @@ module Datacite
         it 'handles ucm-ark+=b6071=z7wc73-mrt-datacite.xml'
       end
 
-      describe 'all documents' do
-        xit 'parses them correctly' do
-          Dir.glob('spec/data/dash1-datacite-xml') do |f|
-            datacite_xml = File.read(f)
-            resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
-          end
-        end
-      end
     end
   end
 end
