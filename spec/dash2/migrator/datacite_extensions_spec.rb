@@ -97,7 +97,6 @@ module Datacite
         end
 
         it 'parses all funder contributors' do
-          puts '<all>'
           File.readlines('spec/data/funded-datasets.txt').each do |file|
             datacite_xml = File.read("spec/data/dash1-datacite-xml/#{file.strip}")
             resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
@@ -107,15 +106,14 @@ module Datacite
             fdescs = resource.funding_descriptions
             expect(fdescs.size).to eq(frefs.size)
 
-            frefs.zip(fdescs) do |fref, fdesc|
-              puts '<!-- ____________________________________________________________ -->'
-              puts "<!-- #{file.strip} -->"
-              puts fref.save_to_xml
-              puts fdesc.save_to_xml
-              puts
-            end
+            # frefs.zip(fdescs) do |fref, fdesc|
+            #   puts '<!-- ____________________________________________________________ -->'
+            #   puts "<!-- #{file.strip} -->"
+            #   puts fref.save_to_xml
+            #   puts fdesc.save_to_xml
+            #   puts
+            # end
           end
-          puts '</all>'
         end
 
         it 'doesn\'t add funding references to datasets without funder contributors' do
