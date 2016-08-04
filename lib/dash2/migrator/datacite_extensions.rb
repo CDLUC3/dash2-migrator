@@ -38,9 +38,10 @@ module Datacite
 
       def fix_funding!
         funder_contribs.zip(funding_descriptions) do |funder_contrib, funding_desc|
+          descriptions.delete(funding_desc)
           all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
           all_names.zip(all_grants).each do |funder_name, grant_number|
-            award_number = (grant_number == 'nil' ? nil : grant_number)
+            award_number = (grant_number && grant_number != 'nil' && grant_number !~ /^\s*$/) ? grant_number.strip : nil
             fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: award_number)
             funding_references << fref
             descriptions << fref.to_description
@@ -57,7 +58,8 @@ module Datacite
           'Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation.' =>
                 'Bill &amp; Melinda Gates Foundation; MacArthur Foundation; National Institutes of Health; Bill &amp; Melinda Gates Foundation',
           'Current dataset preparation: Bill and Melinda Gates Foundation (OPP1086183). Original data collection: MacArthur Foundation (05-84956-000-GSS), National Institutes of Health (R01HD053129) and Bill and Melinda Gates Foundation (48541).' =>
-                'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541'
+                'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541',
+          '<description descriptionType="Other"/>' => ''
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
