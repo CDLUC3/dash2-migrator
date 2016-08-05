@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 gem 'nokogiri', '1.6.7.2'
 gem 'rest-client', '2.0.0.rc2'
 
-gem 'stash-wrapper', '~> 0.1', '>= 0.1.10'
+gem 'stash-wrapper', '~> 0.1', '>= 0.1.11.1'
+gem 'datacite-mapping', '~> 0.1', '>= 0.1.17.1'
 
-gem 'datacite-mapping', path: '../datacite-mapping'
 gem 'stash-harvester', path: '../stash-harvester'
 gem 'stash_engine', path: '../stash_engines/stash_engine'
 gem 'stash_datacite', path: '../stash_engines/stash_datacite'
