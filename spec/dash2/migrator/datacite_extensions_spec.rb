@@ -146,31 +146,48 @@ module Datacite
         it 'handles ucm-ark+=b6071=z7wc73-mrt-datacite.xml'
 
         it 'handles rights for all files' do
-          
-          cc0_uri = Stash::Wrapper::License::CC_ZERO.uri
-          cc0_value = Stash::Wrapper::License::CC_ZERO.name
+          expected = {}
+          File.readlines('spec/data/all-cc-zero.txt').each do |f|
+            expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::CC_ZERO
+          end
+          File.readlines('spec/data/all-cc-by.txt').map do |f|
+            expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::CC_BY
+          end
 
-          cc_by_uri = Stash::Wrapper::License::CC_BY.uri
-          cc_by_value = Stash::Wrapper::License::CC_BY.name
+          missing = File.readlines('spec/data/all-missing.txt').map do |f|
+            "spec/data/dash1-datacite-xml/#{f.strip}"
+          end
 
           aggregate_failures 'all files' do
             Dir.glob('spec/data/dash1-datacite-xml/*.xml').sort.each do |f|
+
               datacite_xml = File.read(f)
               resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
 
               rights_list = resource.rights_list
               expect(rights_list).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
+
+              if missing.include?(f)
+                expect(rights_list).to be_empty, "Expected #{f} to have no rights information, but got #{rights_list}"
+                next
+              end
+
               expect(rights_list.size).to eq(1), "Expected #{f} to have 1 <rights/> tag, but found #{rights_list.size}"
 
               rights = rights_list[0]
               expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
+              next unless rights
+
               expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
               expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
 
-              expected_uri = cc0_uri
-              expected_value = cc0_value
-              expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI #{expected_uri}, but got #{rights.uri}"
-              expect(rights.value).to eq(expected_value), "Expected #{f} to rights value #{expected_value}, but got #{rights.value}"
+              expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
+              next unless expected[f]
+
+              expected_uri = expected[f].uri
+              expected_value = expected[f].value
+              expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI [#{expected_uri}], but got [#{rights.uri}]"
+              expect(rights.value).to eq(expected_value), "Expected #{f} to have rights value '#{expected_value}', but got '#{rights.value}'"
             end
           end
         end

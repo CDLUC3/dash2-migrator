@@ -87,7 +87,14 @@ module Datacite
           '. Select a sub-organization' => '',
           'US Bureau of Reclamation Cooperative Agreement' => 'Cooperative Agreement',
           '<description descriptionType="Other"/>' => '',
-          '<description descriptionType="Other">0</description>' => ''
+          '<description descriptionType="Other">0</description>' => '',
+          'rightsURI="http:' => 'rightsURI="https:',
+          'https://creativecommons.org/about/cc0' => Rights::CC_ZERO.uri.to_s,
+          'These data are covered by a Creative Commons CC0 license.' => Rights::CC_ZERO.value,
+          'Creative Commons Public Domain Dedication (CC0)' => Rights::CC_ZERO.value,
+          'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
+          'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
+          '<rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>' => ''
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
