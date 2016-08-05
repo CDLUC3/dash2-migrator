@@ -146,7 +146,13 @@ module Datacite
         it 'handles ucm-ark+=b6071=z7wc73-mrt-datacite.xml'
 
         it 'handles rights for all files' do
-          expected = {}
+          expected = {
+              'spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' =>
+                  Rights.new(
+                      uri: URI('DUA_formal_BMJopen_female%20condomt.docx'),
+                      value:'Terms of Use for these data are outlined in the associated Data Use Agreement'
+                  )
+          }
           File.readlines('spec/data/all-cc-zero.txt').each do |f|
             expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::CC_ZERO
           end
@@ -169,25 +175,21 @@ module Datacite
 
               if missing.include?(f)
                 expect(rights_list).to be_empty, "Expected #{f} to have no rights information, but got #{rights_list}"
-                next
+              else
+                expect(rights_list.size).to eq(1), "Expected #{f} to have 1 <rights/> tag, but found #{rights_list.size}"
+                rights = rights_list[0]
+                expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
+                next unless rights # TODO: Remove once we disaggregate failures
+                expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
+                expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
+
+                expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
+                next unless expected[f] # TODO: Remove once we disaggregate failures
+                expected_uri = expected[f].uri
+                expected_value = expected[f].value
+                expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI [#{expected_uri}], but got [#{rights.uri}]"
+                expect(rights.value).to eq(expected_value), "Expected #{f} to have rights value '#{expected_value}', but got '#{rights.value}'"
               end
-
-              expect(rights_list.size).to eq(1), "Expected #{f} to have 1 <rights/> tag, but found #{rights_list.size}"
-
-              rights = rights_list[0]
-              expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
-              next unless rights
-
-              expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
-              expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
-
-              expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
-              next unless expected[f]
-
-              expected_uri = expected[f].uri
-              expected_value = expected[f].value
-              expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI [#{expected_uri}], but got [#{rights.uri}]"
-              expect(rights.value).to eq(expected_value), "Expected #{f} to have rights value '#{expected_value}', but got '#{rights.value}'"
             end
           end
         end

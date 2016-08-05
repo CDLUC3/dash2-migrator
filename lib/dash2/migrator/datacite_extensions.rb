@@ -94,7 +94,8 @@ module Datacite
           'Creative Commons Public Domain Dedication (CC0)' => Rights::CC_ZERO.value,
           'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
           'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
-          '<rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>' => ''
+          '<rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>' => '',
+          '<rights>Terms of Use for these data' => '<rights rightsURI="DUA_formal_BMJopen_female%20condomt.docx">Terms of Use for these data'
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
