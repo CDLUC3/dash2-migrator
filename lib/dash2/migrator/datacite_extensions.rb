@@ -8,7 +8,7 @@ module Datacite
       UCSF_DUA = Rights.new(
           uri: URI('https://datashare.ucsf.edu/xtf/search?smode=dataUseAgreementUCSF'),
           value: 'UCSF Datashare Data Use Agreement'
-      ),
+      )
       # TODO: get real URL
       UCSF_FEB_13 = Rights.new(
           uri:  URI('https://merritt.cdlib.org/d/ark%3A%2Fb7272%2Fq6bg2kwf/6/producer%2FDUA_formal_BMJopen_female%20condomt.docx'),
@@ -48,9 +48,6 @@ module Datacite
       end
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi)
-        # bad_contrib_regex = Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE)
-        # good_contrib_replacement = "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>"
-        # datacite_xml = mrt_datacite_xml.gsub(bad_contrib_regex, good_contrib_replacement)
         datacite_xml = fix_special_cases(mrt_datacite_xml)
 
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
@@ -58,6 +55,7 @@ module Datacite
           resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
         end
         resource.convert_funding!
+        resource.inject_rights!
         resource
       end
 
@@ -73,6 +71,15 @@ module Datacite
             funding_references << fref
             descriptions << fref.to_description
           end
+        end
+      end
+
+      def inject_rights!
+        return if rights_list && !rights_list.empty?
+        if publisher == 'University of California, San Francisco'
+          self.rights_list = [Rights::UCSF_DUA]
+        elsif identifier && identifier.value == '10.6071/H8RN35SM'
+          self.rights_list = [Rights::CC_BY]
         end
       end
 
@@ -106,7 +113,8 @@ module Datacite
           'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
           'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
           '<rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>' => '',
-          '<rights>Terms of Use for these data' => '<rights rightsURI="DUA_formal_BMJopen_female%20condomt.docx">Terms of Use for these data'
+          '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
+              "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>"
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)

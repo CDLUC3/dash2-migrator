@@ -17,5 +17,3 @@ dataone-ark+=c5146=r3pp45-mrt-datacite.xml
 dataone-ark+=c5146=r3rp4s-mrt-datacite.xml
 dataone-ark+=c5146=r3tg63-mrt-datacite.xml
 ucla-ark+=b5068=d1wc7k-mrt-datacite.xml
-ucsf-ark+=b7272=q6cc0xmh-mrt-datacite.xml
-ucm-ark+=13030=m51g217t-mrt-datacite.xml

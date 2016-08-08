@@ -156,12 +156,28 @@ module Datacite
       end
 
       describe 'rights' do
-        it 'handles missing rights information for UCSF'
-        it 'handles missing rights information for UC Merced'
-        xit 'handles oddball rights information' do
-          # ucla-ark+=b5060=d2qr4v2t-mrt-datacite.xml <rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>
-          # ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml:<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>
+
+        it 'handles ucla-ark+=b5060=d2qr4v2t-mrt-datacite.xml'
+
+        it 'handles ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' do
+          datacite_xml = File.read('spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml')
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          rights_list = resource.rights_list
+          expect(rights_list).to be_an(Array)
+          expect(rights_list.size).to eq(1)
+          expect(rights_list[0].uri).to eq(Rights::UCSF_FEB_13.uri)
+          expect(rights_list[0].value).to eq(Rights::UCSF_FEB_13.value)
         end
+
+        it 'handles ucsf-ark+=b7272=q6057cv6-mrt-datacite.xml' do
+          datacite_xml = File.read('spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6057cv6-mrt-datacite.xml')
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          rights_list = resource.rights_list
+          expect(rights_list).to be_an(Array)
+          expect(rights_list.size).to eq(1)
+          expect(rights_list[0]).to eq(Rights::UCSF_DUA)
+        end
+
         it 'handles ucm-ark+=b6071=z7wc73-mrt-datacite.xml'
 
         it 'handles rights for all files' do
@@ -169,7 +185,7 @@ module Datacite
               'spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' =>
                   Rights::UCSF_FEB_13,
               'spec/data/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml' =>
-                  Rights::CC_BY # TODO: is this right?
+                  Rights::CC_BY
           }
 
           File.readlines('spec/data/all-ucsf-dua.txt').each do |f|
@@ -202,6 +218,8 @@ module Datacite
                 rights = rights_list[0]
                 expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
                 next unless rights # TODO: Remove once we disaggregate failures
+
+                expect(rights).to be_a(Rights), "Expected #{f} to have Rights, but found #{rights}"
                 expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
                 expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
 
