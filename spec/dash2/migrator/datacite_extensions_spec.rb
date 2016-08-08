@@ -4,7 +4,23 @@ module Datacite
   module Mapping
     describe Resource do
       describe '#parse_mrt_datacite' do
-        it 'fixes bad contributors'
+        it 'fixes bad contributors' do
+          datacite_xml = File.read('spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml')
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+
+          contribs = resource.contributors
+          expect(contribs.size).to eq(4)
+
+          expected_names = [
+              'UCSF Bixby Center for Global Reproductive Health',
+              'Ibis Reproductive Health',
+              "UZ-UCSF Collaborative Programme on Women's Health",
+              'South African Medical Research Council HIV Prevention Research Unit'
+          ]
+          contribs.each_with_index do |c, i|
+            expect(c.name).to eq(expected_names[i])
+          end
+        end
 
         it 'injects missing DOIs' do
           datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r3g591-mrt-datacite.xml')
@@ -175,8 +191,6 @@ module Datacite
           expect(rights_list.size).to eq(1)
           expect(rights_list[0]).to eq(Rights::UCSF_DUA)
         end
-
-        it 'handles ucm-ark+=b6071=z7wc73-mrt-datacite.xml'
 
         it 'handles rights for all files' do
           expected = {
