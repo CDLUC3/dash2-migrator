@@ -54,7 +54,9 @@ module Datacite
         datacite_xml = fix_special_cases(mrt_datacite_xml)
 
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
-        resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
+        unless resource.identifier && resource.identifier.value
+          resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
+        end
         resource.convert_funding!
         resource
       end

@@ -6,6 +6,25 @@ module Datacite
       describe '#parse_mrt_datacite' do
         it 'fixes bad contributors'
 
+        it 'injects missing DOIs' do
+          datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r3g591-mrt-datacite.xml')
+          injected_value = '10.123/456'
+          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          identifier = resource.identifier
+          expect(identifier).not_to be_nil
+          expect(identifier.identifier_type).to eq('DOI')
+          expect(identifier.value).to eq(injected_value)
+        end
+
+        it 'preserves existing DOIs' do
+          datacite_xml = File.read('spec/data/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml')
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          identifier = resource.identifier
+          expect(identifier).not_to be_nil
+          expect(identifier.identifier_type).to eq('DOI')
+          expect(identifier.value).to eq('10.6071/H8RN35SM')
+        end
+
         it 'creates a FundingReference from a description' do
           datacite_xml = File.read('spec/data/dash1-datacite-xml/dataone-ark+=c5146=r3059p-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
