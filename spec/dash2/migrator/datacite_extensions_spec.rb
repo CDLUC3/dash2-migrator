@@ -148,11 +148,14 @@ module Datacite
         it 'handles rights for all files' do
           expected = {
               'spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' =>
-                  Rights.new(
-                      uri: URI('DUA_formal_BMJopen_female%20condomt.docx'),
-                      value:'Terms of Use for these data are outlined in the associated Data Use Agreement'
-                  )
+                  Rights::UCSF_FEB_13,
+              'spec/data/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml' =>
+                  Rights::CC_BY # TODO: is this right?
           }
+
+          File.readlines('spec/data/all-ucsf-dua.txt').each do |f|
+            expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::UCSF_DUA
+          end
           File.readlines('spec/data/all-cc-zero.txt').each do |f|
             expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::CC_ZERO
           end
@@ -193,6 +196,9 @@ module Datacite
             end
           end
         end
+
+        it 'uses real URLs for UCSF DUAs'
+
       end
 
     end
