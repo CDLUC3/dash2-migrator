@@ -6,13 +6,13 @@ module Datacite
     class Rights
       # TODO: get real URL
       UCSF_DUA = Rights.new(
-          uri: URI('https://datashare.ucsf.edu/xtf/search?smode=dataUseAgreementUCSF'),
-          value: 'UCSF Datashare Data Use Agreement'
+        uri: URI('https://datashare.ucsf.edu/xtf/search?smode=dataUseAgreementUCSF'),
+        value: 'UCSF Datashare Data Use Agreement'
       )
       # TODO: get real URL
       UCSF_FEB_13 = Rights.new(
-          uri:  URI('https://merritt.cdlib.org/d/ark%3A%2Fb7272%2Fq6bg2kwf/6/producer%2FDUA_formal_BMJopen_female%20condomt.docx'),
-          value: 'custom Data Use Agreement'
+        uri:  URI('https://merritt.cdlib.org/d/ark%3A%2Fb7272%2Fq6bg2kwf/6/producer%2FDUA_formal_BMJopen_female%20condomt.docx'),
+        value: 'custom Data Use Agreement'
       )
     end
 
@@ -112,7 +112,6 @@ module Datacite
           'Creative Commons Public Domain Dedication (CC0)' => Rights::CC_ZERO.value,
           'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
           'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
-          '<rights>RatSCIA materials are free. In order to download the RatSCIA materials, please provide name, affiliation and email address when prompted. Information is gathered for tracking/funding purposes only.</rights>' => '',
           '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
               "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>"
         }

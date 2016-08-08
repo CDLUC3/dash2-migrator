@@ -143,7 +143,7 @@ module Datacite
         end
 
         it 'doesn\'t add funding references to datasets without funder contributors' do
-          File.readlines('spec/data/unfunded-datasets.txt').each do |file|
+          File.readlines('spec/data/all-no-funding.txt').each do |file|
             datacite_xml = File.read("spec/data/dash1-datacite-xml/#{file.strip}")
             resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
             frefs = resource.funding_references
@@ -156,8 +156,6 @@ module Datacite
       end
 
       describe 'rights' do
-
-        it 'handles ucla-ark+=b5060=d2qr4v2t-mrt-datacite.xml'
 
         it 'handles ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' do
           datacite_xml = File.read('spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml')
@@ -182,9 +180,9 @@ module Datacite
 
         it 'handles rights for all files' do
           expected = {
-              'spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' =>
-                  Rights::UCSF_FEB_13,
-              'spec/data/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml' =>
+            'spec/data/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' =>
+                Rights::UCSF_FEB_13,
+            'spec/data/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml' =>
                   Rights::CC_BY
           }
 
@@ -198,10 +196,6 @@ module Datacite
             expected["spec/data/dash1-datacite-xml/#{f.strip}"] = Rights::CC_BY
           end
 
-          missing = File.readlines('spec/data/all-missing.txt').map do |f|
-            "spec/data/dash1-datacite-xml/#{f.strip}"
-          end
-
           aggregate_failures 'all files' do
             Dir.glob('spec/data/dash1-datacite-xml/*.xml').sort.each do |f|
 
@@ -211,25 +205,21 @@ module Datacite
               rights_list = resource.rights_list
               expect(rights_list).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
 
-              if missing.include?(f)
-                expect(rights_list).to be_empty, "Expected #{f} to have no rights information, but got #{rights_list}"
-              else
-                expect(rights_list.size).to eq(1), "Expected #{f} to have 1 <rights/> tag, but found #{rights_list.size}"
-                rights = rights_list[0]
-                expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
-                next unless rights # TODO: Remove once we disaggregate failures
+              expect(rights_list.size).to eq(1), "Expected #{f} to have 1 <rights/> tag, but found #{rights_list.size}"
+              rights = rights_list[0]
+              expect(rights).not_to be_nil, "Expected #{f} to have rights information, but it didn't"
+              next unless rights # TODO: Remove once we disaggregate failures
 
-                expect(rights).to be_a(Rights), "Expected #{f} to have Rights, but found #{rights}"
-                expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
-                expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
+              expect(rights).to be_a(Rights), "Expected #{f} to have Rights, but found #{rights}"
+              expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
+              expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
 
-                expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
-                next unless expected[f] # TODO: Remove once we disaggregate failures
-                expected_uri = expected[f].uri
-                expected_value = expected[f].value
-                expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI [#{expected_uri}], but got [#{rights.uri}]"
-                expect(rights.value).to eq(expected_value), "Expected #{f} to have rights value '#{expected_value}', but got '#{rights.value}'"
-              end
+              expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
+              next unless expected[f] # TODO: Remove once we disaggregate failures
+              expected_uri = expected[f].uri
+              expected_value = expected[f].value
+              expect(rights.uri).to eq(expected_uri), "Expected #{f} to have rights URI [#{expected_uri}], but got [#{rights.uri}]"
+              expect(rights.value).to eq(expected_value), "Expected #{f} to have rights value '#{expected_value}', but got '#{rights.value}'"
             end
           end
         end

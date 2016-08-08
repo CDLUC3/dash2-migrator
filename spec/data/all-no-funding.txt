@@ -23,7 +23,6 @@ uci-ark+=b7280=d1sg6j-mrt-datacite.xml
 uci-ark+=b7280=d1t88j-mrt-datacite.xml
 uci-ark+=b7280=d1w885-mrt-datacite.xml
 uci-ark+=b7280=d1x59t-mrt-datacite.xml
-ucla-ark+=b5060=d2qr4v2t-mrt-datacite.xml
 ucla-ark+=b5068=d1h59v-mrt-datacite.xml
 ucla-ark+=b5068=d1rp49-mrt-datacite.xml
 ucla-ark+=b5068=d1wc7k-mrt-datacite.xml
