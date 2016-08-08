@@ -2,6 +2,20 @@ require 'datacite/mapping'
 
 module Datacite
   module Mapping
+
+    class Rights
+      # TODO: get real URL
+      UCSF_DUA = Rights.new(
+          uri: URI('https://datashare.ucsf.edu/xtf/search?smode=dataUseAgreementUCSF'),
+          value: 'UCSF Datashare Data Use Agreement'
+      ),
+      # TODO: get real URL
+      UCSF_FEB_13 = Rights.new(
+          uri:  URI('https://merritt.cdlib.org/d/ark%3A%2Fb7272%2Fq6bg2kwf/6/producer%2FDUA_formal_BMJopen_female%20condomt.docx'),
+          value: 'custom Data Use Agreement'
+      )
+    end
+
     class FundingReference
       def to_description
         grant_info = grant_number &&
@@ -59,11 +73,6 @@ module Datacite
           end
         end
       end
-
-      # <!-- ____________________________________________________________ -->
-      # <!-- uci-ark+=b7280=d15k5m-mrt-datacite.xml -->
-      # <fundingReference><funderName>National Institutes of Health and National Science Foundation</funderName><awardNumber>1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF)</awardNumber></fundingReference>
-      # <description descriptionType='Other' xml:lang='en'>Data were created with funding from the National Institutes of Health and National Science Foundation under grants 1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF).</description>
 
       def self.fix_special_cases(datacite_xml)
         cases = {
