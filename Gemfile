@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'nokogiri', '1.6.7.2'
 gem 'rest-client', '2.0.0.rc2'
+gem 'mysql2', '~> 0.3'
 
 gem 'config-factory', '~> 0.0', '>= 0.0.9'
 gem 'datacite-mapping', '~> 0.1', '>= 0.1.17.1'
@@ -12,6 +13,7 @@ gem 'simple-rss', '~> 1.3'
 gem 'stash-harvester', path: '../stash-harvester'
 gem 'stash_engine', path: '../stash_engines/stash_engine'
 gem 'stash_datacite', path: '../stash_engines/stash_datacite'
+gem 'stash_ezid_datacite', :git => 'https://github.com/CDLUC3/stash_ezid_datacite.git'
 
 # Development
 

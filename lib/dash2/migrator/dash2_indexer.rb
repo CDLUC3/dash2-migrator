@@ -1,7 +1,31 @@
 require 'stash/indexer'
+require 'active_record'
 
 module Dash2
   module Migrator
+
+    # ###################################################
+    # Require hacks
+
+    ::LICENSES = YAML.load_file('config/licenses.yml')
+
+    def self.gem_path(gem)
+      Gem::Specification.find_by_name(gem).gem_dir
+    end
+
+    %w(stash_engine stash_datacite).each do |gem|
+      require gem
+
+      if 'stash_datacite' == gem
+        StashDatacite.class_variable_set(:@@resource_class, 'StashEngine::Resource')
+      end
+
+      model_path = "#{gem_path(gem)}/app/models/#{gem}"
+      Dir.glob("#{model_path}/*.rb").sort.each(&method(:require))
+    end
+
+    # ###################################################
+
     # "Indexes" recorsd by writing them into the stash_engine / stash_datacite database
     class Dash2Indexer < Stash::Indexer::Indexer
       # Creates a new {Dash2Indexer}
@@ -11,26 +35,19 @@ module Dash2
         super(metadata_mapper: metadata_mapper)
         @db_config_path = db_config_path
       end
-    end
 
-    # Configuration for a {Dash2Indexer}
-    class Dash2IndexConfig < Stash::Indexer::IndexConfig
-      adapter 'Dash2'
-
-      # Creates a new {Dash2IndexConfig}
-      # @param metadata_mapper [Stash::Indexer::MetadataMapper] the metadata mapper
-      # @param db_config_path [String] the path to the database configuration file
-      def initialize(db_config_path:)
-        super(url: URI.join('file:///', File.absolute_path(db_config_path)))
+      def index(harvested_records)
+        harvested_records.each do |hr|
+          hr.each do |r|
+            index_record(r.as_wrapper)
+          end
+        end
       end
 
-      def db_config_path
-        uri.path
+      def index_record(stash_wrapper)
+
       end
 
-      def create_indexer(metadata_mapper)
-        Dash2Indexer.new(metadata_mapper: metadata_mapper, db_config_path: db_config_path)
-      end
     end
   end
 end

@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-require 'stash/config'
-require 'ar_persistence_config'
-
 module Dash2
   module Migrator
     describe Config do
