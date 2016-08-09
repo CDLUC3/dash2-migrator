@@ -3,6 +3,7 @@ require 'stash/harvester'
 
 module Dash2
   module Migrator
+
     class MerrittAtomHarvestTask < Stash::Harvester::HarvestTask
       def initialize(config:, from_time: nil, until_time: nil)
         super(config: config)
@@ -15,13 +16,21 @@ module Dash2
       end
 
       def harvest_records
-        pages = enum_for(:pages, query_uri, RSS::Parser.parse(query_uri, false)).lazy
+        # options = {username: config.username, password: config.password}
+        pages = enum_for(:pages, query_uri, parse_rss(query_uri)).lazy
         pages.flat_map(&:items).map do |entry|
           MerrittAtomHarvestedRecord.new(query_uri, entry)
         end
       end
 
       private
+
+      def parse_rss(uri)
+        # RSS::Parser.parse() isn't smart enough to handle authenticated URIs
+        # (blows up in https://github.com/ruby/ruby/blob/v2_2_3/lib/open-uri.rb#L260-L262)
+        feed_xml = RestClient.get(uri.to_s)
+        RSS::Parser.parse(feed_xml, false)
+      end
 
       def pages(feed_uri, feed)
         page_uri = feed_uri
@@ -31,7 +40,7 @@ module Dash2
           self_uri, next_uri, last_uri = links_for(page)
           break if self_uri == last_uri
           page_uri = next_uri.relative? ? page_uri + next_uri : next_uri
-          page = RSS::Parser.parse(page_uri, false)
+          page = parse_rss(page_uri)
         end
       end
 

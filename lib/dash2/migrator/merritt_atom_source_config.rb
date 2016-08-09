@@ -7,13 +7,33 @@ module Dash2
 
       attr_reader :tenant_path
 
-      def initialize(tenant_path:, feed_uri:)
+      def initialize(tenant_path:, feed_uri:, env_name: nil)
         super(source_url: feed_uri)
+        @env_name = env_name
         @tenant_path = File.absolute_path(tenant_path)
       end
 
+      def tenant_config
+        @tenant_config ||= begin
+         tenant_config = YAML.load_file(tenant_path)
+         tenant_config[env_name.to_s]
+       end
+      end
+
+      def repo_config
+        tenant_config['repository']
+      end
+
+      def username
+        repo_config['username']
+      end
+
+      def password
+        repo_config['password']
+      end
+
       def feed_uri
-        source_uri
+        @feed_uri ||= URI.parse(source_uri.to_s.sub('https://', "https://#{username}:#{password}@"))
       end
 
       def create_harvest_task(from_time = nil, until_time = nil)

@@ -18,7 +18,7 @@ module Dash2
 
           source_config = config.source_config
           expect(source_config).to be_a(MerrittAtomSourceConfig)
-          expect(source_config.feed_uri).to eq(URI('https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'))
+          expect(source_config.feed_uri).to eq(URI("https://#{source_config.username}:#{source_config.password}@merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd"))
           expect(source_config.tenant_path).to eq(File.absolute_path('config/tenants/dataone.yml'))
         end
       end

@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'webmock/rspec'
+require 'base64'
 
 module Dash2
   module Migrator
@@ -8,31 +9,29 @@ module Dash2
       attr_reader :page2_uri
       attr_reader :feed
       attr_reader :page2
-
+      attr_reader :config
       attr_reader :task
 
       before(:each) do
-        @feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
-        @page2_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd&page=2'
-        @feed = File.read('spec/data/ark:-13030-m5709fmd.atom').freeze
-        @page2 = File.read('spec/data/ark:-13030-m5709fmd&page=2.atom').freeze
-
+        base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
         @tenant_path = File.absolute_path('config/tenants/dataone.yml')
-        @config = MerrittAtomSourceConfig.new(tenant_path: @tenant_path, feed_uri: @feed_uri)
+        @config = MerrittAtomSourceConfig.new(tenant_path: @tenant_path, feed_uri: base_feed_uri, env_name: 'test')
         @task = MerrittAtomHarvestTask.new(config: @config)
 
+        @feed_uri = base_feed_uri.sub('https://', "https://#{config.username}:#{config.password}@")
+        @feed = File.read('spec/data/ark:-13030-m5709fmd.atom').freeze
         stub_request(:get, feed_uri).to_return(body: feed)
+
+        @page2_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd&page=2"
+        @page2 = File.read('spec/data/ark:-13030-m5709fmd&page=2.atom').freeze
         stub_request(:get, page2_uri).to_return(body: page2)
       end
 
       describe '#harvest_records' do
         it 'gets the Merritt Atom feed' do
           task.harvest_records
-
           expect(a_request(:get, feed_uri)).to have_been_made
         end
-
-        it 'uses basic-auth credentials from the tenant file'
 
         it 'gets all entries' do
           records_array = task.harvest_records.to_a

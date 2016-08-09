@@ -12,10 +12,10 @@ module Datacite
           expect(contribs.size).to eq(4)
 
           expected_names = [
-              'UCSF Bixby Center for Global Reproductive Health',
-              'Ibis Reproductive Health',
-              "UZ-UCSF Collaborative Programme on Women's Health",
-              'South African Medical Research Council HIV Prevention Research Unit'
+            'UCSF Bixby Center for Global Reproductive Health',
+            'Ibis Reproductive Health',
+            "UZ-UCSF Collaborative Programme on Women's Health",
+            'South African Medical Research Council HIV Prevention Research Unit'
           ]
           contribs.each_with_index do |c, i|
             expect(c.name).to eq(expected_names[i])
