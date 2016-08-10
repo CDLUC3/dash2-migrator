@@ -45,7 +45,6 @@ module Dash2
       end
 
       def index_record(stash_wrapper)
-
       end
 
     end

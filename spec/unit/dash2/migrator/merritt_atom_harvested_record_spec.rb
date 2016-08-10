@@ -39,10 +39,12 @@ module Dash2
       describe '#stash_wrapper' do
         it 'creates a StashWrapper' do
           expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)
+          # File.open('tmp/harvested-wrapper.xml', 'w') do |f|
+          #   f.write(wrapper.write_xml)
+          # end
         end
 
         it 'extracts the file inventory' do
-
           text_plain = MIME::Type.new('text/plain')
           text_csv = MIME::Type.new('text/csv')
           application_openxml = MIME::Type.new('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
