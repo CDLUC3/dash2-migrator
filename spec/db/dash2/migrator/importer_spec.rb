@@ -139,7 +139,7 @@ module Dash2
         end
 
         it 'extracts the dates' do
-          dates = imported.dates
+          dates = imported.datacite_datesg
           expect(dates.size).to eq(1)
           date = dates[0]
           expect(date.date).to eq(Date.new(2015, 12, 2))
