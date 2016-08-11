@@ -139,7 +139,7 @@ module Dash2
         end
 
         it 'extracts the dates' do
-          dates = imported.datacite_datesg
+          dates = imported.datacite_dates
           expect(dates.size).to eq(1)
           date = dates[0]
           expect(date.date).to eq(Date.new(2015, 12, 2))
@@ -162,6 +162,28 @@ module Dash2
           alt_ident = alt_idents[0]
           expect(alt_ident.alternate_identifier).to eq('https://oneshare.cdlib.org/xtf/view?docId=dataone/ark%2B%3Dc5146%3Dr3rg6g/mrt-datacite.xml')
           expect(alt_ident.alternate_identifier_type).to eq('URL')
+        end
+
+        it 'extracts the related identifiers' do
+          rel_idents = imported.related_identifiers
+          expect(rel_idents.size).to eq(2)
+          expected = [
+              {
+                  relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
+                  id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
+                  value: '10.1371/journal.pone.0143878'
+              },
+              {
+                  relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
+                  id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
+                  value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
+              },
+          ]
+          rel_idents.each_with_index do |ri, i|
+            expect(ri.related_identifier).to eq(expected[i][:value])
+            expect(ri.related_identifier_type).to eq(expected[i][:id_type])
+            expect(ri.relation_type).to eq(expected[i][:relation_type])
+          end
         end
       end
 
