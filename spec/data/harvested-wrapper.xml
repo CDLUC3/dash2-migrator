@@ -14,8 +14,8 @@
         <st:embargo>
             <st:type>none</st:type>
             <st:period>none</st:period>
-            <st:start>2016-08-10Z</st:start>
-            <st:end>2016-08-10Z</st:end>
+            <st:start>2015-12-02</st:start>
+            <st:end>2015-12-02</st:end>
         </st:embargo>
         <st:inventory num_files='13'>
             <st:file>
@@ -93,6 +93,8 @@
             <creators>
                 <creator>
                     <creatorName>Chen, Hao</creatorName>
+                    <nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">0123-4567-8910-1112</nameIdentifier>
+                    <affiliation>North Carolina Central University</affiliation>
                 </creator>
             </creators>
             <titles>
@@ -102,6 +104,8 @@
             <publicationYear>2016</publicationYear>
             <subjects>
                 <subject>Zebrafish</subject>
+                <subject>Epithelium</subject>
+                <subject>Barrett's esophagus</subject>
             </subjects>
             <fundingReferences>
                 <fundingReference>
@@ -118,12 +122,23 @@
                 </fundingReference>
             </fundingReferences>
             <contributors>
+                <contributor contributorType="ProjectMember">
+                    <contributorName>Chen, Xiaoxin</contributorName>
+                    <nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">1234-5678-9101-1121</nameIdentifier>
+                    <affiliation>University of North Carolina at Chapel Hill</affiliation>
+                </contributor>
                 <contributor contributorType='DataManager'>
                     <contributorName>Wilson, James</contributorName>
                 </contributor>
             </contributors>
+            <dates>
+                <date dateType="Available">2015-12-02</date>
+            </dates>
             <language>en</language>
             <resourceType resourceTypeGeneral='Dataset'>Dataset</resourceType>
+            <alternateIdentifiers>
+                <alternateIdentifier alternateIdentifierType="URL">https://oneshare.cdlib.org/xtf/view?docId=dataone/ark%2B%3Dc5146%3Dr3rg6g/mrt-datacite.xml</alternateIdentifier>
+            </alternateIdentifiers>
             <relatedIdentifiers>
                 <relatedIdentifier relationType='IsCitedBy' relatedIdentifierType='DOI'>10.1371/journal.pone.0143878
                 </relatedIdentifier>
@@ -176,6 +191,17 @@
                     under grant OCI-1135525.
                 </description>
             </descriptions>
+            <geoLocations>
+                <geoLocation>
+                    <geoLocationBox>37.046 -119.211 37.075 -119.182 </geoLocationBox>
+                    <geoLocationPlace>Providence Creek (Lower, Upper and P301)</geoLocationPlace>
+                </geoLocation>
+                <geoLocation>
+                    <geoLocationPoint>31.233 -67.302</geoLocationPoint>
+                    <geoLocationBox>41.09 -71.032 42.893 -68.211</geoLocationBox>
+                    <geoLocationPlace>Atlantic Ocean</geoLocationPlace>
+                </geoLocation>
+            </geoLocations>
         </resource>
     </st:stash_descriptive>
 </st:stash_wrapper>
