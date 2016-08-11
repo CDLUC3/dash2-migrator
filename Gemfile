@@ -21,8 +21,12 @@ gem 'rubocop', '~> 0.37', group: :development
 
 # Test
 
-gem 'equivalent-xml', '~> 0.6.0', group: :test
-gem 'rspec', '~> 3.2', group: :test
-gem 'simplecov', '~> 0.9.2', group: :test
-gem 'simplecov-console', '~> 0.2.0', group: :test
-gem 'webmock', '~> 1.24', group: :test
+group :test do
+  gem 'equivalent-xml', '~> 0.6.0'
+  gem 'database_cleaner', '~> 1.5'
+  gem 'rspec', '~> 3.2'
+  gem 'simplecov', '~> 0.9.2'
+  gem 'simplecov-console', '~> 0.2.0'
+  gem 'webmock', '~> 1.24'
+end
+

@@ -21,8 +21,13 @@ module Dash2
       end
 
       model_path = "#{gem_path(gem)}/app/models/#{gem}"
-      Dir.glob("#{model_path}/*.rb").sort.each(&method(:require))
+      lib_path = "#{gem_path(gem)}/lib/#{gem}"
+      [model_path, lib_path].each do |path|
+        Dir.glob("#{path}/**/*.rb").sort.each(&method(:require))
+      end
     end
+
+    StashDatacite::ResourcePatch.associate_with_resource(StashEngine::Resource)
 
     # ###################################################
 

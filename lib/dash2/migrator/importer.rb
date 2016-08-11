@@ -26,6 +26,7 @@ module Dash2
           with_user_id: user.id
         )
         # TODO: mint or update DOI
+        # TODO: fake files for test data
         # TODO: submit to Merritt
       end
 
@@ -66,7 +67,7 @@ module Dash2
         dcs_resource.descriptions.each { |dcs_description| add_sd_description(dcs_description, se_resource_id) }
         dcs_resource.geo_locations.each { |dcs_geo_location| add_sd_geo_location(dcs_geo_location, se_resource_id) }
         dcs_resource.funding_references.each { |dcs_funding_reference| add_funding(dcs_funding_reference, se_resource_id) }
-        se_resource.geolcation = true unless dcs_resource.geo_locations.empty?
+        se_resource.geolocation = true unless dcs_resource.geo_locations.empty?
         se_resource.save!
       end
 
@@ -150,10 +151,9 @@ module Dash2
       end
 
       def add_sd_alternate_ident(dcs_alternate_ident, se_resource_id)
-        ident_type = dcs_alternate_ident.type
         StashDatacite::AlternateIdentifier.create(
           alternate_identifier: dcs_alternate_ident.value,
-          alternate_identifier_type: (ident_type.value if ident_type),
+          alternate_identifier_type: dcs_alternate_ident.type, # a string, not an enum
           resource_id: se_resource_id
         )
       end
@@ -278,7 +278,7 @@ module Dash2
           subject: dcs_subject.value,
           subject_scheme: dcs_subject.scheme,
           scheme_URI: (scheme_uri if scheme_uri)
-        )
+        ).id
       end
 
     end

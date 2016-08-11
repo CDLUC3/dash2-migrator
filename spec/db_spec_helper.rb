@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'database_cleaner'
 
 logfile = File.expand_path('log/test.log')
 FileUtils.mkdir_p File.dirname(logfile)
@@ -10,10 +11,12 @@ ActiveRecord::Migration.verbose = false
 ActiveRecord::Migrator.up 'db/migrate'
 
 RSpec.configure do |config|
-  config.around do |example|
-    ActiveRecord::Base.transaction do
-      example.run
-      raise ActiveRecord::Rollback
-    end
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :deletion
+    # DatabaseCleaner.strategy = :transaction
+    # DatabaseCleaner.clean_with(:truncation)
+  end
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 end
