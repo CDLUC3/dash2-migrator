@@ -49,8 +49,19 @@ module Dash2
           expect(embargo).not_to be_nil
           expect(embargo.type).to be(Stash::Wrapper::EmbargoType::NONE)
           expect(embargo.period).to eq('none')
-          expect(embargo.start_date).to eq(Date.new(2015, 8, 16))
-          expect(embargo.end_date).to eq(Date.new(2015, 8, 16))
+          expected_date = Date.new(2015, 8, 16)
+          expect(embargo.start_date).to eq(expected_date)
+          expect(embargo.end_date).to eq(expected_date)
+        end
+
+        it 'sets the wrapped datacite embargo date based on the atom <published> tag' do
+          datacite_xml = wrapper.stash_descriptive[0]
+          resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+          dates = resource.dates
+          expect(dates.size).to eq(1)
+          date = dates[0]
+          expect(date.type).to eq(Datacite::Mapping::DateType::AVAILABLE)
+          expect(date.value).to eq('2015-08-16T10:57:26+00:00')
         end
 
         it 'extracts the file inventory' do

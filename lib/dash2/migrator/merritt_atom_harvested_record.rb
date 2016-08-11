@@ -19,12 +19,12 @@ module Dash2
 
       def as_wrapper
         @wrapper ||= Stash::Wrapper::StashWrapper.new(
-          identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
-          version: Stash::Wrapper::Version.new(number: 1, date: date),
-          embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
-          license: stash_license,
-          inventory: Stash::Wrapper::Inventory.new(files: stash_files),
-          descriptive_elements: [datacite_xml]
+            identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
+            version: Stash::Wrapper::Version.new(number: 1, date: date),
+            embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
+            license: stash_license,
+            inventory: Stash::Wrapper::Inventory.new(files: stash_files),
+            descriptive_elements: [datacite_xml]
         )
       end
 
@@ -49,7 +49,13 @@ module Dash2
       end
 
       def datacite_resource
-        @datacite_resource ||= Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, doi)
+        @datacite_resource ||= begin
+          resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, doi)
+          unless resource.dates && !resource.dates.empty?
+            resource.dates = [Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published)]
+          end
+          resource
+        end
       end
 
       def datacite_xml
