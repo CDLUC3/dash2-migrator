@@ -102,6 +102,40 @@ module Dash2
           funder_type = Datacite::Mapping::ContributorType::FUNDER.value.downcase
           funder_contribs = contribs.select { |c| c.contributor_type == funder_type }
           expect(funder_contribs.size).to eq(3)
+          expected = [
+              {contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011'},
+              {contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122'},
+              {contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525'}
+          ]
+          funder_contribs.each_with_index do |fc, i|
+            expect(fc.contributor_name).to eq(expected[i][:contributor_name])
+            expect(fc.award_number).to eq(expected[i][:award_number])
+            expect(fc.affiliation).to be_nil
+          end
+        end
+        
+        it 'extracts the non-funding contributors' do
+          funder_type = Datacite::Mapping::ContributorType::FUNDER.value.downcase
+          contribs = imported.contributors
+          contribs = contribs.select { |c| c.contributor_type != funder_type }
+          expect(contribs.size).to eq(2)
+
+          expect(contribs[0].contributor_name).to eq('Chen, Xiaoxin')
+          expect(contribs[0].contributor_type).to eq(Datacite::Mapping::ContributorType::PROJECT_MEMBER.value.downcase)
+          expect(contribs[0].affiliations.size).to eq(1)
+          affiliation = contribs[0].affiliations[0]
+          expect(affiliation.long_name).to eq('University of North Carolina at Chapel Hill')
+          name_ident = contribs[0].name_identifier
+          expect(name_ident.name_identifier).to eq('1234-5678-9101-1121')
+          expect(name_ident.name_identifier_scheme).to eq('ORCID')
+          expect(name_ident.scheme_URI).to eq('http://orcid.org/')
+
+          expect(contribs[1].contributor_name).to eq('Wilson, James')
+          expect(contribs[1].contributor_type).to eq(Datacite::Mapping::ContributorType::DATA_MANAGER.value.downcase)
+          expect(contribs[1].affiliations.size).to eq(0)
+          expect(contribs[1].name_identifier).to be_nil
+
+          contribs.each { |c| expect(c.award_number).to be_nil }
         end
       end
 
