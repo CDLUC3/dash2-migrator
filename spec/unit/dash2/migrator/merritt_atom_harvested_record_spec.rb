@@ -44,6 +44,15 @@ module Dash2
           # end
         end
 
+        it 'sets the embargo date based on the atom <published> tag' do
+          embargo = wrapper.embargo
+          expect(embargo).not_to be_nil
+          expect(embargo.type).to be(Stash::Wrapper::EmbargoType::NONE)
+          expect(embargo.period).to eq('none')
+          expect(embargo.start_date).to eq(Date.new(2015, 8, 16))
+          expect(embargo.end_date).to eq(Date.new(2015, 8, 16))
+        end
+
         it 'extracts the file inventory' do
           text_plain = MIME::Type.new('text/plain')
           text_csv = MIME::Type.new('text/csv')

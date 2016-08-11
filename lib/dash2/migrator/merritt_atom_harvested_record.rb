@@ -21,6 +21,7 @@ module Dash2
         @wrapper ||= Stash::Wrapper::StashWrapper.new(
           identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
           version: Stash::Wrapper::Version.new(number: 1, date: date),
+          embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
           license: stash_license,
           inventory: Stash::Wrapper::Inventory.new(files: stash_files),
           descriptive_elements: [datacite_xml]
@@ -36,6 +37,11 @@ module Dash2
       def date
         updated = entry.updated
         updated.content if updated
+      end
+
+      def date_published
+        published = entry.published
+        published.content if published
       end
 
       def mrt_datacite_xml
