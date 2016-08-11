@@ -137,6 +137,32 @@ module Dash2
 
           contribs.each { |c| expect(c.award_number).to be_nil }
         end
+
+        it 'extracts the dates' do
+          dates = imported.dates
+          expect(dates.size).to eq(1)
+          date = dates[0]
+          expect(date.date).to eq(Date.new(2015, 12, 2))
+          expect(date.date_type).to eq(Datacite::Mapping::DateType::AVAILABLE.value.downcase)
+        end
+
+        it 'extracts the language' do
+          language = imported.language
+          expect(language.language).to eq('en')
+        end
+
+        it 'extracts the resource type' do
+          resource_type = imported.resource_type
+          expect(resource_type.resource_type).to eq(Datacite::Mapping::ResourceTypeGeneral::DATASET.value.downcase)
+        end
+
+        it 'extracts the alternate identifiers' do
+          alt_idents = imported.alternate_identifiers
+          expect(alt_idents.size).to eq(1)
+          alt_ident = alt_idents[0]
+          expect(alt_ident.alternate_identifier).to eq('https://oneshare.cdlib.org/xtf/view?docId=dataone/ark%2B%3Dc5146%3Dr3rg6g/mrt-datacite.xml')
+          expect(alt_ident.alternate_identifier_type).to eq('URL')
+        end
       end
 
       describe 'DOI handling' do
