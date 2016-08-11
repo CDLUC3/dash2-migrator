@@ -223,7 +223,7 @@ module Dash2
 
       def add_sd_geo_location_point(dcs_geo_location_point, se_resource_id)
         return unless dcs_geo_location_point
-        GeolocationPoint.create(
+        StashDatacite::GeolocationPoint.create(
             latitude: dcs_geo_location_point.latitude, 
             longitude: dcs_geo_location_point.longitude, 
             resource_id: se_resource_id
@@ -232,12 +232,22 @@ module Dash2
 
       def add_sd_geo_location_box(dcs_geo_location_box, se_resource_id)
         return unless dcs_geo_location_box
-        GeolocationBox.create(
+        StashDatacite::GeolocationBox.create(
             ne_latitude: dcs_geo_location_box.north_latitude,
             ne_longitude: dcs_geo_location_box.east_longitude,
             sw_latitude: dcs_geo_location_box.south_latitude,
             sw_longitude: dcs_geo_location_box.west_longitude,
             resource_id: se_resource_id
+        )
+      end
+
+      def add_funding(dcs_funding_reference, se_resource_id)
+        award_number = dcs_funding_reference.award_number
+        StashDatacite::Contributor.create(
+          contributor_name: dcs_funding_reference.name,
+          contributor_type: Datacite::Mapping::ContributorType::FUNDER.value,
+          award_number: (award_number.value if award_number),
+          resource_id: se_resource_id
         )
       end
 
