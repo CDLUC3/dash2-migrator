@@ -1,5 +1,7 @@
-require 'stash/indexer'
 require 'active_record'
+require 'stash/indexer'
+require 'stash_ezid/client'
+require 'dash2/migrator/id_mode'
 
 module Dash2
   module Migrator
@@ -31,14 +33,20 @@ module Dash2
 
     # ###################################################
 
-    # "Indexes" recorsd by writing them into the stash_engine / stash_datacite database
+    # "Indexes" records by writing them into the stash_engine / stash_datacite database
     class Dash2Indexer < Stash::Indexer::Indexer
+
+      attr_reader :id_mode
+      attr_reader :ezid_client
+
       # Creates a new {Dash2Indexer}
       # @param metadata_mapper [Stash::Indexer::MetadataMapper] the metadata mapper
       # @param db_config_path [String] the path to the database configuration file
-      def initialize(metadata_mapper:, db_config_path:)
+      def initialize(metadata_mapper:, db_config_path:, id_mode:, ezid_client:)
         super(metadata_mapper: metadata_mapper)
         @db_config_path = db_config_path
+        @id_mode = id_mode
+        @ezid_client = ezid_client
       end
 
       def index(harvested_records)
@@ -50,6 +58,9 @@ module Dash2
       end
 
       def index_record(stash_wrapper)
+        # TODO: mint or update DOI
+        # TODO: fake files for test data
+        # TODO: submit to Merritt
       end
 
     end

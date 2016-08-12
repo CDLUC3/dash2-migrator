@@ -4,6 +4,13 @@ defaults: &defaults
   index:
     adapter: Dash2
     db_config_path: config/database.yml
+    id_mode: mint_or_update
+    ezid_config:
+      shoulder: doi:10.5072/FK2
+      account: apitest
+      password: apitest
+      id_scheme: doi
+      owner: apitest
   db:
     adapter: sqlite3
     database: ':memory:'
@@ -25,3 +32,15 @@ stage:
 
 production:
   <<: *defaults
+  index:
+    adapter: Dash2
+    db_config_path: config/database.yml
+    id_mode: always_update
+    ezid_config:
+      shoulder: doi:10.5072/FK2
+      account: apitest   # TODO: ???
+      password: apitest  # TODO: ???
+      id_scheme: doi
+      owner: apitest     # TODO: ???
+
+

@@ -1,5 +1,6 @@
 require 'datacite/mapping'
 require 'stash_ezid/client'
+require 'dash2/migrator/id_mode'
 
 # TODO: Extract all the StashDatacite:: stuff and move it into that module
 
@@ -10,11 +11,13 @@ module Dash2
       attr_reader :ezid_client
       attr_reader :user_uid
       attr_reader :stash_wrapper
+      attr_reader :id_mode
 
-      def initialize(stash_wrapper:, user_uid:, ezid_client:)
+      def initialize(stash_wrapper:, user_uid:, ezid_client:, id_mode:)
         @stash_wrapper = stash_wrapper
         @user_uid = user_uid
         @ezid_client = ezid_client
+        @id_mode = id_mode
       end
 
       def import
