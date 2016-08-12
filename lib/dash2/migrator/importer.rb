@@ -230,10 +230,10 @@ module Dash2
       def add_sd_geo_location_box(dcs_geo_location_box, se_resource_id)
         return unless dcs_geo_location_box
         StashDatacite::GeolocationBox.create(
-          ne_latitude: dcs_geo_location_box.north_latitude,
-          ne_longitude: dcs_geo_location_box.east_longitude,
           sw_latitude: dcs_geo_location_box.south_latitude,
           sw_longitude: dcs_geo_location_box.west_longitude,
+          ne_latitude: dcs_geo_location_box.north_latitude,
+          ne_longitude: dcs_geo_location_box.east_longitude,
           resource_id: se_resource_id
         )
       end

@@ -150,6 +150,12 @@
             <sizes>
                 <size>3824823</size>
             </sizes>
+            <formats>
+                <format>text/plain</format>
+                <format>text/application/vnd.openxmlformats-officedocument.wordprocessingml.document</format>
+                <format>application/xml</format>
+                <format>application/pdf</format>
+            </formats>
             <rightsList>
                 <rights rightsURI='https://creativecommons.org/publicdomain/zero/1.0/'>CC0 1.0 Universal (CC0 1.0)
                     Public Domain Dedication

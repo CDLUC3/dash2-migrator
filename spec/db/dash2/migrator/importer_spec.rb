@@ -187,9 +187,7 @@ module Dash2
         end
 
         it 'extracts the sizes' do
-          sizes = imported.sizes
-          expect(sizes.size).to eq(1)
-          size = sizes[0]
+          size = imported.size
           expect(size.size).to eq(3_824_823.to_s)
         end
 
@@ -207,12 +205,6 @@ module Dash2
           end
         end
 
-        it 'extracts the version' do
-          version = imported.version
-          expect(version).not_to be_nil
-          expect(version.version).to eq('3.1')
-        end
-
         it 'extracts the rights' do
           rights = imported.rights
           expect(rights.size).to eq(1)
@@ -226,25 +218,25 @@ module Dash2
             {
               type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
               value: 'Mammalian esophagus exhibits a remarkable change in epithelial
-                        structure during the transition from embryo to adult. However, the
-                        molecular mechanisms of esophageal epithelial development are not well
-                        understood. Zebrafish (Danio rerio), a common model organism for
-                        vertebrate development and gene function, has not previously been
-                        characterized as a model system for esophageal epithelial development.
-                        In this study, we characterized a piece of non-keratinized stratified
-                        squamous epithelium similar to human esophageal epithelium in the
-                        upper digestive tract of developing zebrafish. Under the microscope,
-                        this piece was detectable at 5dpf and became stratified at 7dpf.
-                        Expression of esophageal epithelial marker genes (Krt5, P63, Sox2
-                        and Pax9) was detected by immunohistochemistry and in situ
-                        hybridization. Knockdown of P63, a gene known to be critical for
-                        esophageal epithelium, disrupted the development of this epithelium.
-                        With this model system, we found that Pax9 knockdown resulted in loss
-                        or disorganization of the squamous epithelium, as well as
-                        down-regulation of the differentiation markers Krt4 and Krt5. In
-                        summary, we characterized a region of stratified squamous epithelium
-                        in the zebrafish upper digestive tract which can be used for
-                        functional studies of candidate genes involved in esophageal epithelial biology.'
+                      structure during the transition from embryo to adult. However, the
+                      molecular mechanisms of esophageal epithelial development are not well
+                      understood. Zebrafish (Danio rerio), a common model organism for
+                      vertebrate development and gene function, has not previously been
+                      characterized as a model system for esophageal epithelial development.
+                      In this study, we characterized a piece of non-keratinized stratified
+                      squamous epithelium similar to human esophageal epithelium in the
+                      upper digestive tract of developing zebrafish. Under the microscope,
+                      this piece was detectable at 5dpf and became stratified at 7dpf.
+                      Expression of esophageal epithelial marker genes (Krt5, P63, Sox2
+                      and Pax9) was detected by immunohistochemistry and in situ
+                      hybridization. Knockdown of P63, a gene known to be critical for
+                      esophageal epithelium, disrupted the development of this epithelium.
+                      With this model system, we found that Pax9 knockdown resulted in loss
+                      or disorganization of the squamous epithelium, as well as
+                      down-regulation of the differentiation markers Krt4 and Krt5. In
+                      summary, we characterized a region of stratified squamous epithelium
+                      in the zebrafish upper digestive tract which can be used for
+                      functional studies of candidate genes involved in esophageal epithelial biology.'
                 .squeeze(' ')
             }
           ]
@@ -253,7 +245,37 @@ module Dash2
             expect(desc.description).to eq(expected[i][:value])
             expect(desc.description_type).to eq(expected[i][:type])
           end
+        end
 
+        it 'extracts the geolocations' do
+          expected_places = [
+              'Providence Creek (Lower, Upper and P301)',
+              'Atlantic Ocean'
+          ]
+          places = imported.geolocation_places
+          expect(places.size).to eq(expected_places.size)
+          places.each_with_index do |p, i|
+            expect(p.geo_location_place).to eq(expected_places[i])
+          end
+
+          expected_boxes = [
+              [37.046, -119.211, 37.075, -119.182],
+              [41.09, -71.032, 42.893, -68.211]
+          ]
+          boxes = imported.geolocation_boxes
+          expect(boxes.size).to eq(expected_boxes.size)
+          boxes.each_with_index do |b, i|
+            coords = [b.sw_latitude, b.sw_longitude, b.ne_latitude, b.ne_longitude]
+            coords.each_with_index do |c, j|
+              expect(c).to be_within(0.0001).of(expected_boxes[i][j])
+            end
+          end
+
+          points = imported.geolocation_points
+          expect(points.size).to eq(1)
+          point = points[0]
+          expect(point.latitude).to be_within(0.0001).of(31.233)
+          expect(point.longitude).to be_within(0.0001).of(-67.302)
         end
       end
 
