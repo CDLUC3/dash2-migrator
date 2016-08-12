@@ -23,7 +23,7 @@ module Dash2
           index_config = config.index_config
           expect(index_config).to be_a(Dash2IndexConfig)
           expect(index_config.db_config_path).to eq(File.absolute_path('config/database.yml'))
-          expect(index_config.id_mode).to eq(IDMode::MINT_OR_UPDATE)
+          expect(index_config.id_mode).to eq(IDMode::ALWAYS_MINT)
           expected_ezid_config = {
               shoulder: 'doi:10.5072/FK2',
               account: 'apitest',

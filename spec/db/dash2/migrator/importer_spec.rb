@@ -1,4 +1,5 @@
 require 'db_spec_helper'
+require 'uri'
 
 module Dash2
   module Migrator
@@ -12,47 +13,112 @@ module Dash2
       attr_reader :user_uid
       attr_reader :wrapper
       attr_reader :importer
+      attr_reader :user
+      attr_reader :imported
+      attr_reader :tenant
 
       before(:all) do
         @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
 
         path = 'config/migrator-dataone.yml'
         @index_config = Stash::Config.from_file(path).index_config
-        # @ezid_shoulder ='doi:10.5072/FK2'
-        # @ezid_account = 'apitest'
-        # @ezid_password = 'apitest'
-        # @ezid_client ||= StashEzid::Client.new(
-        #     shoulder: ezid_shoulder,
-        #     account: ezid_account,
-        #     password: ezid_password,
-        #     id_scheme: 'doi',
-        #     owner: 'apitest'
-        # )
-        ezid_client = instance_double(StashEzid::Client)
 
         wrapper_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/harvested-wrapper.xml')
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
-        @importer = Importer.new(stash_wrapper: wrapper, user_uid: user_uid, ezid_client: ezid_client)
+
+        tenant_config = YAML.load_file('/Users/dmoles/Work/dash2-migrator/config/tenants/dataone.yml')['test']
+        @tenant = StashEngine::Tenant.new(tenant_config)
       end
 
-      describe 'DOI handling' do
-        it 'mints a DOI in demo mode'
-        it 'updates the DOI in production mode'
-      end
-
-      describe 'imports' do
-        attr_reader :imported
-
-        before(:each) do
-          StashEngine::User.create(
+      before(:each) do
+        @user = StashEngine::User.create(
             uid: user_uid,
             first_name: 'Lisa',
             last_name: 'Muckenhaupt',
             email: 'lmuckenhaupt@example.org',
             provider: 'developer',
-            tenant_id: 'ucop'
+            tenant_id: tenant.tenant_id
+        )
+        @ezid_client = instance_double(StashEzid::Client)
+      end
+
+      describe 'DOI handling' do
+
+        describe 'demo mode' do
+          before(:each) do
+            @importer = Dash2::Migrator::Importer.new(
+                stash_wrapper: wrapper,
+                user_uid: user_uid,
+                ezid_client: ezid_client,
+                id_mode: IDMode::MINT_OR_UPDATE,
+                tenant: tenant
+            )
+          end
+
+          it 'ignores the existing DOI on initial parsing' do
+            datacite_xml = stash_wrapper.stash_descriptive[0]
+            dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+            se_resource = se_resource_from(dcs_resource: dcs_resource, with_user_id: user.id)
+            expect(se_resource.identifier).to be_nil
+            expect(ezid_client).not_to receive(:mint_id)
+            expect(ezid_client).not_to receive(:update_metadata)
+          end
+
+          it 'mints a DOI in demo mode' do
+            doi = 'doi:10.123/456'
+            expect(ezid_client).to receive(:mint_id) { doi }
+            @imported = importer.import
+            identifier = imported.identifier
+            expect(identifier).not_to be_nil
+            expect(identifier.identifier).to eq(doi)
+          end
+
+          it 'updates an existing DOI in demo mode' do
+            doi = 'doi:10.123/456'
+            allow(ezid_client).to receive(:mint_id) { doi }
+            @imported = importer.import
+            expect(ezid_client).to receive(:update_metadata).with(
+                doi,
+                kind_of(String),
+                URI::HTTPS.build(host: 'oneshare2-dev.cdlib.org', path: "stash/dataset/#{doi}").to_s
+            )
+            re_imported = importer.import
+            identifier = re_imported.identifier
+            expect(identifier).not_to be_nil
+            expect(identifier.identifier).to eq(doi)
+          end
+        end
+
+        describe 'production mode' do
+          before(:each) do
+            @importer = Dash2::Migrator::Importer.new(
+                stash_wrapper: wrapper,
+                user_uid: user_uid,
+                ezid_client: ezid_client,
+                id_mode: IDMode::ALWAYS_UPDATE,
+                tenant: tenant
+            )
+            # 10.15146/R3RG6G
+          end
+        end
+
+        it 'updates the DOI in production mode' do
+          @imported = importer.import
+        end
+      end
+
+      describe 'imports' do
+
+        before(:each) do
+          @importer = Dash2::Migrator::Importer.new(
+              stash_wrapper: wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: IDMode::MINT_OR_UPDATE,
+              tenant: tenant
           )
           @imported = importer.import
+          allow(ezid_client).to receive(:mint_id)
         end
 
         it 'imports a record' do
@@ -108,9 +174,9 @@ module Dash2
           funder_contribs = contribs.select { |c| c.contributor_type == funder_type }
           expect(funder_contribs.size).to eq(3)
           expected = [
-            { contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011' },
-            { contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122' },
-            { contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525' }
+              {contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011'},
+              {contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122'},
+              {contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525'}
           ]
           funder_contribs.each_with_index do |fc, i|
             expect(fc.contributor_name).to eq(expected[i][:contributor_name])
@@ -173,16 +239,16 @@ module Dash2
           rel_idents = imported.related_identifiers
           expect(rel_idents.size).to eq(2)
           expected = [
-            {
-              relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
-              id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
-              value: '10.1371/journal.pone.0143878'
-            },
-            {
-              relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
-              id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
-              value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
-            }
+              {
+                  relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
+                  id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
+                  value: '10.1371/journal.pone.0143878'
+              },
+              {
+                  relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
+                  id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
+                  value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
+              }
           ]
           rel_idents.each_with_index do |ri, i|
             expect(ri.related_identifier).to eq(expected[i][:value])
@@ -199,10 +265,10 @@ module Dash2
         it 'extracts the formats' do
           formats = imported.formats
           expected = [
-            'text/plain',
-            'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/xml',
-            'application/pdf'
+              'text/plain',
+              'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'application/xml',
+              'application/pdf'
           ]
           expect(formats.size).to eq(expected.size)
           formats.each_with_index do |f, i|
@@ -220,9 +286,9 @@ module Dash2
         it 'extracts the descriptions' do
           descriptions = imported.descriptions
           expected = [
-            {
-              type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
-              value: 'Mammalian esophagus exhibits a remarkable change in epithelial
+              {
+                  type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
+                  value: 'Mammalian esophagus exhibits a remarkable change in epithelial
                       structure during the transition from embryo to adult. However, the
                       molecular mechanisms of esophageal epithelial development are not well
                       understood. Zebrafish (Danio rerio), a common model organism for
@@ -242,8 +308,8 @@ module Dash2
                       summary, we characterized a region of stratified squamous epithelium
                       in the zebrafish upper digestive tract which can be used for
                       functional studies of candidate genes involved in esophageal epithelial biology.'
-                .squeeze(' ')
-            }
+                             .squeeze(' ')
+              }
           ]
           expect(descriptions.size).to eq(expected.size)
           descriptions.each_with_index do |desc, i|

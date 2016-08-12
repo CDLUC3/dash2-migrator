@@ -12,28 +12,51 @@ module Dash2
       attr_reader :user_uid
       attr_reader :stash_wrapper
       attr_reader :id_mode
+      attr_reader :tenant
 
-      def initialize(stash_wrapper:, user_uid:, ezid_client:, id_mode:)
+      def initialize(stash_wrapper:, user_uid:, ezid_client:, id_mode:, tenant:)
         @stash_wrapper = stash_wrapper
         @user_uid = user_uid
         @ezid_client = ezid_client
         @id_mode = id_mode
+        @tenant = tenant
       end
 
       def import
         user = StashEngine::User.find_by_uid(user_uid)
         raise "No user found for #{user_uid}" unless user
-
         se_resource = se_resource_from(
           dcs_resource: dcs_resource,
           with_user_id: user.id
         )
-        # TODO: mint or update DOI
+
+        case id_mode
+          when IDMode::ALWAYS_MINT
+            mint_new_doi(se_resource)
+          when ID_MODE::ALWAYS_UPDATE
+            update_doi(dcs_resource, se_resource)
+          else
+            fail "Unknown ID mode: #{id_mode || 'nil'}"
+        end
+
         # TODO: fake files for test data
         # TODO: submit to Merritt
       end
 
-      # Accessors
+      def mint_new_doi(se_resource)
+        # doi_value = ezid_client.
+      end
+
+      def update_doi(dcs_resource, se_resource)
+        doi_value = dcs_resource.identifier.value
+        se_resource.update_identifier(doi_value)
+
+        target_url = URI("https://#{tenant.full_domain}/doi_value").to_s
+
+        # rfg = StashDatacite::Resource::ResourceFileGeneration.new(se_resource, tenant)
+        # rfg.generate_merritt_zip(target_url, doi_value)
+        # zipfile = "#{Rails.root}/uploads/#{se_resource.id}_archive.zip"
+      end
 
       def dcs_resource
         @dcs_resource ||= begin
@@ -41,8 +64,6 @@ module Dash2
           Datacite::Mapping::Resource.parse_xml(datacite_xml)
         end
       end
-
-      private
 
       def se_resource_from(dcs_resource:, with_user_id:)
         se_resource = make_se_resource(with_user_id)

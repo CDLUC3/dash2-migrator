@@ -4,7 +4,7 @@ module Dash2
   module Migrator
     class IDMode < TypesafeEnum::Base
       new :ALWAYS_UPDATE
-      new :MINT_OR_UPDATE
+      new :ALWAYS_MINT
     end
   end
 end
