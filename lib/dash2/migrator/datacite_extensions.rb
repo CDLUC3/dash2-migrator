@@ -16,6 +16,12 @@ module Datacite
       )
     end
 
+    class Description
+      def value=(v)
+        @value = v.strip.squeeze(' ').gsub(/-[ \n]/, '')
+      end
+    end
+
     class FundingReference
       def to_description
         grant_info = grant_number &&
@@ -55,6 +61,9 @@ module Datacite
           resource.identifier = Datacite::Mapping::Identifier.new(value: doi)
         end
         resource.convert_funding!
+        resource.descriptions.each do |d|
+          d.value.gsub!("\n", '<br/>')
+        end
         resource.inject_rights!
         resource
       end
