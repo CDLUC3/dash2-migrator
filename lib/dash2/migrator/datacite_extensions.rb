@@ -26,7 +26,7 @@ module Datacite
     class Rights
       # TODO: consdier pushing this to datacite-mapping
       def value=(v)
-        @value = v.strip.gsub("\n", ' ').squeeze(' ')
+        @value = v.strip.tr("\n", ' ').squeeze(' ')
       end
     end
 

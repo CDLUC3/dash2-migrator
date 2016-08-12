@@ -25,11 +25,11 @@ module Dash2
           expect(index_config.db_config_path).to eq(File.absolute_path('config/database.yml'))
           expect(index_config.id_mode).to eq(IDMode::ALWAYS_MINT)
           expected_ezid_config = {
-              shoulder: 'doi:10.5072/FK2',
-              account: 'apitest',
-              password: 'apitest',
-              id_scheme: 'doi',
-              owner: nil
+            shoulder: 'doi:10.5072/FK2',
+            account: 'apitest',
+            password: 'apitest',
+            id_scheme: 'doi',
+            owner: nil
           }
 
           indexer = index_config.create_indexer(config.metadata_mapper)

@@ -34,7 +34,6 @@ module Dash2
 
     end
 
-
     StashDatacite::ResourcePatch.associate_with_resource(StashEngine::Resource)
 
     # ###################################################
@@ -77,11 +76,11 @@ module Dash2
 
       def index_record(stash_wrapper, user_uid)
         importer = Dash2::Migrator::Importer.new(
-            stash_wrapper: stash_wrapper,
-            user_uid: user_uid,
-            ezid_client: ezid_client,
-            id_mode: id_mode,
-            tenant: tenant,
+          stash_wrapper: stash_wrapper,
+          user_uid: user_uid,
+          ezid_client: ezid_client,
+          id_mode: id_mode,
+          tenant: tenant
         )
         importer.import
       end

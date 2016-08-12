@@ -15,7 +15,7 @@ module Dash2
       # @param db_config_path [String] the path to the database configuration file
       def initialize(db_config_path:, id_mode:, tenant_path:)
         super(url: URI.join('file:///', File.absolute_path(db_config_path)))
-        @id_mode = IDMode.find_by_value(id_mode) || fail("Unknown id_mode: #{id_mode || 'nil'}")
+        @id_mode = IDMode.find_by_value(id_mode) || raise("Unknown id_mode: #{id_mode || 'nil'}")
         @tenant_path = tenant_path
       end
 
@@ -38,10 +38,10 @@ module Dash2
       # @param metadata_mapper [Stash::Indexer::MetadataMapper] the metadata mapper
       def create_indexer(metadata_mapper)
         Dash2Indexer.new(
-            metadata_mapper: metadata_mapper,
-            db_config_path: db_config_path,
-            id_mode: id_mode,
-            tenant_config: tenant_config
+          metadata_mapper: metadata_mapper,
+          db_config_path: db_config_path,
+          id_mode: id_mode,
+          tenant_config: tenant_config
         )
       end
 

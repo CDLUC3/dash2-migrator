@@ -8,6 +8,7 @@ module Dash2
       attr_reader :user_uid
       attr_reader :index_config
       attr_reader :wrapper
+      attr_reader :dc_resource
       attr_reader :tenant
       attr_reader :user
       attr_reader :ezid_client
@@ -24,18 +25,21 @@ module Dash2
         wrapper_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/harvested-wrapper.xml')
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
 
+        datacite_xml = wrapper.stash_descriptive[0]
+        @dc_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+
         tenant_config = YAML.load_file('/Users/dmoles/Work/dash2-migrator/config/tenants/dataone.yml')['test']
         @tenant = StashEngine::Tenant.new(tenant_config)
       end
 
       before(:each) do
         @user = StashEngine::User.create(
-            uid: user_uid,
-            first_name: 'Lisa',
-            last_name: 'Muckenhaupt',
-            email: 'lmuckenhaupt@example.org',
-            provider: 'developer',
-            tenant_id: tenant.tenant_id
+          uid: user_uid,
+          first_name: 'Lisa',
+          last_name: 'Muckenhaupt',
+          email: 'lmuckenhaupt@example.org',
+          provider: 'developer',
+          tenant_id: tenant.tenant_id
         )
         @ezid_client = instance_double(StashEzid::Client)
       end
@@ -43,68 +47,73 @@ module Dash2
       describe 'DOI handling' do
 
         describe 'demo mode' do
+
+          attr_reader :doi_value
+
           before(:each) do
             @importer = Dash2::Migrator::Importer.new(
-                stash_wrapper: wrapper,
-                user_uid: user_uid,
-                ezid_client: ezid_client,
-                id_mode: IDMode::ALWAYS_MINT,
-                tenant: tenant
+              stash_wrapper: wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: IDMode::ALWAYS_MINT,
+              tenant: tenant
             )
+
+            @doi_value = '10.10.123/456'
+            doi = "doi:#{doi_value}"
+            expect(ezid_client).to receive(:mint_id) { doi }
+            @imported = importer.import
           end
 
           it 'mints a DOI in demo mode' do
-            doi = 'doi:10.123/456'
-            expect(ezid_client).to receive(:mint_id) { doi }
-            @imported = importer.import
             identifier = imported.identifier
             expect(identifier).not_to be_nil
-            expect(identifier.identifier).to eq(doi)
+            expect(identifier.identifier).to eq(doi_value)
+
           end
 
-          it 'updates an existing DOI in demo mode' do
-            doi = 'doi:10.123/456'
-            allow(ezid_client).to receive(:mint_id) { doi }
-            @imported = importer.import
-            expect(ezid_client).to receive(:update_metadata).with(
-                doi,
-                kind_of(String),
-                URI::HTTPS.build(host: 'oneshare2-dev.cdlib.org', path: "stash/dataset/#{doi}").to_s
-            )
-            re_imported = importer.import
-            identifier = re_imported.identifier
-            expect(identifier).not_to be_nil
-            expect(identifier.identifier).to eq(doi)
+          it 'updates the DOI in the XML' do
+            dcs_ident = importer.dcs_resource.identifier
+            expect(dcs_ident.value).to eq(doi_value)
           end
         end
 
         describe 'production mode' do
           before(:each) do
             @importer = Dash2::Migrator::Importer.new(
-                stash_wrapper: wrapper,
-                user_uid: user_uid,
-                ezid_client: ezid_client,
-                id_mode: IDMode::ALWAYS_UPDATE,
-                tenant: tenant
+              stash_wrapper: wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: IDMode::ALWAYS_UPDATE,
+              tenant: tenant
             )
-            # 10.15146/R3RG6G
           end
 
           it 'updates the DOI in production mode' do
+            expected_xml = dc_resource.write_xml
+            doi_value = '10.15146/R3RG6G'
+            doi = "doi:#{doi_value}"
+            expect(ezid_client).to receive(:update_metadata).with(
+              doi,
+              expected_xml,
+              URI::HTTPS.build(host: 'oneshare2-dev.cdlib.org', path: "/stash/dataset/#{doi}").to_s
+            )
             @imported = importer.import
+            identifier = imported.identifier
+            expect(identifier).not_to be_nil
+            expect(identifier.identifier).to eq(doi_value)
           end
         end
       end
 
-      describe 'se_resource_frome' do
-
+      describe 'se_resource_from' do
         before(:each) do
           @importer = Dash2::Migrator::Importer.new(
-              stash_wrapper: wrapper,
-              user_uid: user_uid,
-              ezid_client: ezid_client,
-              id_mode: IDMode::ALWAYS_MINT,
-              tenant: tenant
+            stash_wrapper: wrapper,
+            user_uid: user_uid,
+            ezid_client: ezid_client,
+            id_mode: IDMode::ALWAYS_MINT,
+            tenant: tenant
           )
           datacite_xml = wrapper.stash_descriptive[0]
           dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
@@ -171,9 +180,9 @@ module Dash2
           funder_contribs = contribs.select { |c| c.contributor_type == funder_type }
           expect(funder_contribs.size).to eq(3)
           expected = [
-              {contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011'},
-              {contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122'},
-              {contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525'}
+            { contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011' },
+            { contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122' },
+            { contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525' }
           ]
           funder_contribs.each_with_index do |fc, i|
             expect(fc.contributor_name).to eq(expected[i][:contributor_name])
@@ -236,16 +245,16 @@ module Dash2
           rel_idents = se_resource.related_identifiers
           expect(rel_idents.size).to eq(2)
           expected = [
-              {
-                  relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
-                  id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
-                  value: '10.1371/journal.pone.0143878'
-              },
-              {
-                  relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
-                  id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
-                  value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
-              }
+            {
+              relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
+              id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
+              value: '10.1371/journal.pone.0143878'
+            },
+            {
+              relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
+              id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
+              value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
+            }
           ]
           rel_idents.each_with_index do |ri, i|
             expect(ri.related_identifier).to eq(expected[i][:value])
@@ -262,10 +271,10 @@ module Dash2
         it 'extracts the formats' do
           formats = se_resource.formats
           expected = [
-              'text/plain',
-              'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-              'application/xml',
-              'application/pdf'
+            'text/plain',
+            'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/xml',
+            'application/pdf'
           ]
           expect(formats.size).to eq(expected.size)
           formats.each_with_index do |f, i|
@@ -283,30 +292,30 @@ module Dash2
         it 'extracts the descriptions' do
           descriptions = se_resource.descriptions
           expected = [
-              {
-                  type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
-                  value: 'Mammalian esophagus exhibits a remarkable change in epithelial
-                      structure during the transition from embryo to adult. However, the
-                      molecular mechanisms of esophageal epithelial development are not well
-                      understood. Zebrafish (Danio rerio), a common model organism for
-                      vertebrate development and gene function, has not previously been
-                      characterized as a model system for esophageal epithelial development.
-                      In this study, we characterized a piece of non-keratinized stratified
-                      squamous epithelium similar to human esophageal epithelium in the
-                      upper digestive tract of developing zebrafish. Under the microscope,
-                      this piece was detectable at 5dpf and became stratified at 7dpf.
-                      Expression of esophageal epithelial marker genes (Krt5, P63, Sox2
-                      and Pax9) was detected by immunohistochemistry and in situ
-                      hybridization. Knockdown of P63, a gene known to be critical for
-                      esophageal epithelium, disrupted the development of this epithelium.
-                      With this model system, we found that Pax9 knockdown resulted in loss
-                      or disorganization of the squamous epithelium, as well as
-                      down-regulation of the differentiation markers Krt4 and Krt5. In
-                      summary, we characterized a region of stratified squamous epithelium
-                      in the zebrafish upper digestive tract which can be used for
-                      functional studies of candidate genes involved in esophageal epithelial biology.'
-                             .squeeze(' ')
-              }
+            {
+              type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
+              value: 'Mammalian esophagus exhibits a remarkable change in epithelial
+                    structure during the transition from embryo to adult. However, the
+                    molecular mechanisms of esophageal epithelial development are not well
+                    understood. Zebrafish (Danio rerio), a common model organism for
+                    vertebrate development and gene function, has not previously been
+                    characterized as a model system for esophageal epithelial development.
+                    In this study, we characterized a piece of non-keratinized stratified
+                    squamous epithelium similar to human esophageal epithelium in the
+                    upper digestive tract of developing zebrafish. Under the microscope,
+                    this piece was detectable at 5dpf and became stratified at 7dpf.
+                    Expression of esophageal epithelial marker genes (Krt5, P63, Sox2
+                    and Pax9) was detected by immunohistochemistry and in situ
+                    hybridization. Knockdown of P63, a gene known to be critical for
+                    esophageal epithelium, disrupted the development of this epithelium.
+                    With this model system, we found that Pax9 knockdown resulted in loss
+                    or disorganization of the squamous epithelium, as well as
+                    down-regulation of the differentiation markers Krt4 and Krt5. In
+                    summary, we characterized a region of stratified squamous epithelium
+                    in the zebrafish upper digestive tract which can be used for
+                    functional studies of candidate genes involved in esophageal epithelial biology.'
+                .squeeze(' ')
+            }
           ]
           expect(descriptions.size).to eq(expected.size)
           descriptions.each_with_index do |desc, i|
@@ -317,8 +326,8 @@ module Dash2
 
         it 'extracts the geolocations' do
           expected_places = [
-              'Providence Creek (Lower, Upper and P301)',
-              'Atlantic Ocean'
+            'Providence Creek (Lower, Upper and P301)',
+            'Atlantic Ocean'
           ]
           places = se_resource.geolocation_places
           expect(places.size).to eq(expected_places.size)
@@ -327,8 +336,8 @@ module Dash2
           end
 
           expected_boxes = [
-              [37.046, -119.211, 37.075, -119.182],
-              [41.09, -71.032, 42.893, -68.211]
+            [37.046, -119.211, 37.075, -119.182],
+            [41.09, -71.032, 42.893, -68.211]
           ]
           boxes = se_resource.geolocation_boxes
           expect(boxes.size).to eq(expected_boxes.size)
