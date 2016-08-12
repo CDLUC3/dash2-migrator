@@ -29,7 +29,7 @@ module Dash2
               account: 'apitest',
               password: 'apitest',
               id_scheme: 'doi',
-              owner: 'apitest'
+              owner: nil
           }
           expect(index_config.ezid_config).to eq(expected_ezid_config)
 

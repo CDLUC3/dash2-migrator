@@ -25,8 +25,9 @@ module Dash2
 
       def tenant_config
         @tenant_config ||= begin
-          tenant_config = YAML.load_file(tenant_path)
-          tenant_config[env_name.to_s]
+          full_tenant_config = YAML.load_file(tenant_path)
+          env_tenant_config = full_tenant_config[env_name.to_s]
+          deep_symbolize_keys(env_tenant_config)
         end
       end
 
@@ -44,6 +45,14 @@ module Dash2
             ezid_client: ezid_client
         )
       end
+
+      def deep_symbolize_keys(val)
+        return val unless val.is_a?(Hash)
+        val.map do |k, v|
+          [k.respond_to?(:to_sym) ? k.to_sym : k, deep_symbolize_keys(v)]
+        end.to_h
+      end
+
     end
   end
 end
