@@ -2,7 +2,7 @@ require 'db_spec_helper'
 
 module Dash2
   module Migrator
-    describe Dash2Indexer do
+    describe Importer do
 
       attr_reader :index_config
       # attr_reader :ezid_shoulder
@@ -33,6 +33,11 @@ module Dash2
         wrapper_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/harvested-wrapper.xml')
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
         @importer = Importer.new(stash_wrapper: wrapper, user_uid: user_uid, ezid_client: ezid_client)
+      end
+
+      describe 'DOI handling' do
+        it 'mints a DOI in demo mode'
+        it 'updates the DOI in production mode'
       end
 
       describe 'imports' do
@@ -279,10 +284,6 @@ module Dash2
         end
       end
 
-      describe 'DOI handling' do
-        it 'mints a DOI in demo mode'
-        it 'updates the DOI in production mode'
-      end
     end
   end
 end
