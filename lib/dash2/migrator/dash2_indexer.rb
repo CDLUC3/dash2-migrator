@@ -27,7 +27,13 @@ module Dash2
       [model_path, lib_path].each do |path|
         Dir.glob("#{path}/**/*.rb").sort.each(&method(:require))
       end
+
+      if 'stash_engine' == gem
+        require "#{gem_path(gem)}/config/initializers/hash_to_ostruct.rb"
+      end
+
     end
+
 
     StashDatacite::ResourcePatch.associate_with_resource(StashEngine::Resource)
 

@@ -5,17 +5,15 @@ module Dash2
   module Migrator
     describe Importer do
 
-      attr_reader :index_config
-      # attr_reader :ezid_shoulder
-      # attr_reader :ezid_account
-      # attr_reader :ezid_password
-      attr_reader :ezid_client
       attr_reader :user_uid
+      attr_reader :index_config
       attr_reader :wrapper
-      attr_reader :importer
-      attr_reader :user
-      attr_reader :imported
       attr_reader :tenant
+      attr_reader :user
+      attr_reader :ezid_client
+      attr_reader :importer
+      attr_reader :se_resource
+      attr_reader :imported
 
       before(:all) do
         @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
@@ -50,18 +48,9 @@ module Dash2
                 stash_wrapper: wrapper,
                 user_uid: user_uid,
                 ezid_client: ezid_client,
-                id_mode: IDMode::MINT_OR_UPDATE,
+                id_mode: IDMode::ALWAYS_MINT,
                 tenant: tenant
             )
-          end
-
-          it 'ignores the existing DOI on initial parsing' do
-            datacite_xml = stash_wrapper.stash_descriptive[0]
-            dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
-            se_resource = se_resource_from(dcs_resource: dcs_resource, with_user_id: user.id)
-            expect(se_resource.identifier).to be_nil
-            expect(ezid_client).not_to receive(:mint_id)
-            expect(ezid_client).not_to receive(:update_metadata)
           end
 
           it 'mints a DOI in demo mode' do
@@ -100,33 +89,41 @@ module Dash2
             )
             # 10.15146/R3RG6G
           end
-        end
 
-        it 'updates the DOI in production mode' do
-          @imported = importer.import
+          it 'updates the DOI in production mode' do
+            @imported = importer.import
+          end
         end
       end
 
-      describe 'imports' do
+      describe 'se_resource_frome' do
 
         before(:each) do
           @importer = Dash2::Migrator::Importer.new(
               stash_wrapper: wrapper,
               user_uid: user_uid,
               ezid_client: ezid_client,
-              id_mode: IDMode::MINT_OR_UPDATE,
+              id_mode: IDMode::ALWAYS_MINT,
               tenant: tenant
           )
-          @imported = importer.import
+          datacite_xml = wrapper.stash_descriptive[0]
+          dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+          @se_resource = importer.se_resource_from(dcs_resource: dcs_resource, with_user_id: user_uid)
           allow(ezid_client).to receive(:mint_id)
         end
 
-        it 'imports a record' do
-          expect(imported).to be_a(StashEngine::Resource)
+        it 'doesn\'t mess with DOIs' do
+          expect(se_resource.identifier).to be_nil
+          expect(ezid_client).not_to receive(:mint_id)
+          expect(ezid_client).not_to receive(:update_metadata)
+        end
+
+        it 'creates a StashEngine::Resource' do
+          expect(se_resource).to be_a(StashEngine::Resource)
         end
 
         it 'extracts the creators' do
-          creators = imported.creators
+          creators = se_resource.creators
           expect(creators.size).to eq(1)
           creator = creators[0]
           expect(creator.creator_first_name).to eq('Hao')
@@ -142,7 +139,7 @@ module Dash2
         end
 
         it 'extracts the title' do
-          titles = imported.titles
+          titles = se_resource.titles
           expect(titles.size).to eq(2)
           title = titles[0]
           expect(title.title).to eq('A Zebrafish Model for Studies on Esophageal Epithelial Biology')
@@ -152,24 +149,24 @@ module Dash2
         end
 
         it 'extracts the publisher' do
-          publisher = imported.publisher
+          publisher = se_resource.publisher
           expect(publisher.publisher).to eq('DataONE')
         end
 
         it 'extracts the publication year' do
-          publication_years = imported.publication_years
+          publication_years = se_resource.publication_years
           expect(publication_years.size).to eq(1)
           publication_year = publication_years[0]
           expect(publication_year.publication_year).to eq(2016.to_s)
         end
 
         it 'extracts the subjects' do
-          subjects = imported.subjects
+          subjects = se_resource.subjects
           expect(subjects.size).to eq(3)
         end
 
         it 'extracts the funding' do
-          contribs = imported.contributors
+          contribs = se_resource.contributors
           funder_type = Datacite::Mapping::ContributorType::FUNDER.value.downcase
           funder_contribs = contribs.select { |c| c.contributor_type == funder_type }
           expect(funder_contribs.size).to eq(3)
@@ -187,7 +184,7 @@ module Dash2
 
         it 'extracts the non-funding contributors' do
           funder_type = Datacite::Mapping::ContributorType::FUNDER.value.downcase
-          contribs = imported.contributors
+          contribs = se_resource.contributors
           contribs = contribs.select { |c| c.contributor_type != funder_type }
           expect(contribs.size).to eq(2)
 
@@ -210,7 +207,7 @@ module Dash2
         end
 
         it 'extracts the dates' do
-          dates = imported.datacite_dates
+          dates = se_resource.datacite_dates
           expect(dates.size).to eq(1)
           date = dates[0]
           expect(date.date).to eq(Date.new(2015, 12, 2))
@@ -218,17 +215,17 @@ module Dash2
         end
 
         it 'extracts the language' do
-          language = imported.language
+          language = se_resource.language
           expect(language.language).to eq('en')
         end
 
         it 'extracts the resource type' do
-          resource_type = imported.resource_type
+          resource_type = se_resource.resource_type
           expect(resource_type.resource_type).to eq(Datacite::Mapping::ResourceTypeGeneral::DATASET.value.downcase)
         end
 
         it 'extracts the alternate identifiers' do
-          alt_idents = imported.alternate_identifiers
+          alt_idents = se_resource.alternate_identifiers
           expect(alt_idents.size).to eq(1)
           alt_ident = alt_idents[0]
           expect(alt_ident.alternate_identifier).to eq('https://oneshare.cdlib.org/xtf/view?docId=dataone/ark%2B%3Dc5146%3Dr3rg6g/mrt-datacite.xml')
@@ -236,7 +233,7 @@ module Dash2
         end
 
         it 'extracts the related identifiers' do
-          rel_idents = imported.related_identifiers
+          rel_idents = se_resource.related_identifiers
           expect(rel_idents.size).to eq(2)
           expected = [
               {
@@ -258,12 +255,12 @@ module Dash2
         end
 
         it 'extracts the sizes' do
-          size = imported.size
+          size = se_resource.size
           expect(size.size).to eq(3_824_823.to_s)
         end
 
         it 'extracts the formats' do
-          formats = imported.formats
+          formats = se_resource.formats
           expected = [
               'text/plain',
               'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -277,14 +274,14 @@ module Dash2
         end
 
         it 'extracts the rights' do
-          rights = imported.rights
+          rights = se_resource.rights
           expect(rights.size).to eq(1)
           expect(rights[0].rights).to eq('CC0 1.0 Universal (CC0 1.0) Public Domain Dedication')
           expect(rights[0].rights_uri).to eq('https://creativecommons.org/publicdomain/zero/1.0/')
         end
 
         it 'extracts the descriptions' do
-          descriptions = imported.descriptions
+          descriptions = se_resource.descriptions
           expected = [
               {
                   type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
@@ -323,7 +320,7 @@ module Dash2
               'Providence Creek (Lower, Upper and P301)',
               'Atlantic Ocean'
           ]
-          places = imported.geolocation_places
+          places = se_resource.geolocation_places
           expect(places.size).to eq(expected_places.size)
           places.each_with_index do |p, i|
             expect(p.geo_location_place).to eq(expected_places[i])
@@ -333,7 +330,7 @@ module Dash2
               [37.046, -119.211, 37.075, -119.182],
               [41.09, -71.032, 42.893, -68.211]
           ]
-          boxes = imported.geolocation_boxes
+          boxes = se_resource.geolocation_boxes
           expect(boxes.size).to eq(expected_boxes.size)
           boxes.each_with_index do |b, i|
             coords = [b.sw_latitude, b.sw_longitude, b.ne_latitude, b.ne_longitude]
@@ -342,7 +339,7 @@ module Dash2
             end
           end
 
-          points = imported.geolocation_points
+          points = se_resource.geolocation_points
           expect(points.size).to eq(1)
           point = points[0]
           expect(point.latitude).to be_within(0.0001).of(31.233)
