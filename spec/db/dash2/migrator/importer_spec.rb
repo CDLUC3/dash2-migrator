@@ -14,6 +14,7 @@ module Dash2
       attr_reader :ezid_client
       attr_reader :importer
       attr_reader :se_resource
+      attr_reader :doi_value
       attr_reader :imported
 
       before(:all) do
@@ -47,8 +48,6 @@ module Dash2
       describe 'DOI handling' do
 
         describe 'demo mode' do
-
-          attr_reader :doi_value
 
           before(:each) do
             @importer = Dash2::Migrator::Importer.new(
@@ -104,6 +103,26 @@ module Dash2
             expect(identifier.identifier).to eq(doi_value)
           end
         end
+      end
+
+      describe 'merritt submission' do
+        before(:each) do
+          @importer = Dash2::Migrator::Importer.new(
+              stash_wrapper: wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: IDMode::ALWAYS_MINT,
+              tenant: tenant
+          )
+
+          @doi_value = '10.10.123/456'
+          doi = "doi:#{doi_value}"
+          allow(ezid_client).to receive(:mint_id) { doi }
+        end
+
+        # TODO: inject sword client
+        it 'creates a SWORD client from tenant parameters'
+        it 'submits to SWORD'
       end
 
       describe 'se_resource_from' do
