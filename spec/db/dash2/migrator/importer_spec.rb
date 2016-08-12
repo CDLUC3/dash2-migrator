@@ -40,12 +40,12 @@ module Dash2
 
         before(:each) do
           StashEngine::User.create(
-              uid: user_uid,
-              first_name: 'Lisa',
-              last_name: 'Muckenhaupt',
-              email: 'lmuckenhaupt@example.org',
-              provider: 'developer',
-              tenant_id: 'ucop'
+            uid: user_uid,
+            first_name: 'Lisa',
+            last_name: 'Muckenhaupt',
+            email: 'lmuckenhaupt@example.org',
+            provider: 'developer',
+            tenant_id: 'ucop'
           )
           @imported = importer.import
         end
@@ -103,9 +103,9 @@ module Dash2
           funder_contribs = contribs.select { |c| c.contributor_type == funder_type }
           expect(funder_contribs.size).to eq(3)
           expected = [
-              {contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011'},
-              {contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122'},
-              {contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525'}
+            { contributor_name: 'U.S. Environmental Protection Agency', award_number: 'EPA STAR Fellowship 2011' },
+            { contributor_name: 'CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants', award_number: 'HRD-0734825 and HRD-1242122' },
+            { contributor_name: 'CI-Team Grant', award_number: 'OCI-1135525' }
           ]
           funder_contribs.each_with_index do |fc, i|
             expect(fc.contributor_name).to eq(expected[i][:contributor_name])
@@ -113,7 +113,7 @@ module Dash2
             expect(fc.affiliation).to be_nil
           end
         end
-        
+
         it 'extracts the non-funding contributors' do
           funder_type = Datacite::Mapping::ContributorType::FUNDER.value.downcase
           contribs = imported.contributors
@@ -168,22 +168,92 @@ module Dash2
           rel_idents = imported.related_identifiers
           expect(rel_idents.size).to eq(2)
           expected = [
-              {
-                  relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
-                  id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
-                  value: '10.1371/journal.pone.0143878'
-              },
-              {
-                  relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
-                  id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
-                  value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
-              },
+            {
+              relation_type: Datacite::Mapping::RelationType::IS_CITED_BY.value.downcase,
+              id_type: Datacite::Mapping::RelatedIdentifierType::DOI.value.downcase,
+              value: '10.1371/journal.pone.0143878'
+            },
+            {
+              relation_type: Datacite::Mapping::RelationType::IS_DOCUMENTED_BY.value.downcase,
+              id_type: Datacite::Mapping::RelatedIdentifierType::URL.value.downcase,
+              value: 'http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878'
+            }
           ]
           rel_idents.each_with_index do |ri, i|
             expect(ri.related_identifier).to eq(expected[i][:value])
             expect(ri.related_identifier_type).to eq(expected[i][:id_type])
             expect(ri.relation_type).to eq(expected[i][:relation_type])
           end
+        end
+
+        it 'extracts the sizes' do
+          sizes = imported.sizes
+          expect(sizes.size).to eq(1)
+          size = sizes[0]
+          expect(size.size).to eq(3_824_823.to_s)
+        end
+
+        it 'extracts the formats' do
+          formats = imported.formats
+          expected = [
+            'text/plain',
+            'text/application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/xml',
+            'application/pdf'
+          ]
+          expect(formats.size).to eq(expected.size)
+          formats.each_with_index do |f, i|
+            expect(f.format).to eq(expected[i])
+          end
+        end
+
+        it 'extracts the version' do
+          version = imported.version
+          expect(version).not_to be_nil
+          expect(version.version).to eq('3.1')
+        end
+
+        it 'extracts the rights' do
+          rights = imported.rights
+          expect(rights.size).to eq(1)
+          expect(rights[0].rights).to eq('CC0 1.0 Universal (CC0 1.0) Public Domain Dedication')
+          expect(rights[0].rights_uri).to eq('https://creativecommons.org/publicdomain/zero/1.0/')
+        end
+
+        it 'extracts the descriptions' do
+          descriptions = imported.descriptions
+          expected = [
+            {
+              type: Datacite::Mapping::DescriptionType::ABSTRACT.value.downcase,
+              value: 'Mammalian esophagus exhibits a remarkable change in epithelial
+                        structure during the transition from embryo to adult. However, the
+                        molecular mechanisms of esophageal epithelial development are not well
+                        understood. Zebrafish (Danio rerio), a common model organism for
+                        vertebrate development and gene function, has not previously been
+                        characterized as a model system for esophageal epithelial development.
+                        In this study, we characterized a piece of non-keratinized stratified
+                        squamous epithelium similar to human esophageal epithelium in the
+                        upper digestive tract of developing zebrafish. Under the microscope,
+                        this piece was detectable at 5dpf and became stratified at 7dpf.
+                        Expression of esophageal epithelial marker genes (Krt5, P63, Sox2
+                        and Pax9) was detected by immunohistochemistry and in situ
+                        hybridization. Knockdown of P63, a gene known to be critical for
+                        esophageal epithelium, disrupted the development of this epithelium.
+                        With this model system, we found that Pax9 knockdown resulted in loss
+                        or disorganization of the squamous epithelium, as well as
+                        down-regulation of the differentiation markers Krt4 and Krt5. In
+                        summary, we characterized a region of stratified squamous epithelium
+                        in the zebrafish upper digestive tract which can be used for
+                        functional studies of candidate genes involved in esophageal epithelial biology.'
+                .squeeze(' ')
+            }
+          ]
+          expect(descriptions.size).to eq(expected.size)
+          descriptions.each_with_index do |desc, i|
+            expect(desc.description).to eq(expected[i][:value])
+            expect(desc.description_type).to eq(expected[i][:type])
+          end
+
         end
       end
 

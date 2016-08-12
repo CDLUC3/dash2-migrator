@@ -29,4 +29,3 @@ group :test do
   gem 'simplecov-console', '~> 0.2.0'
   gem 'webmock', '~> 1.24'
 end
-

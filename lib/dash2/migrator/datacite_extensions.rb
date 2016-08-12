@@ -17,8 +17,16 @@ module Datacite
     end
 
     class Description
+      # TODO: consdier pushing this to datacite-mapping
       def value=(v)
-        @value = v.strip.squeeze(' ').gsub(/-[ \n]/, '')
+        @value = v.strip.squeeze(' ').gsub(/-[ \n]+/, '')
+      end
+    end
+
+    class Rights
+      # TODO: consdier pushing this to datacite-mapping
+      def value=(v)
+        @value = v.strip.gsub("\n", ' ').squeeze(' ')
       end
     end
 
