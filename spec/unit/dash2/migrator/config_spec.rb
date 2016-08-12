@@ -31,11 +31,11 @@ module Dash2
               id_scheme: 'doi',
               owner: nil
           }
-          expect(index_config.ezid_config).to eq(expected_ezid_config)
 
           indexer = index_config.create_indexer(config.metadata_mapper)
           expect(indexer).to be_a(Dash2::Migrator::Dash2Indexer)
           expect(indexer.ezid_client).to be_a(StashEzid::Client)
+          expect(indexer.ezid_config).to eq(expected_ezid_config)
         end
 
         it 'creates a source config' do

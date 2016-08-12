@@ -37,12 +37,11 @@ module Dash2
 
       # @param metadata_mapper [Stash::Indexer::MetadataMapper] the metadata mapper
       def create_indexer(metadata_mapper)
-        ezid_client = StashEzid::Client.new(ezid_config)
         Dash2Indexer.new(
             metadata_mapper: metadata_mapper,
             db_config_path: db_config_path,
             id_mode: id_mode,
-            ezid_client: ezid_client
+            tenant_config: tenant_config
         )
       end
 

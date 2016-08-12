@@ -28,6 +28,10 @@ module Dash2
         )
       end
 
+      def user_uid
+        fail 'user_uid not implemented'
+      end
+
       private
 
       def doi
