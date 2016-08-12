@@ -130,7 +130,8 @@ module Datacite
           'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
           'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
           '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
-              "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>"
+              "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
+          '<geoLocationPlace>false</geoLocationPlace>' => ''
         }
         cases.each do |regex, replacement|
           datacite_xml = datacite_xml.gsub(regex, replacement)
