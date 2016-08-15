@@ -13,6 +13,10 @@ module Dash2
         @tenant_path = File.absolute_path(tenant_path)
       end
 
+      def description
+        "Merritt Atom source for #{tenant_path}"
+      end
+
       def tenant_config
         @tenant_config ||= begin
          tenant_config = YAML.load_file(tenant_path)

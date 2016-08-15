@@ -68,9 +68,7 @@ module Dash2
 
       def index(harvested_records)
         harvested_records.each do |hr|
-          hr.each do |r|
-            index_record(r.as_wrapper, r.user_uid)
-          end
+          index_record(hr.as_wrapper, hr.user_uid)
         end
       end
 

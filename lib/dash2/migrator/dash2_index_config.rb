@@ -19,6 +19,11 @@ module Dash2
         @tenant_path = tenant_path
       end
 
+
+      def description
+        "Dash2IndexConfig for #{tenant_path}"
+      end
+
       def ezid_config
         @ezid_config ||= tenant_config[:identifier_service]
       end
