@@ -9,6 +9,8 @@ module Stash
 
       before(:all) do
         @user_uid = 'lmuckenhaupt-dataone@ucop.edu'
+        @em_count = 0
+        @edit_count = 0
       end
 
       before(:each) do
@@ -29,12 +31,18 @@ module Stash
         }
         allow(StashEzid::Client).to receive(:new) { @ezid_client }
 
-        @sword_client = instance_double(Stash::Sword::Client)
-        allow(@sword_client).to receive(:create) do |doi, _zipfile|
-          receipt = instance_double(Stash::Sword::DepositReceipt)
-          allow(receipt).to receive(:em_iri) { "http://example.org/#{doi}/em" }
-          allow(receipt).to receive(:edit_iri) { "http://example.org/#{doi}/edit" }
+        receipt = instance_double(Stash::Sword::DepositReceipt)
+        allow(receipt).to receive(:em_iri) do
+          @em_count = @em_count + 1
+          "http://example.org/#{@em_count}/em"
         end
+        allow(receipt).to receive(:edit_iri) do
+          @edit_count = @edit_count + 1
+          "http://example.org/#{@edit_count}/edit"
+        end
+
+        @sword_client = instance_double(Stash::Sword::Client)
+        allow(@sword_client).to receive(:create) { receipt }
         allow(Stash::Sword::Client).to receive(:new) { @sword_client }
       end
 

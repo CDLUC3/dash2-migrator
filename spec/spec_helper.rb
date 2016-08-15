@@ -34,4 +34,3 @@ ENV['STASH_ENV'] = 'test'
 
 require 'dash2/migrator'
 require 'stash/config'
-require 'ar_persistence_config'

@@ -6,11 +6,7 @@ defaults: &defaults
     db_config_path: config/database.yml
     tenant_path: config/tenants/dataone.yml # TODO: avoid passing separately to source and index
     id_mode: always_mint
-  db:
-    adapter: sqlite3
-    database: ':memory:'
-    pool: 5
-    timeout: 5000
+  db: none
   source:
     protocol: 'Merritt Atom'
     tenant_path: config/tenants/dataone.yml # TODO: avoid passing separately to source and index

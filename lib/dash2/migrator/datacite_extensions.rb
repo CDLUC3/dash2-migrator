@@ -62,7 +62,7 @@ module Datacite
       end
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi)
-        datacite_xml = fix_special_cases(mrt_datacite_xml)
+        datacite_xml = fix_special_cases(mrt_datacite_xml.force_encoding('utf-8'))
 
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
         unless resource.identifier && resource.identifier.value
