@@ -142,21 +142,19 @@ module Dash2
         end
 
         it 'submits a create to SWORD' do
-          expect_any_instance_of(StashEngine::Resource).to receive(:update_uri) { nil }
-          expect(sword_client).to receive(:create).with(
-            doi: doi,
-            zipfile: /.*zip/
-          )
+          receipt = instance_double(Stash::Sword::DepositReceipt)
+          allow(receipt).to receive(:em_iri) { 'http://example.org/em_iri' }
+          allow(receipt).to receive(:edit_iri) { 'http://example.org/edit_iri' }
+
+          allow_any_instance_of(StashEngine::Resource).to receive(:update_uri) { nil }
+          expect(sword_client).to receive(:create).with(doi: doi, zipfile: /.*zip/) { receipt }
           importer.import
         end
 
         it 'submits an update to SWORD if edit-IRI present' do
           update_uri = 'http://example.org'
-          expect_any_instance_of(StashEngine::Resource).to receive(:update_uri) { update_uri }
-          expect(sword_client).to receive(:update).with(
-            edit_iri: update_uri,
-            zipfile: /.*zip/
-          )
+          allow_any_instance_of(StashEngine::Resource).to receive(:update_uri) { update_uri }
+          expect(sword_client).to receive(:update).with(edit_iri: update_uri, zipfile: /.*zip/) { 200 }
           importer.import
         end
 

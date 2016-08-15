@@ -66,34 +66,43 @@ module Dash2
         rfg = StashDatacite::Resource::ResourceFileGeneration.new(se_resource, tenant)
         rfg.instance_variable_set(:@client, ezid_client)
 
-        Dir.mktmpdir do |tmp|
-          mrt_datacite_xml = "#{tmp}/mrt-datacite.xml"
-          dcs_resource.write_to_file(mrt_datacite_xml, pretty: true)
+        folder = "#{Dir.tmpdir}/import_#{se_resource.id}"
+        Dir.mkdir(folder)
 
-          stash_wrapper_xml = "#{tmp}/stash-wrapper.xml"
-          stash_wrapper.write_to_file(stash_wrapper_xml, pretty: true)
+        mrt_datacite_xml = "#{folder}/mrt-datacite.xml"
+        dcs_resource.write_to_file(mrt_datacite_xml, pretty: true)
 
-          mrt_oaidc_xml = "#{tmp}/mrt-oaidc.xml"
-          File.open(mrt_oaidc_xml, 'w') { |f| f.write(rfg.generate_dublincore) }
+        stash_wrapper_xml = "#{folder}/stash-wrapper.xml"
+        stash_wrapper.write_to_file(stash_wrapper_xml, pretty: true)
 
-          mrt_dataone_manifest_txt = "#{tmp}/mrt-dataone-manifest.txt"
-          File.open(mrt_dataone_manifest_txt, 'w') { |f| f.write(rfg.generate_dataone) }
+        mrt_oaidc_xml = "#{folder}/mrt-oaidc.xml"
+        File.open(mrt_oaidc_xml, 'w') { |f| f.write(rfg.generate_dublincore) }
 
-          zipfile = "#{tmp}/#{se_resource.id}_archive.zip"
-          Zip::File.open(zipfile, Zip::File::CREATE) do |zf|
-            %w(mrt-datacite.xml stash-wrapper.xml mrt-oaidc.xml mrt-dataone-manifest.txt).each do |f|
-              zf.add(f, "#{tmp}/#{f}")
-            end
+        mrt_dataone_manifest_txt = "#{folder}/mrt-dataone-manifest.txt"
+        File.open(mrt_dataone_manifest_txt, 'w') { |f| f.write(rfg.generate_dataone) }
+
+        zipfile = "#{folder}/#{se_resource.id}_archive.zip"
+        Zip::File.open(zipfile, Zip::File::CREATE) do |zf|
+          %w(mrt-datacite.xml stash-wrapper.xml mrt-oaidc.xml mrt-dataone-manifest.txt).each do |f|
+            zf.add(f, "#{folder}/#{f}")
           end
+        end
 
-          system "cp #{zipfile} /Users/dmoles/Desktop"
+        system "cp #{zipfile} /Users/dmoles/Desktop"
 
-          edit_iri = se_resource.update_uri
-          if edit_iri
-            sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
-          else
-            sword_client.create(doi: "doi:#{dcs_resource.identifier.value}", zipfile: zipfile)
-          end
+        edit_iri = se_resource.update_uri
+        if edit_iri
+          status = sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
+          id_val = se_resource.identifier.identifier
+          puts "update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}"
+        else
+          doi = "doi:#{dcs_resource.identifier.value}"
+          receipt = sword_client.create(doi: doi, zipfile: zipfile)
+          se_resource.download_uri = receipt.em_iri
+          se_resource.update_uri = receipt.edit_iri
+          se_resource.save
+          id_val = se_resource.identifier.identifier
+          puts("create(doi: #{doi}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
         end
       end
 
