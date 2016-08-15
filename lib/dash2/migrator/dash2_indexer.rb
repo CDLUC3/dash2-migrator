@@ -43,6 +43,7 @@ module Dash2
 
       attr_reader :id_mode
       attr_reader :tenant_config
+      attr_reader :db_config_path
 
       # Creates a new {Dash2Indexer}
       # @param metadata_mapper [Stash::Indexer::MetadataMapper] the metadata mapper
@@ -67,6 +68,7 @@ module Dash2
       end
 
       def index(harvested_records)
+        ensure_db_connection!
         harvested_records.each do |hr|
           index_record(hr.as_wrapper, hr.user_uid)
         end
@@ -81,6 +83,17 @@ module Dash2
           tenant: tenant
         )
         importer.import
+      end
+
+      def ensure_db_connection!
+        begin
+          ActiveRecord::Base.connection
+        rescue ActiveRecord::ConnectionNotEstablished
+          stash_env = ENV['STASH_ENV']
+          raise '$STASH_ENV not set' unless stash_env
+          db_config = YAML.load_file(db_config_path)[stash_env]
+          ActiveRecord::Base.establish_connection(db_config)
+        end
       end
 
     end
