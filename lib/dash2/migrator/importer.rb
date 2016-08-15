@@ -81,9 +81,22 @@ module Dash2
         mrt_dataone_manifest_txt = "#{folder}/mrt-dataone-manifest.txt"
         File.open(mrt_dataone_manifest_txt, 'w') { |f| f.write(rfg.generate_dataone) }
 
+        data_files = []
+        if 'test'.casecmp(ENV['STASH_ENV'].to_s).zero?
+          stash_wrapper.inventory.files.each do |stash_file|
+            data_file = stash_file.pathname
+            File.open("#{folder}/#{data_file}", 'w') do |f|
+              f.puts("#{data_file}\t#{stash_file.size_bytes}\t#{stash_file.mime_type}\t(placeholder)")
+            end
+            data_files << data_file
+          end
+        end
+
         zipfile = "#{folder}/#{se_resource.id}_archive.zip"
         Zip::File.open(zipfile, Zip::File::CREATE) do |zf|
-          %w(mrt-datacite.xml stash-wrapper.xml mrt-oaidc.xml mrt-dataone-manifest.txt).each do |f|
+          metadata_files = %w(mrt-datacite.xml stash-wrapper.xml mrt-oaidc.xml mrt-dataone-manifest.txt)
+          (metadata_files + data_files).each do |f|
+            Stash::Harvester.log.info("Adding #{f} to zipfile #{zipfile}")
             zf.add(f, "#{folder}/#{f}")
           end
         end
@@ -94,7 +107,7 @@ module Dash2
         if edit_iri
           status = sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
           id_val = se_resource.identifier.identifier
-          puts "update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}"
+          Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
         else
           doi = "doi:#{dcs_resource.identifier.value}"
           receipt = sword_client.create(doi: doi, zipfile: zipfile)
@@ -102,7 +115,7 @@ module Dash2
           se_resource.update_uri = receipt.edit_iri
           se_resource.save
           id_val = se_resource.identifier.identifier
-          puts("create(doi: #{doi}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
+          Stash::Harvester.log.info("create(doi: #{doi}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
         end
       end
 
