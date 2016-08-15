@@ -59,6 +59,20 @@ module Dash2
         ezid_client.update_metadata("doi:#{doi_value}", dcs_resource.write_xml, target_url)
       end
 
+      def create_file_uploads(se_resource)
+        version_time = stash_wrapper.version.date.to_time
+        stash_files = stash_wrapper.inventory.files
+        stash_files.each do |sf|
+          StashEngine::FileUpload.create(
+            resource_id: se_resource.id,
+            upload_file_name: sf.pathname,
+            upload_content_type: sf.mime_type.to_s,
+            upload_file_size: sf.size_bytes,
+            upload_updated_at: version_time
+          )
+        end
+      end
+
       def sword_client
         @sword_client ||= Stash::Sword::Client.new(tenant.sword_params)
       end
@@ -132,6 +146,8 @@ module Dash2
       end
 
       def populate_se_resource(se_resource, dcs_resource)
+        create_file_uploads(se_resource)
+
         se_resource_id = se_resource.id
         dcs_resource.creators.each { |dcs_creator| add_sd_creator(dcs_creator, se_resource_id) }
         dcs_resource.titles.each { |dcs_title| add_sd_title(dcs_title, se_resource_id) }

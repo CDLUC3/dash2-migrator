@@ -13,7 +13,7 @@ require 'dash2/migrator'
 # Check environment
 
 ENV['STASH_ENV'] ||= 'test'
-fail 'Production migration not implemented' if ENV['STASH_ENV'] == 'production'
+raise 'Production migration not implemented' if ENV['STASH_ENV'] == 'production'
 
 # ############################################################
 # Configure users
@@ -23,14 +23,14 @@ class Dash2::Migrator::MerrittAtomHarvestedRecord
     @ucop_users ||= begin
       ucop_users = StashEngine::User.where(tenant_id: 'ucop').all
       if ucop_users.empty?
-        [ StashEngine::User.create(
-            uid: 'lmuckenhaupt-ucop@ucop.edu',
-            first_name: 'Lisa',
-            last_name: 'Muckenhaupt',
-            email: 'lmuckenhaupt@example.org',
-            provider: 'developer',
-            tenant_id: 'ucop'
-        ) ]
+        [StashEngine::User.create(
+          uid: 'lmuckenhaupt-ucop@ucop.edu',
+          first_name: 'Lisa',
+          last_name: 'Muckenhaupt',
+          email: 'lmuckenhaupt@example.org',
+          provider: 'developer',
+          tenant_id: 'ucop'
+        )]
       else
         ucop_users
       end

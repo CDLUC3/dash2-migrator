@@ -15,12 +15,12 @@ module Stash
 
       before(:each) do
         @user = StashEngine::User.create(
-            uid: user_uid,
-            first_name: 'Lisa',
-            last_name: 'Muckenhaupt',
-            email: 'lmuckenhaupt@example.org',
-            provider: 'developer',
-            tenant_id: 'dataone'
+          uid: user_uid,
+          first_name: 'Lisa',
+          last_name: 'Muckenhaupt',
+          email: 'lmuckenhaupt@example.org',
+          provider: 'developer',
+          tenant_id: 'dataone'
         )
         allow_any_instance_of(Dash2::Migrator::MerrittAtomHarvestedRecord).to receive(:user_uid) { user_uid }
 
@@ -33,11 +33,11 @@ module Stash
 
         receipt = instance_double(Stash::Sword::DepositReceipt)
         allow(receipt).to receive(:em_iri) do
-          @em_count = @em_count + 1
+          @em_count += 1
           "http://example.org/#{@em_count}/em"
         end
         allow(receipt).to receive(:edit_iri) do
-          @edit_count = @edit_count + 1
+          @edit_count += 1
           "http://example.org/#{@edit_count}/edit"
         end
 

@@ -86,14 +86,12 @@ module Dash2
       end
 
       def ensure_db_connection!
-        begin
-          ActiveRecord::Base.connection
-        rescue ActiveRecord::ConnectionNotEstablished
-          stash_env = ENV['STASH_ENV']
-          raise '$STASH_ENV not set' unless stash_env
-          db_config = YAML.load_file(db_config_path)[stash_env]
-          ActiveRecord::Base.establish_connection(db_config)
-        end
+        ActiveRecord::Base.connection
+      rescue ActiveRecord::ConnectionNotEstablished
+        stash_env = ENV['STASH_ENV']
+        raise '$STASH_ENV not set' unless stash_env
+        db_config = YAML.load_file(db_config_path)[stash_env]
+        ActiveRecord::Base.establish_connection(db_config)
       end
 
     end

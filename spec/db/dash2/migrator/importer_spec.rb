@@ -186,6 +186,20 @@ module Dash2
           expect(se_resource).to be_a(StashEngine::Resource)
         end
 
+        it 'extracts the files' do
+          stash_files = wrapper.inventory.files
+          expected_time = wrapper.version.date.to_time
+          se_file_uploads = se_resource.file_uploads
+          expect(se_file_uploads.size).to eq(stash_files.size)
+          stash_files.each_with_index do |sf, i|
+            sef = se_file_uploads[i]
+            expect(sef.upload_file_name).to eq(sf.pathname)
+            expect(sef.upload_content_type).to eq(sf.mime_type.to_s)
+            expect(sef.upload_file_size).to eq(sf.size_bytes)
+            expect(sef.upload_updated_at.to_i).to be_within(120).of(expected_time.to_i)
+          end
+        end
+
         it 'extracts the creators' do
           creators = se_resource.creators
           expect(creators.size).to eq(1)
