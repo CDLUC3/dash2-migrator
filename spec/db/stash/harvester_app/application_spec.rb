@@ -13,7 +13,7 @@ module Stash
         allow(StashEzid::Client).to receive(:new) { @ezid_client }
 
         @sword_client = instance_double(Stash::Sword::Client)
-        allow(@sword_client).to receive(:create) do |doi, zipfile|
+        allow(@sword_client).to receive(:create) do |doi, _zipfile|
           receipt = instance_double(Stash::Sword::DepositReceipt)
           allow(receipt).to receive(:em_iri) { "http://example.org/#{doi}/em" }
           allow(receipt).to receive(:edit_iri) { "http://example.org/#{doi}/edit" }

@@ -19,7 +19,6 @@ module Dash2
         @tenant_path = tenant_path
       end
 
-
       def description
         "Dash2IndexConfig for #{tenant_path}"
       end

@@ -106,7 +106,12 @@ module Dash2
       def content_for(title)
         uri = uri_for(title)
         return nil unless uri
-        RestClient.get(uri.to_s).body
+        begin
+          RestClient.get(uri.to_s).body
+        rescue => e
+          ::Stash::Harvester.log.error("Error fetching URI #{uri}: #{e}")
+          raise
+        end
       end
     end
   end
