@@ -7,6 +7,7 @@ gem 'mysql2', '~> 0.3'
 gem 'config-factory', '~> 0.0', '>= 0.0.9'
 gem 'datacite-mapping', '~> 0.1', '>= 0.1.17.1'
 gem 'stash-wrapper', '~> 0.1', '>= 0.1.11.1'
+gem 'xml-mapping_extensions', '~> 0.4', '>= 0.4.6'
 
 gem 'simple-rss', '~> 1.3'
 

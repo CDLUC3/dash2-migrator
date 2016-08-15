@@ -16,6 +16,8 @@ module Dash2
       attr_reader :se_resource
       attr_reader :doi_value
       attr_reader :imported
+      attr_reader :sword_params
+      attr_reader :sword_client
 
       before(:all) do
         @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
@@ -43,6 +45,19 @@ module Dash2
           tenant_id: tenant.tenant_id
         )
         @ezid_client = instance_double(StashEzid::Client)
+
+        @sword_client = instance_double(Stash::Sword::Client)
+        allow(sword_client).to receive(:create)
+        allow(sword_client).to receive(:update)
+
+        @sword_params = {
+          collection_uri: 'http://uc3-mrtsword-dev.cdlib.org:39001/mrtsword/collection/demo_open_context',
+          username: 'dataone_dash_submitter',
+          password: 'w2NnJ8qj'
+        }
+        allow(Stash::Sword::Client).to receive(:new).with(sword_params) {
+          @sword_client
+        }
       end
 
       describe 'DOI handling' do
@@ -106,23 +121,46 @@ module Dash2
       end
 
       describe 'merritt submission' do
+
+        attr_reader :doi
+
         before(:each) do
           @importer = Dash2::Migrator::Importer.new(
-              stash_wrapper: wrapper,
-              user_uid: user_uid,
-              ezid_client: ezid_client,
-              id_mode: IDMode::ALWAYS_MINT,
-              tenant: tenant
+            stash_wrapper: wrapper,
+            user_uid: user_uid,
+            ezid_client: ezid_client,
+            id_mode: IDMode::ALWAYS_MINT,
+            tenant: tenant
           )
-
           @doi_value = '10.10.123/456'
-          doi = "doi:#{doi_value}"
+          @doi = "doi:#{doi_value}"
           allow(ezid_client).to receive(:mint_id) { doi }
         end
 
-        # TODO: inject sword client
-        it 'creates a SWORD client from tenant parameters'
-        it 'submits to SWORD'
+        it 'creates a SWORD client from tenant parameters' do
+          expect(importer.sword_client).to be(sword_client)
+        end
+
+        it 'submits a create to SWORD' do
+          expect_any_instance_of(StashEngine::Resource).to receive(:update_uri) { nil }
+          expect(sword_client).to receive(:create).with(
+            doi: doi,
+            zipfile: /.*zip/
+          )
+          importer.import
+        end
+
+        it 'submits an update to SWORD if edit-IRI present' do
+          update_uri = 'http://example.org'
+          expect_any_instance_of(StashEngine::Resource).to receive(:update_uri) { update_uri }
+          expect(sword_client).to receive(:update).with(
+            edit_iri: update_uri,
+            zipfile: /.*zip/
+          )
+          importer.import
+        end
+
+        # TODO: create edit IRIs for production
       end
 
       describe 'se_resource_from' do

@@ -1,5 +1,7 @@
+require 'tmpdir'
 require 'datacite/mapping'
 require 'stash_ezid/client'
+require 'stash/sword'
 require 'dash2/migrator/id_mode'
 
 # TODO: Extract all the StashDatacite:: stuff and move it into that module
@@ -13,6 +15,7 @@ module Dash2
       attr_reader :stash_wrapper
       attr_reader :id_mode
       attr_reader :tenant
+      attr_reader :sword_client
 
       def initialize(stash_wrapper:, user_uid:, ezid_client:, id_mode:, tenant:)
         @stash_wrapper = stash_wrapper
@@ -27,6 +30,7 @@ module Dash2
         raise "No user found for #{user_uid}" unless user
         se_resource = se_resource_from(dcs_resource: dcs_resource, with_user_id: user.id)
         mint_or_update_doi(se_resource)
+        sword_create_or_update(se_resource)
         se_resource
       end
 
@@ -52,6 +56,45 @@ module Dash2
         se_resource.update_identifier(doi_value)
         target_url = tenant.landing_url("/stash/dataset/doi:#{doi_value}")
         ezid_client.update_metadata("doi:#{doi_value}", dcs_resource.write_xml, target_url)
+      end
+
+      def sword_client
+        @sword_client ||= Stash::Sword::Client.new(tenant.sword_params)
+      end
+
+      def sword_create_or_update(se_resource)
+        rfg = StashDatacite::Resource::ResourceFileGeneration.new(se_resource, tenant)
+        rfg.instance_variable_set(:@client, ezid_client)
+
+        Dir.mktmpdir do |tmp|
+          mrt_datacite_xml = "#{tmp}/mrt-datacite.xml"
+          dcs_resource.write_to_file(mrt_datacite_xml, pretty: true)
+
+          stash_wrapper_xml = "#{tmp}/stash-wrapper.xml"
+          stash_wrapper.write_to_file(stash_wrapper_xml, pretty: true)
+
+          mrt_oaidc_xml = "#{tmp}/mrt-oaidc.xml"
+          File.open(mrt_oaidc_xml, 'w') { |f| f.write(rfg.generate_dublincore) }
+
+          mrt_dataone_manifest_txt = "#{tmp}/mrt-dataone-manifest.txt"
+          File.open(mrt_dataone_manifest_txt, 'w') { |f| f.write(rfg.generate_dataone) }
+
+          zipfile = "#{tmp}/#{se_resource.id}_archive.zip"
+          Zip::File.open(zipfile, Zip::File::CREATE) do |zf|
+            %w(mrt-datacite.xml stash-wrapper.xml mrt-oaidc.xml mrt-dataone-manifest.txt).each do |f|
+              zf.add(f, "#{tmp}/#{f}")
+            end
+          end
+
+          system "cp #{zipfile} /Users/dmoles/Desktop"
+
+          edit_iri = se_resource.update_uri
+          if edit_iri
+            sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
+          else
+            sword_client.create(doi: "doi:#{dcs_resource.identifier.value}", zipfile: zipfile)
+          end
+        end
       end
 
       def dcs_resource
