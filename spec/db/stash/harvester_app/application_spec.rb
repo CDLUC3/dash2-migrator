@@ -4,7 +4,24 @@ require 'stash/harvester_app'
 module Stash
   module HarvesterApp
     describe Application do
+
+      attr_reader :user_uid
+
+      before(:all) do
+        @user_uid = 'lmuckenhaupt-dataone@ucop.edu'
+      end
+
       before(:each) do
+        @user = StashEngine::User.create(
+            uid: user_uid,
+            first_name: 'Lisa',
+            last_name: 'Muckenhaupt',
+            email: 'lmuckenhaupt@example.org',
+            provider: 'developer',
+            tenant_id: 'dataone'
+        )
+        allow_any_instance_of(Dash2::Migrator::MerrittAtomHarvestedRecord).to receive(:user_uid) { user_uid }
+
         @ezid_client = instance_double(StashEzid::Client)
         allow(@ezid_client).to receive(:mint_id) {
           time = Time.now
