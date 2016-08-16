@@ -81,7 +81,7 @@ module Dash2
         rfg = StashDatacite::Resource::ResourceFileGeneration.new(se_resource, tenant)
         rfg.instance_variable_set(:@client, ezid_client)
 
-        folder = "#{Dir.tmpdir}/import_#{se_resource.id}"
+        folder = "#{Dir.tmpdir}/#{Time.now.to_i}_import_#{se_resource.id}"
         Dir.mkdir(folder)
 
         mrt_datacite_xml = "#{folder}/mrt-datacite.xml"
@@ -97,7 +97,7 @@ module Dash2
         File.open(mrt_dataone_manifest_txt, 'w') { |f| f.write(rfg.generate_dataone) }
 
         data_files = []
-        if 'test'.casecmp(ENV['STASH_ENV'].to_s).zero?
+        unless 'production'.casecmp(ENV['STASH_ENV'].to_s).zero?
           stash_wrapper.inventory.files.each do |stash_file|
             data_file = stash_file.pathname
             File.open("#{folder}/#{data_file}", 'w') do |f|
