@@ -120,12 +120,15 @@ module Dash2
         if edit_iri
           status = sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
           id_val = se_resource.identifier.identifier
+          se_resource.set_state('published')
+          se_resource.save
           Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
         else
           doi = "doi:#{dcs_resource.identifier.value}"
           receipt = sword_client.create(doi: doi, zipfile: zipfile)
           se_resource.download_uri = receipt.em_iri
           se_resource.update_uri = receipt.edit_iri
+          se_resource.set_state('published')
           se_resource.save
           id_val = se_resource.identifier.identifier
           Stash::Harvester.log.info("create(doi: #{doi}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
