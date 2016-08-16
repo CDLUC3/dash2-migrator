@@ -1,16 +1,16 @@
 defaults: &defaults
   mapper:
     metadata_mapping: datacite_geoblacklight
-  index:
-    adapter: Dash2
-    db_config_path: config/database.yml
-    tenant_path: config/tenants/dataone.yml
-    id_mode: always_mint
   db: none
   source:
     protocol: 'Merritt Atom'
-    tenant_path: config/tenants/ucop.yml
+    tenant_path: config/tenants/dataone.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
+  index:
+    adapter: Dash2
+    db_config_path: config/database.yml
+    tenant_path: config/tenants/ucop.yml
+    id_mode: always_mint
 
 test:
   <<: *defaults
