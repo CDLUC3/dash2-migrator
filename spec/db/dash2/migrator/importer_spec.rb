@@ -197,8 +197,13 @@ module Dash2
             expect(sef.upload_content_type).to eq(sf.mime_type.to_s)
             expect(sef.upload_file_size).to eq(sf.size_bytes)
             expect(sef.upload_updated_at.to_i).to be_within(120).of(expected_time.to_i)
+            expect(sef.file_state).to eq('created')
           end
         end
+
+        it 'creates a version'
+
+        it 'sets the state to "published"'
 
         it 'extracts the creators' do
           creators = se_resource.creators
