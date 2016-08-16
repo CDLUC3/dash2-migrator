@@ -78,15 +78,20 @@ module Dash2
       end
 
       def index_record(stash_wrapper, user_uid)
-        Stash::Harvester.log.info("Importing #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}")
-        importer = Dash2::Migrator::Importer.new(
-          stash_wrapper: stash_wrapper,
-          user_uid: user_uid,
-          ezid_client: ezid_client,
-          id_mode: id_mode,
-          tenant: tenant
-        )
-        importer.import
+        begin
+          Stash::Harvester.log.info("Importing #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}")
+          importer = Dash2::Migrator::Importer.new(
+              stash_wrapper: stash_wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: id_mode,
+              tenant: tenant
+          )
+          importer.import
+        rescue => e
+          Stash::Harvester.log.error("Import failed for #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}: #{e}")
+          Stash::Harvester.log.error(e.backtrace) if e.backtrace
+        end
       end
 
       def db_config
