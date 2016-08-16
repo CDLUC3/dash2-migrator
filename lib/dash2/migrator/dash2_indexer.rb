@@ -69,12 +69,16 @@ module Dash2
 
       def index(harvested_records)
         ensure_db_connection!
-        harvested_records.each do |hr|
-          index_record(hr.as_wrapper, hr.user_uid)
+        Stash::Harvester.log.info("Indexing records for tenant_id #{tenant.tenant_id} into database #{db_config['database']} on #{db_config['host']}")
+        ActiveRecord::Base.transaction(requires_new: true) do
+          harvested_records.each do |hr|
+            index_record(hr.as_wrapper, hr.user_uid)
+          end
         end
       end
 
       def index_record(stash_wrapper, user_uid)
+        Stash::Harvester.log.info("Importing #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}")
         importer = Dash2::Migrator::Importer.new(
           stash_wrapper: stash_wrapper,
           user_uid: user_uid,
@@ -85,12 +89,17 @@ module Dash2
         importer.import
       end
 
+      def db_config
+        @db_config ||= begin
+          stash_env = ENV['STASH_ENV']
+          raise '$STASH_ENV not set' unless stash_env
+          YAML.load_file(db_config_path)[stash_env]
+        end
+      end
+
       def ensure_db_connection!
         ActiveRecord::Base.connection
       rescue ActiveRecord::ConnectionNotEstablished
-        stash_env = ENV['STASH_ENV']
-        raise '$STASH_ENV not set' unless stash_env
-        db_config = YAML.load_file(db_config_path)[stash_env]
         ActiveRecord::Base.establish_connection(db_config)
       end
 
