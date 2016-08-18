@@ -64,7 +64,7 @@ module Dash2
           Datacite::Mapping::Description.new(type: Datacite::Mapping::DescriptionType::ABSTRACT, value: '')
         end
         dcs_abstract.value = [
-            dcs_abstract.value,
+            (dcs_abstract.value unless dcs_abstract.value.blank?),
             "Migrated from #{old_doi} to #{to_doi} at #{Time.now.iso8601} in #{ENV['STASH_ENV']}."
         ].compact.join("\n<br/>\n")
         se_abstract = se_resource.descriptions.where(description_type: 'abstract')[0]
