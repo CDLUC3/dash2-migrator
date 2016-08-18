@@ -132,7 +132,7 @@ module Dash2
             id_mode: IDMode::ALWAYS_MINT,
             tenant: tenant
           )
-          @doi_value = '10.10.123/456'
+          @doi_value = '10.123/456'
           @doi = "doi:#{doi_value}"
           allow(ezid_client).to receive(:mint_id) { doi }
         end
@@ -147,8 +147,30 @@ module Dash2
           allow(receipt).to receive(:edit_iri) { 'http://example.org/edit_iri' }
 
           allow_any_instance_of(StashEngine::Resource).to receive(:update_uri) { nil }
-          expect(sword_client).to receive(:create).with(doi: doi, zipfile: /.*zip/) { receipt }
+          zipfile = nil
+          expect(sword_client).to receive(:create).with(doi: doi, zipfile: /.*zip/) do |args|
+            zipfile = args[:zipfile]
+            receipt
+          end
           importer.import
+
+          archive = ::Zip::File.open(zipfile)
+
+          # TODO: test zipfile generation separate from SWORD submission
+          datacite_entry = archive.find_entry('mrt-datacite.xml')
+          expect(datacite_entry).not_to(be_nil)
+          resource = Datacite::Mapping::Resource.parse_xml(datacite_entry.get_input_stream)
+          expect(resource.doi).to eq(doi)
+
+          stash_wrapper_entry = archive.find_entry('stash-wrapper.xml')
+          expect(stash_wrapper_entry).not_to(be_nil)
+          stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(stash_wrapper_entry.get_input_stream)
+          expect(stash_wrapper.id_value).to eq(@doi_value)
+
+          embedded_resource = Datacite::Mapping::Resource.parse_xml(stash_wrapper.stash_descriptive[0])
+          expect(embedded_resource.doi).to eq(doi)
+
+          expect(resource.save_to_xml).to be_xml(embedded_resource.save_to_xml)
         end
 
         it 'submits an update to SWORD if edit-IRI present' do

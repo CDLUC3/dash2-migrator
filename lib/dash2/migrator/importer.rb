@@ -48,8 +48,13 @@ module Dash2
 
       def mint_new_doi(se_resource)
         doi = ezid_client.mint_id
-        se_resource.update_identifier(doi)
         dcs_resource.identifier = Datacite::Mapping::Identifier.from_doi(doi)
+        stash_wrapper.identifier = Stash::Wrapper::Identifier.new(
+            type: Stash::Wrapper::IdentifierType::DOI,
+            value: dcs_resource.identifier.value
+        )
+        stash_wrapper.stash_descriptive[0] = dcs_resource.save_to_xml
+        se_resource.update_identifier(doi)
       end
 
       def update_doi(dcs_resource, se_resource)
