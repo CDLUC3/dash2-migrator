@@ -55,6 +55,6 @@ end
 # ############################################################
 # Harvest
 
-config_file = 'config/migrator-dataone-to-ucop.yml'
+config_file = 'config/migrator-ucsf-to-ucop.yml'
 app = Stash::HarvesterApp::Application.with_config_file(config_file)
 app.start
