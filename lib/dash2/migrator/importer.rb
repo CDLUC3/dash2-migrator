@@ -48,6 +48,7 @@ module Dash2
 
       def mint_new_doi(se_resource)
         doi = ezid_client.mint_id
+        document_migration(to_doi: doi, se_resource: se_resource) unless ENV['STASH_ENV'] == 'production'
         dcs_resource.identifier = Datacite::Mapping::Identifier.from_doi(doi)
         stash_wrapper.identifier = Stash::Wrapper::Identifier.new(
             type: Stash::Wrapper::IdentifierType::DOI,
@@ -55,6 +56,22 @@ module Dash2
         )
         stash_wrapper.stash_descriptive[0] = dcs_resource.save_to_xml
         se_resource.update_identifier(doi)
+      end
+
+      def document_migration(to_doi:, se_resource:)
+        old_doi = dcs_resource.doi
+        dcs_abstract = dcs_resource.descriptions.find { |d| d.type = Datacite::Mapping::DescriptionType::ABSTRACT } || begin
+          Datacite::Mapping::Description.new(type: Datacite::Mapping::DescriptionType::ABSTRACT, value: '')
+        end
+        dcs_abstract.value = [
+            dcs_abstract.value,
+            "Migrated from #{old_doi} to #{to_doi} at #{Time.now.iso8601} in #{ENV['STASH_ENV']}."
+        ].compact.join("\n<br/>\n")
+        se_abstract = se_resource.descriptions.where(description_type: 'abstract')[0]
+        if se_abstract
+          se_abstract.description = dcs_abstract.value
+          se_abstract.save
+        end
       end
 
       def update_doi(dcs_resource, se_resource)

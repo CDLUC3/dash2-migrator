@@ -25,17 +25,17 @@ module Dash2
         path = 'config/migrator-dataone.yml'
         @index_config = Stash::Config.from_file(path).index_config
 
+        tenant_config = YAML.load_file('/Users/dmoles/Work/dash2-migrator/config/tenants/dataone.yml')['test']
+        @tenant = StashEngine::Tenant.new(tenant_config)
+      end
+
+      before(:each) do
         wrapper_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/harvested-wrapper.xml')
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
 
         datacite_xml = wrapper.stash_descriptive[0]
         @dc_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
 
-        tenant_config = YAML.load_file('/Users/dmoles/Work/dash2-migrator/config/tenants/dataone.yml')['test']
-        @tenant = StashEngine::Tenant.new(tenant_config)
-      end
-
-      before(:each) do
         @user = StashEngine::User.create(
           uid: user_uid,
           first_name: 'Lisa',
@@ -46,8 +46,12 @@ module Dash2
         )
         @ezid_client = instance_double(StashEzid::Client)
 
+        receipt = instance_double(Stash::Sword::DepositReceipt)
+        allow(receipt).to receive(:em_iri) { 'http://example.org/em_iri' }
+        allow(receipt).to receive(:edit_iri) { 'http://example.org/edit_iri' }
+
         @sword_client = instance_double(Stash::Sword::Client)
-        allow(sword_client).to receive(:create)
+        allow(sword_client).to receive(:create) { receipt }
         allow(sword_client).to receive(:update)
 
         @sword_params = {
@@ -73,9 +77,10 @@ module Dash2
               tenant: tenant
             )
 
-            @doi_value = '10.10.123/456'
+            @doi_value = '10.123/456'
             doi = "doi:#{doi_value}"
             expect(ezid_client).to receive(:mint_id) { doi }
+
             @imported = importer.import
           end
 
@@ -83,7 +88,6 @@ module Dash2
             identifier = imported.identifier
             expect(identifier).not_to be_nil
             expect(identifier.identifier).to eq(doi_value)
-
           end
 
           it 'updates the DOI in the XML' do
@@ -360,8 +364,9 @@ module Dash2
         end
 
         it 'extracts the sizes' do
-          size = se_resource.size
-          expect(size.size).to eq(3_824_823.to_s)
+          sizes = se_resource.sizes
+          expect(sizes.size).to eq(1)
+          expect(sizes[0].size).to eq(3_824_823.to_s)
         end
 
         it 'extracts the formats' do
@@ -415,7 +420,7 @@ module Dash2
           ]
           expect(descriptions.size).to eq(expected.size)
           descriptions.each_with_index do |desc, i|
-            expect(desc.description).to eq(expected[i][:value])
+            expect(desc.description).to start_with(expected[i][:value])
             expect(desc.description_type).to eq(expected[i][:type])
           end
         end
