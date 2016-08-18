@@ -1,0 +1,11 @@
+ucb: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5q82t8x
+uci: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5fr19qh
+ucla: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5tm8r6v
+(none): https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5b00k0h
+ucm: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5sv2b3c
+(none): https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5jt2v2m
+ucsc: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5t16hvv
+ucsf: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m52j8gvj
+ucsf (closed): https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5ng4nz1
+ucop: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5v13jxb
+dataone: https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd
