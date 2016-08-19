@@ -25,12 +25,12 @@ module Dash2
         path = 'config/migrator-dataone.yml'
         @index_config = Stash::Config.from_file(path).index_config
 
-        tenant_config = YAML.load_file('/Users/dmoles/Work/dash2-migrator/config/tenants/dataone.yml')['test']
+        tenant_config = YAML.load_file('config/tenants/dataone.yml')['test']
         @tenant = StashEngine::Tenant.new(tenant_config)
       end
 
       before(:each) do
-        wrapper_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/harvested-wrapper.xml')
+        wrapper_xml = File.read('spec/data/harvested-wrapper.xml')
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
 
         datacite_xml = wrapper.stash_descriptive[0]
@@ -63,6 +63,35 @@ module Dash2
           @sword_client
         }
       end
+
+      describe 'problem files' do
+        before(:each) do
+          @importer = Dash2::Migrator::Importer.new(
+              stash_wrapper: wrapper,
+              user_uid: user_uid,
+              ezid_client: ezid_client,
+              id_mode: IDMode::ALWAYS_MINT,
+              tenant: tenant
+          )
+
+          @doi_value = '10.123/456'
+          doi = "doi:#{doi_value}"
+          expect(ezid_client).to receive(:mint_id) { doi }
+        end
+
+        xit 'imports problem files' do
+          problem_files = Dir.glob('spec/data/problem-files/*.xml').sort
+          # problem_files = ['spec/data/harvested-wrapper.xml']
+          problem_files.each do |f|
+            stash_wrapper_xml = File.read(f)
+            @wrapper = Stash::Wrapper::StashWrapper.parse_xml(stash_wrapper_xml)
+            datacite_xml = wrapper.stash_descriptive[0]
+            @dc_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+            importer.import
+          end
+        end
+      end
+
 
       describe 'DOI handling' do
 

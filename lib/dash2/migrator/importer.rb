@@ -122,7 +122,9 @@ module Dash2
         data_files = []
         unless 'production'.casecmp(ENV['STASH_ENV'].to_s).zero?
           stash_wrapper.inventory.files.each do |stash_file|
-            data_file = stash_file.pathname
+            # Since this is just for test we don't care about zipfile directory structure, we just need valid filenames
+            data_file = stash_file.pathname.gsub('/', '-')
+            stash_file.pathname = data_file
             File.open("#{folder}/#{data_file}", 'w') do |f|
               f.puts("#{data_file}\t#{stash_file.size_bytes}\t#{stash_file.mime_type}\t(placeholder)")
             end

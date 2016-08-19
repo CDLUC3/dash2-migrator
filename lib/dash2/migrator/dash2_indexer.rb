@@ -78,6 +78,7 @@ module Dash2
       end
 
       def index_record(stash_wrapper, user_uid)
+        original_doi = stash_wrapper.identifier.value
         begin
           Stash::Harvester.log.info("Importing #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}")
           importer = Dash2::Migrator::Importer.new(
@@ -90,7 +91,11 @@ module Dash2
           importer.import
         rescue => e
           Stash::Harvester.log.error("Import failed for #{stash_wrapper.id_value} for user #{user_uid}, tenant_id #{tenant.tenant_id}: #{e}")
-          Stash::Harvester.log.error(e.backtrace) if e.backtrace
+          Stash::Harvester.log.error(e.backtrace.join("\n")) if e.backtrace
+
+          problem_file = "spec/data/problem-files/stash-wrapper-#{original_doi.gsub('/', '-')}.xml"
+          stash_wrapper.write_to_file(problem_file)
+          Stash::Harvester.log.debug("Wrote problem stash-wrapper to #{problem_file}")
         end
       end
 
