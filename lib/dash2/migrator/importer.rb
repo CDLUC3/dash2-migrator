@@ -162,7 +162,20 @@ module Dash2
           Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
         else
           doi = "doi:#{dcs_resource.identifier.value}"
-          receipt = sword_client.create(doi: doi, zipfile: zipfile)
+
+          receipt = nil
+          retries = 3
+          while receipt.nil? && retries > 0
+            begin
+              receipt = sword_client.create(doi: doi, zipfile: zipfile)
+            rescue RestClient::Exceptions::ReadTimeout => e
+              Stash::Harvester.log.warn("ReadTimeout in SWORD submission; #{retries} retries remaining: #{e}")
+              retries = retries - 1
+            end
+          end
+
+          raise "Unable to submit #{doi} to SWORD: too many timeouts" unless receipt
+
           se_resource.download_uri = receipt.em_iri
           se_resource.update_uri = receipt.edit_iri
           id_val = se_resource.identifier.identifier
