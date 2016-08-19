@@ -7,6 +7,7 @@ module Dash2
   module Migrator
     class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
       DOI_PATTERN = %r{10\..+/.+$}
+      MAX_FILES = 20
 
       attr_reader :feed_uri
       attr_reader :entry
@@ -15,6 +16,10 @@ module Dash2
         super(identifier: entry.id.content, timestamp: entry.updated)
         @feed_uri = Stash::Util.to_uri(feed_uri)
         @entry = entry
+      end
+
+      def log
+        ::Stash::Harvester.log
       end
 
       def as_wrapper
@@ -82,14 +87,24 @@ module Dash2
       end
 
       def stash_files
-        @stash_files ||= entry.links.select do |l|
-          title = l.title
-          title && title.start_with?('producer/') && !title.start_with?('producer/mrt-')
-        end.map do |l|
-          pathname = l.title.match(/(?<=\/)(.*)/)[0]
-          size_bytes = l.length.to_i
-          mime_type = l.type
-          Stash::Wrapper::StashFile.new(pathname: pathname, size_bytes: size_bytes, mime_type: mime_type)
+        @stash_files ||= begin
+          file_links = entry.links.select do |l|
+            title = l.title
+            title && title.start_with?('producer/') && !title.start_with?('producer/mrt-')
+          end
+          files = file_links.map do |l|
+            pathname = l.title.match(/(?<=\/)(.*)/)[0]
+            size_bytes = l.length.to_i
+            mime_type = l.type
+            Stash::Wrapper::StashFile.new(pathname: pathname, size_bytes: size_bytes, mime_type: mime_type)
+          end
+
+          if file_links.size > MAX_FILES && ENV['STASH_ENV'] != 'production'
+            log.warn "#{doi}: Taking only first #{MAX_FILES} of #{file_links.size} files"
+            files.first(MAX_FILES)
+          else
+            files
+          end
         end
       end
 
@@ -109,10 +124,11 @@ module Dash2
         begin
           RestClient.get(uri.to_s).body
         rescue => e
-          ::Stash::Harvester.log.error("Error fetching URI #{uri}: #{e}")
+          log.error("Error fetching URI #{uri}: #{e}")
           raise
         end
       end
+
     end
   end
 end
