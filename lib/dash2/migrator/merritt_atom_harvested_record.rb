@@ -78,7 +78,7 @@ module Dash2
         rights_url = rights.uri.to_s
         return Stash::Wrapper::License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
         return Stash::Wrapper::License::CC_BY if rights_url.include?('licenses/by')
-        nil
+        Stash::Wrapper::License.new(name: rights.value, uri: rights.uri)
       end
 
       def stash_files
