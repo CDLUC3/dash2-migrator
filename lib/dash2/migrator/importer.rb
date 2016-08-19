@@ -274,7 +274,16 @@ module Dash2
 
       def set_sd_resource_type(dcs_resource_type, se_resource_id)
         return nil unless dcs_resource_type
-        StashDatacite::ResourceType.create(resource_type_friendly: dcs_resource_type.value, resource_id: se_resource_id)
+        dcs_resource_type_general = dcs_resource_type.resource_type_general
+        se_resource_type = dcs_resource_type_general.value.downcase
+        StashDatacite::ResourceType.create(
+            resource_id: se_resource_id,
+            resource_type_friendly: if StashDatacite::ResourceType::ResourceTypesLimited.values.include?(se_resource_type) then
+                                      se_resource_type
+                                    else
+                                      'other'
+                                    end
+        )
       end
 
       def add_sd_alternate_ident(dcs_alternate_ident, se_resource_id)

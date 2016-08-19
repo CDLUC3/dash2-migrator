@@ -136,7 +136,7 @@
                 <date dateType="Available">2015-12-02</date>
             </dates>
             <language>en</language>
-            <resourceType resourceTypeGeneral='Dataset'>Dataset</resourceType>
+            <resourceType resourceTypeGeneral='Dataset'>application/octet-stream</resourceType>
             <alternateIdentifiers>
                 <alternateIdentifier alternateIdentifierType="URL">https://oneshare.cdlib.org/xtf/view?docId=dataone/ark%2B%3Dc5146%3Dr3rg6g/mrt-datacite.xml</alternateIdentifier>
             </alternateIdentifiers>
