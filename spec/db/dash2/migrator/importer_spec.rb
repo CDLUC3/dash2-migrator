@@ -94,9 +94,7 @@ module Dash2
 
 
       describe 'DOI handling' do
-
         describe 'demo mode' do
-
           before(:each) do
             @importer = Dash2::Migrator::Importer.new(
               stash_wrapper: wrapper,
@@ -106,9 +104,11 @@ module Dash2
               tenant: tenant
             )
 
-            @doi_value = '10.123/456'
-            doi = "doi:#{doi_value}"
-            expect(ezid_client).to receive(:mint_id) { doi }
+            expect(ezid_client).to receive(:mint_id) {
+              time = Time.now
+              @doi_value = "10.123/#{time.to_i}.#{time.nsec}"
+              doi = "doi:#{doi_value}"
+            }
 
             @imported = importer.import
           end
@@ -122,6 +122,22 @@ module Dash2
           it 'updates the DOI in the XML' do
             dcs_ident = importer.dcs_resource.identifier
             expect(dcs_ident.value).to eq(doi_value)
+          end
+
+          it "doesn't re-mint when re-importing" do
+            identifier_1 = imported.identifier
+            wrapper_2 = Stash::Wrapper::StashWrapper.parse_xml(File.read('spec/data/harvested-wrapper.xml'))
+            importer_2 = Dash2::Migrator::Importer.new(
+                stash_wrapper: wrapper_2,
+                user_uid: user_uid,
+                ezid_client: ezid_client,
+                id_mode: IDMode::ALWAYS_MINT,
+                tenant: tenant
+            )
+            imported_2 = importer_2.import
+            identifier_2 = imported_2.identifier
+            expect(identifier_2.identifier).to eq(identifier_1.identifier)
+            expect(imported_2.id).to eq(imported.id)
           end
         end
 
