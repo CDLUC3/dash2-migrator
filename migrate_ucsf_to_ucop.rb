@@ -55,6 +55,13 @@ end
 # ############################################################
 # Harvest
 
-config_file = 'config/migrator-ucsf-to-ucop.yml'
-app = Stash::HarvesterApp::Application.with_config_file(config_file)
-app.start
+config_files = [
+    'config/migrator-ucsf-to-ucop.yml',
+    'config/migrator-ucsf2-to-ucop.yml'
+]
+
+config_files.each do |config_file|
+  Stash::HarvesterApp::Application.with_config_file(config_file).start
+end
+
+
