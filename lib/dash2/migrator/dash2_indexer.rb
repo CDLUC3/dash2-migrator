@@ -70,8 +70,8 @@ module Dash2
       def index(harvested_records)
         ensure_db_connection!
         Stash::Harvester.log.info("Indexing records for tenant_id #{tenant.tenant_id} into database #{db_config['database']} on #{db_config['host']}")
-        ActiveRecord::Base.transaction(requires_new: true) do
-          harvested_records.each do |hr|
+        harvested_records.each do |hr|
+          ActiveRecord::Base.transaction(requires_new: true) do
             index_record(hr.as_wrapper, hr.user_uid)
           end
         end
