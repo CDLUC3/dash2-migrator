@@ -11,18 +11,34 @@ module Dash2
         EZID_METHODS = [:mint_id, :update_metadata].freeze
 
         attr_reader :ezid_client
+        attr_reader :tenant
 
-        def initialize(ezid_client:)
+        def initialize(ezid_client:, tenant:)
           @ezid_client = DOIUpdater.ezid_client(ezid_client)
+          @tenant = DOIUpdater.tenant(tenant)
         end
 
         def update(stash_wrapper:, dcs_resource:, se_resource:)
-          doi_value = doi_value(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
+          doi_value = doi_value(
+              stash_wrapper: stash_wrapper,
+              dcs_resource: dcs_resource,
+              se_resource: se_resource
+          )
+          ezid_client.update_metadata(
+            "doi:#{doi_value}",
+            dcs_resource.write_xml,
+            tenant.landing_url("/stash/dataset/doi:#{doi_value}")
+          )
         end
 
+        def self.tenant(tenant)
+          return tenant if tenant.respond_to?(:landing_url)
+          return tenant if tenant.to_s =~ /InstanceDouble\(StashEngine::Tenant\)/ # For RSpec tests
+          raise ArgumentError, "tenant does not appear to be a StashEngine::Tenant: #{tenant || 'nil'}"
+        end
 
         def self.ezid_client(client)
-          return client if client.is_a?(StashEzid::Client)
+          return client if client.respond_to?(:update_metadata)
           return client if client.to_s =~ /InstanceDouble\(StashEzid::Client\)/ # For RSpec tests
           raise ArgumentError, "ezid_client does not appear to be a StashEzid::Client: #{client || 'nil'}"
         end
