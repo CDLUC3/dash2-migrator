@@ -1,0 +1,22 @@
+require 'spec_helper'
+require 'database_cleaner'
+
+logfile = File.expand_path('log/test.log')
+FileUtils.mkdir_p File.dirname(logfile)
+ActiveRecord::Base.logger = Logger.new(logfile) if defined?(ActiveRecord::Base)
+
+db_config = YAML.load_file('config/database.yml')['test']
+ActiveRecord::Base.establish_connection(db_config)
+ActiveRecord::Migration.verbose = false
+ActiveRecord::Migrator.up 'db/migrate'
+
+RSpec.configure do |config|
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :deletion
+    # DatabaseCleaner.strategy = :transaction
+    # DatabaseCleaner.clean_with(:truncation)
+  end
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+end

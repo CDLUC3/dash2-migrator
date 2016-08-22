@@ -22,14 +22,13 @@ module Dash2
         StashDatacite.class_variable_set(:@@resource_class, 'StashEngine::Resource')
       end
 
-      model_path = "#{gem_path(gem)}/app/models/#{gem}"
-      lib_path = "#{gem_path(gem)}/lib/#{gem}"
-      [model_path, lib_path].each do |path|
+      gempath = gem_path(gem)
+      ["#{gempath}/app/models/#{gem}", "#{gempath}/lib/#{gem}"].each do |path|
         Dir.glob("#{path}/**/*.rb").sort.each(&method(:require))
       end
 
       if 'stash_engine' == gem
-        require "#{gem_path(gem)}/config/initializers/hash_to_ostruct.rb"
+        require "#{gempath}/config/initializers/hash_to_ostruct.rb"
       end
 
     end
