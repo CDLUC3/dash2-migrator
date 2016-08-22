@@ -77,7 +77,7 @@ module Dash2
 
         end
 
-        describe '#update_doi' do
+        describe '#update' do
 
           before(:each) do
             @ezid_client = instance_double(StashEzid::Client)
@@ -117,9 +117,11 @@ module Dash2
 
           it 'updates the metadata' do
             doi_value = '10.123/456'
+            sw_version = Stash::Wrapper::Version.new(number: 1, date: Date.today)
 
             stash_wrapper = instance_double(Stash::Wrapper::StashWrapper)
             expect(stash_wrapper).to receive(:identifier) { Stash::Wrapper::Identifier.new(value: doi_value, type: Stash::Wrapper::IdentifierType::DOI) }
+            allow(stash_wrapper).to receive(:version) { sw_version }
 
             dcs_resource = instance_double(Datacite::Mapping::Resource)
             expect(dcs_resource).to receive(:identifier) { Datacite::Mapping::Identifier.new(value: doi_value) }
@@ -137,17 +139,19 @@ module Dash2
             end
 
             expect(ezid_client).to receive(:update_metadata).with(
-                "doi:#{doi_value}",
-                '<resource/>',
-                "http://example.org/stash/dataset/doi:#{doi_value}"
+              "doi:#{doi_value}",
+              '<resource/>',
+              "http://example.org/stash/dataset/doi:#{doi_value}"
             )
 
             updater.update(
-                stash_wrapper: stash_wrapper,
-                se_resource: se_resource,
-                dcs_resource: dcs_resource
+              stash_wrapper: stash_wrapper,
+              se_resource: se_resource,
+              dcs_resource: dcs_resource
             )
           end
+
+          it 'documents the migration in the Stash::Wrapper::Version'
         end
       end
     end

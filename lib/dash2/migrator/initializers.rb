@@ -4,7 +4,7 @@ require 'dash2/migrator/initializers/licenses'
 require 'dash2/migrator/initializers/hash_to_ostruct'
 
 module StashDatacite
-  @@resource_class = 'StashEngine::Resource'
+  @@resource_class = 'StashEngine::Resource' # rubocop:disable Style/ClassVars
 end
 
 module Dash2
