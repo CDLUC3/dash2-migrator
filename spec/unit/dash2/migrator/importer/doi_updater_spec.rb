@@ -115,7 +115,7 @@ module Dash2
             end
           end
 
-          it 'updates the landing page' do
+          it 'updates the metadata' do
             doi_value = '10.123/456'
 
             stash_wrapper = instance_double(Stash::Wrapper::StashWrapper)
