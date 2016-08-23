@@ -11,7 +11,7 @@ module Dash2
         attr_reader :tenant
 
         def initialize(ezid_client:, tenant:, mint_dois: false)
-          raise ArgumentError, 'Migrator should not be minting DOIs in production environment' if mint_dois && DOIUpdater.production?
+          raise ArgumentError, 'Migrator should not be minting DOIs in production environment' if mint_dois && Migrator.production?
           @ezid_client = DOIUpdater.ezid_client(ezid_client)
           @tenant = DOIUpdater.tenant(tenant)
           @mint_dois = mint_dois
@@ -28,11 +28,6 @@ module Dash2
             se_resource: se_resource
           )
           update_task.update!(ezid_client: ezid_client, tenant: tenant)
-        end
-
-        def self.production?
-          stash_env = ENV['STASH_ENV']
-          stash_env && stash_env.casecmp('production').zero?
         end
 
         def self.tenant(tenant)
