@@ -28,14 +28,19 @@ module Dash2
         end
 
         def log
-          Stash::Harvester.log
+          Dash2::Migrator.log
         end
 
         # TODO: replace SwordCreator/SwordUpdater with SubmissionTask or similar
+        # @return [String] the path to the submitted zipfile
         def submit(stash_wrapper:, dcs_resource:, se_resource:, tenant:)
           package_builder = make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant)
-          sword_submit(se_resource, package_builder.make_package)
+          zipfile = package_builder.make_package
+          sword_submit(se_resource, zipfile)
+          zipfile
         end
+
+        private
 
         def make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant)
           ZipPackageBuilder.new(
@@ -46,8 +51,6 @@ module Dash2
             create_placeholder_files: create_placeholder_files
           )
         end
-
-        private
 
         def sword_submit(se_resource, zipfile)
           edit_iri = se_resource.update_uri
@@ -70,7 +73,7 @@ module Dash2
           se_resource.download_uri = receipt.em_iri
           se_resource.update_uri = receipt.edit_iri
           id_val = se_resource.identifier.identifier
-          Stash::Harvester.log.info("create(doi: #{doi}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
+          Stash::Harvester.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
         end
 
         def submit_update(se_resource, edit_iri, zipfile)
@@ -120,7 +123,7 @@ module Dash2
           @sword_client = sword_client
         end
 
-        def submit(retries = SwordPackager.RETRIES)
+        def submit(retries = SwordPackager::RETRIES)
           return sword_client.create(doi: doi, zipfile: zipfile)
         rescue RestClient::Exceptions::ReadTimeout
           return submit(retries - 1) if retries > 0
