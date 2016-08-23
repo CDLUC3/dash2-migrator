@@ -3,7 +3,7 @@ require 'spec_helper'
 module Dash2
   module Migrator
     module Importer
-      describe FakeDOIMinter do
+      describe MintingDOIUpdater do
         attr_reader :old_doi_value
         attr_reader :new_doi_value
 
@@ -53,7 +53,7 @@ module Dash2
               "http://example.org#{path}"
             end
 
-            @minter = FakeDOIMinter.new(ezid_client: ezid_client, tenant: tenant)
+            @minter = MintingDOIUpdater.new(ezid_client: ezid_client, tenant: tenant)
 
             @sw_ident = Stash::Wrapper::Identifier.new(value: old_doi_value, type: Stash::Wrapper::IdentifierType::DOI)
             @stash_wrapper = instance_double(Stash::Wrapper::StashWrapper)

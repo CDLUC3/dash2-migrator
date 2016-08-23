@@ -3,9 +3,9 @@ require 'dash2/migrator/importer/doi_updater'
 module Dash2
   module Migrator
     module Importer
-      class FakeDOIMinter < DOIUpdater
+      class MintingDOIUpdater < DOIUpdater
         def create_update_task(stash_wrapper:, dcs_resource:, se_resource:)
-          MintFakeDOITask.new(
+          MintingDOIUpdateTask.new(
             stash_wrapper: stash_wrapper,
             dcs_resource: dcs_resource,
             se_resource: se_resource
@@ -13,7 +13,7 @@ module Dash2
         end
       end
 
-      class MintFakeDOITask < UpdateDOITask
+      class MintingDOIUpdateTask < DOIUpdateTask
 
         attr_reader :new_doi
 
@@ -26,7 +26,7 @@ module Dash2
 
         def old_doi
           @old_doi ||= begin
-            old_doi_value = UpdateDOITask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
+            old_doi_value = DOIUpdateTask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
             old_doi = "doi:#{old_doi_value}"
             old_doi
           end
