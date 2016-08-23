@@ -115,43 +115,58 @@ module Dash2
             end
           end
 
-          it 'updates the metadata' do
-            doi_value = '10.123/456'
-            sw_version = Stash::Wrapper::Version.new(number: 1, date: Date.today)
+          describe 'successful update' do
+            attr_reader :stash_wrapper
+            attr_reader :dcs_resource
+            attr_reader :se_resource
+            attr_reader :sw_version
+            attr_reader :doi_value
 
-            stash_wrapper = instance_double(Stash::Wrapper::StashWrapper)
-            expect(stash_wrapper).to receive(:identifier) { Stash::Wrapper::Identifier.new(value: doi_value, type: Stash::Wrapper::IdentifierType::DOI) }
-            allow(stash_wrapper).to receive(:version) { sw_version }
+            before(:each) do
+              @doi_value = '10.123/456'
+              @sw_version = Stash::Wrapper::Version.new(number: 1, date: Date.today)
 
-            dcs_resource = instance_double(Datacite::Mapping::Resource)
-            expect(dcs_resource).to receive(:identifier) { Datacite::Mapping::Identifier.new(value: doi_value) }
-            expect(dcs_resource).to receive(:write_xml) { '<resource/>' }
+              @stash_wrapper = instance_double(Stash::Wrapper::StashWrapper)
+              expect(stash_wrapper).to receive(:identifier) { Stash::Wrapper::Identifier.new(value: doi_value, type: Stash::Wrapper::IdentifierType::DOI) }
+              allow(stash_wrapper).to receive(:version) { sw_version }
 
-            se_resource = instance_double(StashEngine::Resource)
-            expect(se_resource).to receive(:identifier) {
-              se_ident = double(StashEngine::Identifier)
-              expect(se_ident).to receive(:identifier) { doi_value }
-              se_ident
-            }
+              @dcs_resource = instance_double(Datacite::Mapping::Resource)
+              expect(dcs_resource).to receive(:identifier) { Datacite::Mapping::Identifier.new(value: doi_value) }
+              expect(dcs_resource).to receive(:write_xml) { '<resource/>' }
 
-            expect(tenant).to receive(:landing_url).with("/stash/dataset/doi:#{doi_value}") do |path|
-              "http://example.org#{path}"
+              @se_resource = instance_double(StashEngine::Resource)
+              expect(se_resource).to receive(:identifier) {
+                se_ident = double(StashEngine::Identifier)
+                expect(se_ident).to receive(:identifier) { doi_value }
+                se_ident
+              }
+
+              expect(tenant).to receive(:landing_url).with("/stash/dataset/doi:#{doi_value}") do |path|
+                "http://example.org#{path}"
+              end
+
+              allow(ezid_client).to receive(:update_metadata)
             end
 
-            expect(ezid_client).to receive(:update_metadata).with(
-              "doi:#{doi_value}",
-              '<resource/>',
-              "http://example.org/stash/dataset/doi:#{doi_value}"
-            )
+            it 'updates the metadata' do
+              expect(ezid_client).to receive(:update_metadata).with(
+                "doi:#{doi_value}",
+                '<resource/>',
+                "http://example.org/stash/dataset/doi:#{doi_value}"
+              )
 
-            updater.update(
-              stash_wrapper: stash_wrapper,
-              se_resource: se_resource,
-              dcs_resource: dcs_resource
-            )
+              updater.update(
+                stash_wrapper: stash_wrapper,
+                se_resource: se_resource,
+                dcs_resource: dcs_resource
+              )
+            end
+
+            it 'documents the migration in the Stash::Wrapper::Version' do
+              updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource)
+              expect(sw_version.note).to match(/Migrated at #{Time.now.year}/)
+            end
           end
-
-          it 'documents the migration in the Stash::Wrapper::Version'
         end
       end
     end
