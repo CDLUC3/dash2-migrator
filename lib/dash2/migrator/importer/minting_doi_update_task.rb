@@ -1,20 +1,9 @@
-require 'dash2/migrator/importer/doi_updater'
+require 'dash2/migrator/importer/doi_update_task'
 
 module Dash2
   module Migrator
     module Importer
-      class MintingDOIUpdater < DOIUpdater
-        def create_update_task(stash_wrapper:, dcs_resource:, se_resource:)
-          MintingDOIUpdateTask.new(
-            stash_wrapper: stash_wrapper,
-            dcs_resource: dcs_resource,
-            se_resource: se_resource
-          )
-        end
-      end
-
       class MintingDOIUpdateTask < DOIUpdateTask
-
         attr_reader :new_doi
 
         def initialize(stash_wrapper:, dcs_resource:, se_resource:)
@@ -69,9 +58,7 @@ module Dash2
             alternate_identifier: alt_ident.value
           ).save
         end
-
       end
-
     end
   end
 end
