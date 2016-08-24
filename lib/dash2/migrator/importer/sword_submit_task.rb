@@ -45,7 +45,7 @@ module Dash2
           receipt = submit_create
           se_resource.download_uri = receipt.em_iri
           se_resource.update_uri = receipt.edit_iri
-          Stash::Harvester.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
+          Migrator.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
         end
 
         def submit_create(retries = RETRIES)
@@ -57,7 +57,7 @@ module Dash2
 
         def update(edit_iri)
           status = submit_update(edit_iri)
-          Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
+          Migrator.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
         end
 
         def submit_update(edit_iri, retries = RETRIES)

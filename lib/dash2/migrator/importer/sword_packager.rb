@@ -26,10 +26,6 @@ module Dash2
           raise ArgumentError, "sword_client does not appear to be a Stash::Sword::Client: #{client || 'nil'}"
         end
 
-        def log
-          Dash2::Migrator.log
-        end
-
         # TODO: replace SwordCreator/SwordUpdater with SubmissionTask or similar
         # @return [String] the path to the submitted zipfile
         def submit(stash_wrapper:, dcs_resource:, se_resource:, tenant:)
