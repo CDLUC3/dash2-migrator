@@ -10,8 +10,6 @@ module Dash2
 
       class SwordPackager
 
-        RETRIES = 3
-
         attr_reader :sword_client
         attr_reader :create_placeholder_files
 
@@ -36,8 +34,7 @@ module Dash2
         def submit(stash_wrapper:, dcs_resource:, se_resource:, tenant:)
           package_builder = make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant)
           zipfile = package_builder.make_package
-          sword_submit(se_resource, zipfile)
-          zipfile
+          SubmissionTask.new(se_resource: se_resource, zipfile: zipfile, sword_client: sword_client).submit!
         end
 
         private
@@ -51,86 +48,70 @@ module Dash2
             create_placeholder_files: create_placeholder_files
           )
         end
-
-        def sword_submit(se_resource, zipfile)
-          edit_iri = se_resource.update_uri
-          if edit_iri
-            submit_update(se_resource, edit_iri, zipfile)
-          else
-            submit_create(se_resource, zipfile)
-          end
-          se_resource.set_state('published')
-          se_resource.update_version(zipfile)
-          se_resource.save
-        end
-
-        def submit_create(se_resource, zipfile)
-          receipt = SwordCreator.new(
-            se_resource: se_resource,
-            zipfile: zipfile,
-            sword_client: sword_client
-          ).submit
-          se_resource.download_uri = receipt.em_iri
-          se_resource.update_uri = receipt.edit_iri
-          id_val = se_resource.identifier.identifier
-          Stash::Harvester.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
-        end
-
-        def submit_update(se_resource, edit_iri, zipfile)
-          status = SwordUpdater.new(
-            se_resource: se_resource,
-            edit_iri: edit_iri,
-            zipfile: zipfile,
-            sword_client: sword_client
-          ).submit
-          id_val = se_resource.identifier.identifier
-          Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
-        end
       end
 
-      class SwordUpdater
+      class SubmissionTask
+        RETRIES = 3
 
         attr_reader :se_resource
-        attr_reader :edit_iri
-        attr_reader :zipfile
-        attr_reader :sword_client
-
-        def initialize(se_resource:, edit_iri:, zipfile:, sword_client:)
-          @se_resource = se_resource
-          @edit_iri = edit_iri
-          @zipfile = zipfile
-          @sword_client = sword_client
-        end
-
-        def submit(retries = SwordPackager.RETRIES)
-          return sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
-        rescue RestClient::Exceptions::ReadTimeout
-          return submit(retries - 1) if retries > 0
-          raise "Unable to submit #{zipfile} to #{edit_iri}: too many timeouts"
-        end
-      end
-
-      class SwordCreator
-        attr_reader :se_resource
-        attr_reader :doi
         attr_reader :zipfile
         attr_reader :sword_client
 
         def initialize(se_resource:, zipfile:, sword_client:)
           @se_resource = se_resource
           @zipfile = zipfile
-          @doi = "doi:#{se_resource.identifier.identifier}"
           @sword_client = sword_client
         end
 
-        def submit(retries = SwordPackager::RETRIES)
+        def submit!
+          edit_iri = se_resource.update_uri
+          edit_iri ? update(edit_iri) : create
+          save_resource!
+          zipfile
+        end
+
+        private
+
+        def save_resource!
+          se_resource.set_state('published')
+          se_resource.update_version(zipfile)
+          se_resource.save
+        end
+
+        def id_val
+          se_resource.identifier.identifier
+        end
+
+        def doi
+          "doi:#{id_val}"
+        end
+
+        def create
+          receipt = submit_create
+          se_resource.download_uri = receipt.em_iri
+          se_resource.update_uri = receipt.edit_iri
+          Stash::Harvester.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with em_iri #{receipt.em_iri}, edit_iri #{receipt.edit_iri}")
+        end
+
+        def submit_create(retries = RETRIES)
           return sword_client.create(doi: doi, zipfile: zipfile)
         rescue RestClient::Exceptions::ReadTimeout
           return submit(retries - 1) if retries > 0
           raise "Unable to submit #{zipfile} for #{doi}: too many timeouts"
         end
-      end
 
+        def update(edit_iri)
+          status = submit_update(edit_iri)
+          Stash::Harvester.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
+        end
+
+        def submit_update(edit_iri, retries = RETRIES)
+          return sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
+        rescue RestClient::Exceptions::ReadTimeout
+          return submit(edit_iri, retries - 1) if retries > 0
+          raise "Unable to submit #{zipfile} to #{edit_iri}: too many timeouts"
+        end
+      end
     end
   end
 end
