@@ -74,63 +74,72 @@ module Dash2
             @package_builder = instance_double(ZipPackageBuilder)
           end
 
-          it 'submits a zip package as a create' do
-            allow(se_resource).to receive(:update_uri) { nil }
+          describe '#create' do
+            it 'retries'
 
-            expect(ZipPackageBuilder).to receive(:new).with(
-              stash_wrapper: stash_wrapper,
-              dcs_resource: dcs_resource,
-              se_resource: se_resource,
-              tenant: tenant,
-              create_placeholder_files: false
-            ) { package_builder }
+            it 'submits a zip package as a create' do
+              allow(se_resource).to receive(:update_uri) { nil }
 
-            expected_zipfile = 'archive.zip'
-            expect(package_builder).to receive(:make_package) { expected_zipfile }
+              expect(ZipPackageBuilder).to receive(:new).with(
+                stash_wrapper: stash_wrapper,
+                dcs_resource: dcs_resource,
+                se_resource: se_resource,
+                tenant: tenant,
+                create_placeholder_files: false
+              ) { package_builder }
 
-            em_iri = 'http://example.org/em_iri'
-            edit_iri = 'http://example.org/edit_iri'
-            receipt = instance_double(Stash::Sword::DepositReceipt)
-            allow(receipt).to receive(:em_iri) { em_iri }
-            allow(receipt).to receive(:edit_iri) { edit_iri }
-            expect(sword_client).to receive(:create).with(doi: "doi:#{doi_value}", zipfile: expected_zipfile) { receipt }
+              expected_zipfile = 'archive.zip'
+              expect(package_builder).to receive(:make_package) { expected_zipfile }
 
-            expect(se_resource).to receive(:download_uri=).with(em_iri)
-            expect(se_resource).to receive(:update_uri=).with(edit_iri)
+              em_iri = 'http://example.org/em_iri'
+              edit_iri = 'http://example.org/edit_iri'
+              receipt = instance_double(Stash::Sword::DepositReceipt)
+              allow(receipt).to receive(:em_iri) { em_iri }
+              allow(receipt).to receive(:edit_iri) { edit_iri }
+              expect(sword_client).to receive(:create).with(doi: "doi:#{doi_value}", zipfile: expected_zipfile) { receipt }
 
-            expect(se_resource).to receive(:set_state).with('published')
-            expect(se_resource).to receive(:update_version).with(expected_zipfile)
-            expect(se_resource).to receive(:save)
+              expect(se_resource).to receive(:download_uri=).with(em_iri)
+              expect(se_resource).to receive(:update_uri=).with(edit_iri)
 
-            zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
-            expect(zipfile).to eq(expected_zipfile)
+              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:update_version).with(expected_zipfile)
+              expect(se_resource).to receive(:save)
+
+              zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              expect(zipfile).to eq(expected_zipfile)
+            end
+
           end
 
-          it 'submits a zip package as an update' do
-            edit_iri = 'http://example.org/edit_iri'
-            allow(se_resource).to receive(:update_uri) { edit_iri }
+          describe '#update' do
+            it 'retries'
 
-            expect(ZipPackageBuilder).to receive(:new).with(
-              stash_wrapper: stash_wrapper,
-              dcs_resource: dcs_resource,
-              se_resource: se_resource,
-              tenant: tenant,
-              create_placeholder_files: false
-            ) { package_builder }
+            it 'submits a zip package as an update' do
+              edit_iri = 'http://example.org/edit_iri'
+              allow(se_resource).to receive(:update_uri) { edit_iri }
 
-            expected_zipfile = 'archive.zip'
-            expect(package_builder).to receive(:make_package) { expected_zipfile }
+              expect(ZipPackageBuilder).to receive(:new).with(
+                stash_wrapper: stash_wrapper,
+                dcs_resource: dcs_resource,
+                se_resource: se_resource,
+                tenant: tenant,
+                create_placeholder_files: false
+              ) { package_builder }
 
-            expect(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) { '200' }
+              expected_zipfile = 'archive.zip'
+              expect(package_builder).to receive(:make_package) { expected_zipfile }
 
-            expect(se_resource).to receive(:set_state).with('published')
-            expect(se_resource).to receive(:update_version).with(expected_zipfile)
-            expect(se_resource).to receive(:save)
+              expect(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) { '200' }
 
-            zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
-            expect(zipfile).to eq(expected_zipfile)
+              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:update_version).with(expected_zipfile)
+              expect(se_resource).to receive(:save)
+
+              zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              expect(zipfile).to eq(expected_zipfile)
+            end
+
           end
-
         end
 
       end
