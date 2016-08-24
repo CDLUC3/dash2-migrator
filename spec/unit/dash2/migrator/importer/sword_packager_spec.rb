@@ -24,6 +24,7 @@ module Dash2
           end
 
           it 'accepts a mock Stash::Sword::Client' do
+            client = instance_double(Stash::Sword::Client)
             expect(SwordPackager.new(sword_client: client).sword_client).to be(client)
           end
 
