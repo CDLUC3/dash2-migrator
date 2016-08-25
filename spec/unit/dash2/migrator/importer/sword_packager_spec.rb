@@ -53,6 +53,8 @@ module Dash2
           attr_reader :packager
           attr_reader :package_builder
 
+          attr_reader :expected_zipfile
+
           before(:each) do
             @sword_client = instance_double(Stash::Sword::Client)
 
@@ -75,9 +77,8 @@ module Dash2
           end
 
           describe '#create' do
-            it 'retries'
 
-            it 'submits a zip package as a create' do
+            before(:each) do
               allow(se_resource).to receive(:update_uri) { nil }
 
               expect(ZipPackageBuilder).to receive(:new).with(
@@ -88,9 +89,11 @@ module Dash2
                 create_placeholder_files: false
               ) { package_builder }
 
-              expected_zipfile = 'archive.zip'
-              expect(package_builder).to receive(:make_package) { expected_zipfile }
+              @expected_zipfile = 'archive.zip'
+              allow(package_builder).to receive(:make_package) { expected_zipfile }
+            end
 
+            it 'submits a zip package as a create' do
               em_iri = 'http://example.org/em_iri'
               edit_iri = 'http://example.org/edit_iri'
               receipt = instance_double(Stash::Sword::DepositReceipt)
@@ -109,13 +112,48 @@ module Dash2
               expect(zipfile).to eq(expected_zipfile)
             end
 
+            it 'retries' do
+              em_iri = 'http://example.org/em_iri'
+              edit_iri = 'http://example.org/edit_iri'
+              receipt = instance_double(Stash::Sword::DepositReceipt)
+              allow(receipt).to receive(:em_iri) { em_iri }
+              allow(receipt).to receive(:edit_iri) { edit_iri }
+
+              retries = Dash2::Migrator::Importer::SwordSubmitTask::RETRIES
+              allow(sword_client).to receive(:create).with(doi: "doi:#{doi_value}", zipfile: expected_zipfile) do
+                raise RestClient::Exceptions::ReadTimeout unless (retries -= 1).zero?
+                receipt
+              end
+
+              expect(se_resource).to receive(:download_uri=).with(em_iri)
+              expect(se_resource).to receive(:update_uri=).with(edit_iri)
+
+              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:update_version).with(expected_zipfile)
+              expect(se_resource).to receive(:save)
+
+              zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              expect(zipfile).to eq(expected_zipfile)
+              expect(retries).to eq(0)
+            end
+
+            it 'eventually raises RestClient::Exceptions::ReadTimeout' do
+              allow(sword_client).to receive(:create).with(doi: "doi:#{doi_value}", zipfile: expected_zipfile) do
+                raise RestClient::Exceptions::ReadTimeout
+              end
+
+              expect do
+                packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              end.to raise_error(RestClient::Exceptions::ReadTimeout, /#{expected_zipfile}.*#{doi_value}/)
+            end
           end
 
           describe '#update' do
-            it 'retries'
 
-            it 'submits a zip package as an update' do
-              edit_iri = 'http://example.org/edit_iri'
+            attr_reader :edit_iri
+
+            before(:each) do
+              @edit_iri = 'http://example.org/edit_iri'
               allow(se_resource).to receive(:update_uri) { edit_iri }
 
               expect(ZipPackageBuilder).to receive(:new).with(
@@ -126,8 +164,11 @@ module Dash2
                 create_placeholder_files: false
               ) { package_builder }
 
-              expected_zipfile = 'archive.zip'
+              @expected_zipfile = 'archive.zip'
               expect(package_builder).to receive(:make_package) { expected_zipfile }
+            end
+
+            it 'submits a zip package as an update' do
 
               expect(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) { '200' }
 
@@ -137,6 +178,32 @@ module Dash2
 
               zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
               expect(zipfile).to eq(expected_zipfile)
+            end
+
+            it 'retries' do
+              retries = Dash2::Migrator::Importer::SwordSubmitTask::RETRIES
+              allow(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) do
+                raise RestClient::Exceptions::ReadTimeout unless (retries -= 1).zero?
+                '200'
+              end
+
+              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:update_version).with(expected_zipfile)
+              expect(se_resource).to receive(:save)
+
+              zipfile = packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              expect(zipfile).to eq(expected_zipfile)
+              expect(retries).to eq(0)
+            end
+
+            it 'eventually raises RestClient::Exceptions::ReadTimeout' do
+              allow(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) do
+                raise RestClient::Exceptions::ReadTimeout
+              end
+
+              expect do
+                packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+              end.to raise_error(RestClient::Exceptions::ReadTimeout, /#{expected_zipfile}.*#{edit_iri}/)
             end
 
           end
