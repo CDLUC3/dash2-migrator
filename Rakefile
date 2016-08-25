@@ -28,6 +28,8 @@ task :coverage do
   Rake::Task['spec:unit'].execute
 end
 
+# TODO: figure out database coverage
+
 # ------------------------------------------------------------
 # RuboCop
 
