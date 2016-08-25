@@ -13,6 +13,9 @@ module Dash2
         attr_reader :se_resource
         attr_reader :tenant
 
+        attr_reader :expected_metadata
+
+        attr_reader :zp_builder
         attr_reader :zipfile_path
 
         def zipfile
@@ -99,22 +102,23 @@ module Dash2
             ident
           end)
 
-          zp_builder = ZipPackageBuilder.new(
-            stash_wrapper: stash_wrapper,
-            dcs_resource: dcs_resource,
-            se_resource: se_resource,
-            tenant: tenant
-          )
-          @zipfile_path = zp_builder.make_package
-        end
-
-        it 'writes metadata files' do
-          expected_metadata = {
+          @expected_metadata = {
             'mrt-datacite.xml' => datacite_xml,
             'stash-wrapper.xml' => wrapper_xml,
             'mrt-oaidc.xml' => File.read('spec/data/generated-oaidc.xml'),
             'mrt-dataone-manifest.txt' => File.read('spec/data/generated-dataone-manifest.txt')
           }
+
+          @zp_builder = ZipPackageBuilder.new(
+            stash_wrapper: stash_wrapper,
+            dcs_resource: dcs_resource,
+            se_resource: se_resource,
+            tenant: tenant
+          )
+        end
+
+        it 'writes metadata files' do
+          @zipfile_path = zp_builder.make_package
           expect(zipfile.size).to eq(expected_metadata.size)
           expected_metadata.each do |path, content|
             if path.end_with?('xml')
@@ -131,19 +135,29 @@ module Dash2
 
         describe 'placeholder files' do
           before(:each) do
-            zp_builder = ZipPackageBuilder.new(
+            @zp_builder = ZipPackageBuilder.new(
               stash_wrapper: stash_wrapper,
               dcs_resource: dcs_resource,
               se_resource: se_resource,
               tenant: tenant,
               create_placeholder_files: true
             )
-            @zipfile_path = zp_builder.make_package
           end
-        end
 
-        describe 'deep paths' do
-          it 'writes datafiles with deep directory paths'
+          it 'generates placeholder files' do
+            @zipfile_path = zp_builder.make_package
+            inventory = stash_wrapper.inventory
+            expect(zipfile.size).to eq(expected_metadata.size + inventory.num_files)
+            inventory.files.each do |stash_file|
+              pathname = stash_file.pathname
+              mime_type = stash_file.mime_type.to_s
+              size_bytes = stash_file.size_bytes.to_s
+              entry = zip_entry(pathname)
+              [pathname, size_bytes, mime_type].each do |field|
+                expect(entry).to match(Regexp.escape(field))
+              end
+            end
+          end
         end
       end
     end

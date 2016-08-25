@@ -19,17 +19,17 @@
         </st:embargo>
         <st:inventory num_files='13'>
             <st:file>
-                <st:pathname>survey_Q11-23_sensors_platforms.R</st:pathname>
+                <st:pathname>survey/Q11-23/sensors_platforms.R</st:pathname>
                 <st:size unit='B'>26414</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q25-32_data_metadata_management.R</st:pathname>
+                <st:pathname>survey/Q25-32/data_metadata_management.R</st:pathname>
                 <st:size unit='B'>9794</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q10_research_sites.R</st:pathname>
+                <st:pathname>survey/Q10/research_sites.R</st:pathname>
                 <st:size unit='B'>1180</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
@@ -39,7 +39,7 @@
                 <st:mime_type>text/csv</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q3-9_respondent_info.R</st:pathname>
+                <st:pathname>survey/Q3-9/respondent_info.R</st:pathname>
                 <st:size unit='B'>13784</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
@@ -64,7 +64,7 @@
                 <st:mime_type>application/pdf</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q33-37_networking.R</st:pathname>
+                <st:pathname>survey/Q33-37/networking.R</st:pathname>
                 <st:size unit='B'>22658</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
@@ -74,12 +74,12 @@
                 <st:mime_type>application/pdf</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q24_limitsToExpansion.R</st:pathname>
+                <st:pathname>survey/Q24/limitsToExpansion.R</st:pathname>
                 <st:size unit='B'>11012</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>
             <st:file>
-                <st:pathname>survey_Q38-42_publications.R</st:pathname>
+                <st:pathname>survey/Q38-42/publications.R</st:pathname>
                 <st:size unit='B'>1690</st:size>
                 <st:mime_type>text/plain</st:mime_type>
             </st:file>

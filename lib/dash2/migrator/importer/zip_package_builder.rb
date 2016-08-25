@@ -3,6 +3,8 @@ require 'datacite/mapping'
 require 'stash_engine'
 require 'stash_datacite/dublin_core_builder'
 require 'stash_datacite/data_one_manifest_builder'
+require 'tmpdir'
+require 'fileutils'
 
 module Dash2
   module Migrator
@@ -28,20 +30,19 @@ module Dash2
         def make_package # rubocop:disable Metrics/AbcSize
           time = Time.now.to_i
 
-          folder = "#{Dir.tmpdir}/#{time}_import_#{se_resource.id}"
-          Dir.mkdir(folder)
+          folder = Dir.mktmpdir("#{time}_import_#{se_resource.id}")
           entries = []
           entries << write_mrt_datacite(folder)
           entries << write_stash_wrapper(folder)
           entries << write_mrt_oaidc(folder)
           entries << write_mrt_dataone_manifest(folder)
-          entries.concat(placeholder_files_if_any)
+          entries.concat(placeholder_files_if_any(folder))
 
           make_zipfile(folder, entries)
         end
 
         def make_zipfile(folder, entries)
-          zipfile_path = "#{folder}_archive.zip"
+          zipfile_path = "#{folder}/archive.zip"
           Zip::File.open(zipfile_path, Zip::File::CREATE) do |zf|
             # TODO: test deep paths
             entries.each do |full_path|
@@ -91,17 +92,24 @@ module Dash2
           mrt_dataone_manifest_txt
         end
 
-        def placeholder_files_if_any
+        def placeholder_files_if_any(folder)
           return [] unless create_placeholder_files?
           data_files.map do |stash_file|
             data_file = stash_file.pathname
             placeholder_file = "#{folder}/#{data_file}"
+            maybe_mkdir(placeholder_file)
             File.open(placeholder_file, 'w') do |f|
               f.puts("#{data_file}\t#{stash_file.size_bytes}\t#{stash_file.mime_type}\t(placeholder)")
             end
             placeholder_file
           end
         end
+
+        def maybe_mkdir(placeholder_file)
+          parent = File.dirname(placeholder_file)
+          FileUtils.mkdir_p(parent) unless File.directory?(parent)
+        end
+
       end
     end
   end
