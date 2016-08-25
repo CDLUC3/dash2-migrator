@@ -1,10 +1,10 @@
 AllCops:
   # Suppress complaints about post-2.0 syntax
   TargetRubyVersion: 2.2
-  # Exclude old source
   Exclude:
     - 'lib.old/**/*'
     - 'spec.old/**/*'
+    - 'vendor/**/*'
 
 Style/ClassAndModuleChildren:
   Exclude:
