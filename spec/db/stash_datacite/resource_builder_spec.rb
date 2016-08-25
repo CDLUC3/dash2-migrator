@@ -57,10 +57,6 @@ module StashDatacite
       end
     end
 
-    it 'creates a version'
-
-    it 'sets the state to "published"'
-
     it 'extracts the creators' do
       creators = se_resource.creators
       expect(creators.size).to eq(1)
