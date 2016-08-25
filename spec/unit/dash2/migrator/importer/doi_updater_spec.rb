@@ -53,7 +53,7 @@ module Dash2
             end
 
             it 'accepts a StashEngine::Tenant' do
-              @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/dataone.yml')['test'])
+              @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/example.yml')['test'])
               expect(DOIUpdater.new(ezid_client: ezid_client, tenant: tenant).tenant).to be(tenant)
             end
 
