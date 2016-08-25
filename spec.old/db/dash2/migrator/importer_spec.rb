@@ -2,13 +2,14 @@ require 'db_spec_helper'
 require 'uri'
 
 module Dash2
+  # noinspection ALL
   module Migrator
     describe Importer do
 
       attr_reader :user_uid
       attr_reader :index_config
       attr_reader :wrapper
-      attr_reader :dc_resource
+      attr_reader :dcs_resource
       attr_reader :tenant
       attr_reader :user
       attr_reader :ezid_client
@@ -34,7 +35,7 @@ module Dash2
         @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)
 
         datacite_xml = wrapper.stash_descriptive[0]
-        @dc_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+        @dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
 
         @user = StashEngine::User.create(
           uid: user_uid,
@@ -86,7 +87,7 @@ module Dash2
             stash_wrapper_xml = File.read(f)
             @wrapper = Stash::Wrapper::StashWrapper.parse_xml(stash_wrapper_xml)
             datacite_xml = wrapper.stash_descriptive[0]
-            @dc_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
+            @dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
             importer.import
           end
         end
@@ -153,7 +154,7 @@ module Dash2
           end
 
           it 'updates the DOI in production mode' do
-            expected_xml = dc_resource.write_xml
+            expected_xml = dcs_resource.write_xml
             doi_value = '10.15146/R3RG6G'
             doi = "doi:#{doi_value}"
             expect(ezid_client).to receive(:update_metadata).with(
