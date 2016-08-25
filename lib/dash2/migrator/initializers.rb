@@ -19,5 +19,10 @@ module Dash2
 
     require_gem 'stash_engine'
     require_gem 'stash_datacite'
+
+    StashDatacite::ResourcePatch.associate_with_resource(StashEngine::Resource)
+
+    require 'stash_datacite/resource_patch'
+    require 'stash_datacite/resource_builder'
   end
 end
