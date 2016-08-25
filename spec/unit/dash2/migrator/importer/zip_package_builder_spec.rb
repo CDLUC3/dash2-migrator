@@ -68,36 +68,36 @@ module Dash2
           allow(pub_year).to receive(:publication_year).and_return(dcs_resource.publication_year)
           allow(se_resource).to receive(:publication_years).and_return([pub_year])
 
-          allow(se_resource).to receive(:subjects).and_return(dcs_resource.subjects.map {|s|
+          allow(se_resource).to receive(:subjects).and_return(dcs_resource.subjects.map do |s|
             subject = double(StashDatacite::Subject)
             allow(subject).to receive(:subject).and_return(s.value)
             subject
-          })
+          end)
 
           resource_type = double(StashDatacite::ResourceType)
           allow(resource_type).to receive(:resource_type).and_return(dcs_resource.type.downcase)
           allow(se_resource).to receive(:resource_type).and_return(resource_type)
 
-          allow(se_resource).to receive(:rights).and_return(dcs_resource.rights_list.map {|r|
+          allow(se_resource).to receive(:rights).and_return(dcs_resource.rights_list.map do |r|
             rights = double(StashDatacite::Right)
             allow(rights).to receive(:rights).and_return(r.value)
             allow(rights).to receive(:rights_uri).and_return(r.uri.to_s)
             rights
-          })
+          end)
 
-          allow(se_resource).to receive(:descriptions).and_return(dcs_resource.descriptions.map {|d|
+          allow(se_resource).to receive(:descriptions).and_return(dcs_resource.descriptions.map do |d|
             desc = double(StashDatacite::Description)
             allow(desc).to receive(:description).and_return(d.value)
             desc
-          })
+          end)
 
-          allow(se_resource).to receive(:related_identifiers).and_return(dcs_resource.related_identifiers.map {|rid|
+          allow(se_resource).to receive(:related_identifiers).and_return(dcs_resource.related_identifiers.map do |rid|
             ident = double(StashDatacite::RelatedIdentifier)
             allow(ident).to receive(:relation_type_friendly).and_return(rid.relation_type.value)
             allow(ident).to receive(:related_identifier_type_friendly).and_return(rid.identifier_type.value)
             allow(ident).to receive(:related_identifier).and_return(rid.value)
             ident
-          })
+          end)
 
           zp_builder = ZipPackageBuilder.new(
             stash_wrapper: stash_wrapper,
@@ -118,9 +118,13 @@ module Dash2
           expect(zipfile.size).to eq(expected_metadata.size)
           expected_metadata.each do |path, content|
             if path.end_with?('xml')
-              expect(zip_entry(path)).to be_xml(content)
+              actual = zip_entry(path).gsub(/xml:lang=["']en["']/, '')
+              expected = content.gsub(/xml:lang=["']en["']/, '')
+              expect(actual).to be_xml(expected)
             else
-              expect(zip_entry(path)).to eq(content)
+              actual = zip_entry(path).strip
+              expected = content.strip
+              expect(actual).to eq(expected)
             end
           end
         end

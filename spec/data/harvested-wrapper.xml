@@ -14,8 +14,8 @@
         <st:embargo>
             <st:type>none</st:type>
             <st:period>none</st:period>
-            <st:start>2015-12-02</st:start>
-            <st:end>2015-12-02</st:end>
+            <st:start>2015-12-02Z</st:start>
+            <st:end>2015-12-02Z</st:end>
         </st:embargo>
         <st:inventory num_files='13'>
             <st:file>
