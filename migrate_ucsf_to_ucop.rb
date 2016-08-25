@@ -23,18 +23,22 @@ class Dash2::Migrator::MerrittAtomHarvestedRecord
     @ucop_users ||= begin
       ucop_users = StashEngine::User.where(tenant_id: 'ucop').all
       if ucop_users.empty?
-        [StashEngine::User.create(
-          uid: 'lmuckenhaupt-ucop@ucop.edu',
-          first_name: 'Lisa',
-          last_name: 'Muckenhaupt',
-          email: 'lmuckenhaupt@ucop.edu',
-          provider: 'developer',
-          tenant_id: 'ucop'
-        )]
+        [create_default_user!]
       else
         ucop_users
       end
     end
+  end
+
+  def self.create_default_user!
+    StashEngine::User.create(
+      uid: 'lmuckenhaupt-ucop@ucop.edu',
+      first_name: 'Lisa',
+      last_name: 'Muckenhaupt',
+      email: 'lmuckenhaupt@ucop.edu',
+      provider: 'developer',
+      tenant_id: 'ucop'
+    )
   end
 
   def self.next_uid_index
@@ -56,12 +60,10 @@ end
 # Harvest
 
 config_files = [
-    'config/migrator-ucsf-to-ucop.yml',
-    'config/migrator-ucsf2-to-ucop.yml'
+  'config/migrator-ucsf-to-ucop.yml',
+  'config/migrator-ucsf2-to-ucop.yml'
 ]
 
 config_files.each do |config_file|
   Stash::HarvesterApp::Application.with_config_file(config_file).start
 end
-
-

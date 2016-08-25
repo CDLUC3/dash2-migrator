@@ -17,12 +17,7 @@ namespace :spec do
     task.rspec_opts = %w(--color --format documentation --order default)
     task.pattern = 'db/**/*_spec.rb'
   end
-
-  task all: [:unit, :db]
 end
-
-desc 'Run all tests'
-task spec: 'spec:all'
 
 # ------------------------------------------------------------
 # Coverage
@@ -31,7 +26,6 @@ desc 'Run all tests with coverage'
 task :coverage do
   ENV['COVERAGE'] = 'true'
   Rake::Task['spec:unit'].execute
-  Rake::Task['spec:db'].execute
 end
 
 # ------------------------------------------------------------
@@ -59,5 +53,5 @@ end
 # ------------------------------------------------------------
 # Defaults
 
-desc 'Run unit tests, check test coverage, run database tests, check code style'
-task default: [:coverage, 'spec:db', :rubocop]
+desc 'Run unit tests, check test coverage, check code style'
+task default: [:coverage, :rubocop]

@@ -19,7 +19,7 @@ gem 'stash_ezid_datacite', git: 'https://github.com/CDLUC3/stash_ezid_datacite.g
 
 # Development
 
-gem 'rubocop', '~> 0.37', group: :development
+gem 'rubocop', '~> 0.42', group: :development
 
 # Test
 
