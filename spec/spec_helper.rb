@@ -14,6 +14,7 @@ if ENV['COVERAGE']
   SimpleCov.minimum_coverage 100
   SimpleCov.start do
     add_filter '/spec/'
+    add_filter '/lib/stash_datacite/'
     SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
       SimpleCov::Formatter::HTMLFormatter,
       SimpleCov::Formatter::Console,
