@@ -37,6 +37,23 @@ module Dash2
           end
         end
 
+        describe '#user_uid' do
+          it 'gets the user info from Dash 1'
+          it 'creates a user if needed'
+          it 'doesn\'t create duplicate users'
+          it 'throws NoMethodError for now till we get the above finished' do
+            expect { record.user_uid }.to raise_error(NoMethodError)
+          end
+        end
+
+        describe 'stash_files' do
+          it 'limits the number of files' do
+            too_many_files = Array.new(MerrittAtomHarvestedRecord::MAX_FILES * 2) { instance_double(Stash::Wrapper::StashFile)}
+            record.instance_variable_set(:@all_stash_files, too_many_files)
+            expect(record.stash_files).to eq(too_many_files.take(MerrittAtomHarvestedRecord::MAX_FILES))
+          end
+        end
+
         describe '#stash_wrapper' do
           it 'creates a StashWrapper' do
             expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)

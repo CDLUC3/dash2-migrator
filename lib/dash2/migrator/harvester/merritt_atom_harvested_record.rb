@@ -36,10 +36,8 @@ module Dash2
         end
 
         def user_uid
-          raise 'user_uid not implemented'
+          raise NoMethodError, 'user_uid not implemented yet'
         end
-
-        private
 
         def doi
           @doi ||= find_doi
@@ -92,11 +90,11 @@ module Dash2
         end
 
         def file_links
-          entry.links.select { |l| (title = l.title) && title.start_with?('producer/') && !title.start_with?('producer/mrt-') }
+          @file_links ||= entry.links.select { |l| (title = l.title) && title.start_with?('producer/') && !title.start_with?('producer/mrt-') }
         end
 
         def all_stash_files
-          file_links.map { |l| Stash::Wrapper::StashFile.new(pathname: l.title.match(%r{(?<=/)(.*)})[0], size_bytes: l.length.to_i, mime_type: l.type) }
+          @all_stash_files ||= file_links.map { |l| Stash::Wrapper::StashFile.new(pathname: l.title.match(%r{(?<=/)(.*)})[0], size_bytes: l.length.to_i, mime_type: l.type) }
         end
 
         def link_for(title)
