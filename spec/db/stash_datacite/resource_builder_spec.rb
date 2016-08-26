@@ -14,6 +14,7 @@ module StashDatacite
 
     before(:each) do
       wrapper_xml = File.read('spec/data/harvested-wrapper.xml')
+      # TODO: remove gsubs
       @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml.gsub(/-\s+/, '').gsub(/\s+/, ' '))
       @stash_files = wrapper.stash_files
 

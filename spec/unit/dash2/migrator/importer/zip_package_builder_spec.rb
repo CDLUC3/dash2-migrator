@@ -122,8 +122,8 @@ module Dash2
           expect(zipfile.size).to eq(expected_metadata.size)
           expected_metadata.each do |path, content|
             if path.end_with?('xml')
-              actual = zip_entry(path).gsub(/xml:lang=["']en["']/, '')
-              expected = content.gsub(/xml:lang=["']en["']/, '')
+              actual = zip_entry(path).gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
+              expected = content.gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
               expect(actual).to be_xml(expected)
             else
               actual = zip_entry(path).strip
