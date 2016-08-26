@@ -54,7 +54,7 @@ module Dash2
         end
 
         def data_files
-          stash_wrapper.inventory.files
+          stash_wrapper.stash_files
         end
 
         def data_file_hash

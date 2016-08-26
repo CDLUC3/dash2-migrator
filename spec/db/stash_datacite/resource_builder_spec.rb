@@ -15,7 +15,7 @@ module StashDatacite
     before(:each) do
       wrapper_xml = File.read('spec/data/harvested-wrapper.xml')
       @wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml.gsub(/-\s+/, '').gsub(/\s+/, ' '))
-      @stash_files = wrapper.inventory.files
+      @stash_files = wrapper.stash_files
 
       datacite_xml = wrapper.stash_descriptive[0]
       @dcs_resource = Datacite::Mapping::Resource.parse_xml(datacite_xml)
@@ -34,7 +34,7 @@ module StashDatacite
         user_id: user_id,
         dcs_resource: dcs_resource,
         stash_files: stash_files,
-        upload_date: wrapper.version.date
+        upload_date: wrapper.version_date
       )
       @se_resource = builder.build
     end
@@ -44,7 +44,7 @@ module StashDatacite
     end
 
     it 'extracts the files' do
-      expected_time = wrapper.version.date.to_time
+      expected_time = wrapper.version_date.to_time
       se_file_uploads = se_resource.file_uploads
       expect(se_file_uploads.size).to eq(stash_files.size)
       stash_files.each_with_index do |sf, i|

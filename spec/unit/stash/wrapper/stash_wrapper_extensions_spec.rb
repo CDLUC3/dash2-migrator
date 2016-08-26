@@ -50,6 +50,18 @@ module Stash
           expect(wrapper.datacite_resource).to be_resource(resource)
         end
       end
+
+      describe '#stash_files' do
+        it 'returns the files' do
+          expect(wrapper.stash_files).to be(wrapper.inventory.files)
+        end
+      end
+
+      describe '#version_date' do
+        it 'returns the date' do
+          expect(wrapper.version_date).to be(wrapper.version.date)
+        end
+      end
     end
   end
 end
