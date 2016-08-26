@@ -1,47 +1,66 @@
 require 'rspec/expectations'
 require 'equivalent-xml'
 
-RSpec::Matchers.define :be_xml do |expected|
-  def to_nokogiri(xml)
-    return nil unless xml
-    case xml
-    when Nokogiri::XML::Element
-      xml
-    when Nokogiri::XML::Document
-      xml.root
-    when String
-      to_nokogiri(Nokogiri::XML(xml))
-    when REXML::Element
-      to_nokogiri(xml.to_s)
-    else
-      raise "be_xml() expected XML, got #{xml.class}"
+module Stash
+  module XMLMatchUtils
+    def self.to_nokogiri(xml)
+      return nil unless xml
+      case xml
+      when Nokogiri::XML::Element
+        xml
+      when Nokogiri::XML::Document
+        xml.root
+      when String
+        to_nokogiri(Nokogiri::XML(xml))
+      when REXML::Element
+        to_nokogiri(xml.to_s)
+      else
+        raise "be_xml() expected XML, got #{xml.class}"
+      end
+    end
+
+    def self.to_pretty(nokogiri)
+      return nil unless nokogiri
+      out = StringIO.new
+      save_options = Nokogiri::XML::Node::SaveOptions::FORMAT | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
+      nokogiri.write_xml_to(out, encoding: 'UTF-8', indent: 2, save_with: save_options)
+      out.string
+    end
+
+    def self.equivalent?(expected, actual)
+      expected_xml = to_nokogiri(expected) || raise("expected value #{expected} does not appear to be XML")
+      actual_xml = to_nokogiri(actual)
+
+      EquivalentXml.equivalent?(expected_xml, actual_xml, element_order: false, normalize_whitespace: true)
+    end
+
+    def self.failure_message(expected, actual)
+      expected_string = to_xml_string(expected)
+      actual_string = to_xml_string(actual) || actual
+      "expected XML:\n#{expected_string}\n\nbut was:\n#{actual_string}"
+    end
+
+    def self.to_xml_string(actual)
+      to_pretty(to_nokogiri(actual))
+    end
+
+    def self.failure_message_when_negated(actual)
+      "expected not to get XML:\n\t#{to_xml_string(actual) || 'nil'}"
     end
   end
+end
 
-  def to_pretty(nokogiri)
-    return nil unless nokogiri
-    out = StringIO.new
-    save_options = Nokogiri::XML::Node::SaveOptions::FORMAT | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
-    nokogiri.write_xml_to(out, encoding: 'UTF-8', indent: 2, save_with: save_options)
-    out.string
-  end
-
+RSpec::Matchers.define :be_xml do |expected|
   match do |actual|
-    expected_xml = to_nokogiri(expected) || raise("expected value #{expected} does not appear to be XML")
-    actual_xml = to_nokogiri(actual)
-
-    EquivalentXml.equivalent?(expected_xml, actual_xml, element_order: false, normalize_whitespace: true)
+    Stash::XMLMatchUtils.equivalent?(expected, actual)
   end
 
   failure_message do |actual|
-    expected_string = to_pretty(to_nokogiri(expected))
-    actual_string = to_pretty(to_nokogiri(actual)) || actual
-    "expected XML:\n#{expected_string}\n\nbut was:\n#{actual_string}"
+    Stash::XMLMatchUtils.failure_message(expected, actual)
   end
 
   failure_message_when_negated do |actual|
-    actual_xml = to_element(actual) || actual
-    "expected not to get XML:\n\t#{actual_xml}"
+    Stash::XMLMatchUtils.failure_message_when_negated(actual)
   end
 end
 
