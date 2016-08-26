@@ -32,10 +32,7 @@ module Dash2
       end
 
       def create_indexer
-        Indexer.new(
-          db_config_path: db_config_path,
-          tenant_config: tenant_config
-        )
+        Indexer.new(db_config_path: db_config_path, tenant_config: tenant_config)
       end
 
       private
