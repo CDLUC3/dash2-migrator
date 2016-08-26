@@ -10,6 +10,10 @@ Style/ClassAndModuleChildren:
   Exclude:
     - 'migrate_*.rb'
 
+Style/AccessorMethodName:
+  Exclude:
+    - 'lib/stash_datacite/resource_builder.rb'
+
 # Disable line-length check; it's too easy for the cure to be worse than the disease
 Metrics/LineLength:
   Enabled: False

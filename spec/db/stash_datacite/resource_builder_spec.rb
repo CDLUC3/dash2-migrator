@@ -241,7 +241,7 @@ module StashDatacite
                   summary, we characterized a region of stratified squamous epithelium
                   in the zebrafish upper digestive tract which can be used for
                   functional studies of candidate genes involved in esophageal epithelial biology.'
-                 .gsub(/\s+/, ' ')
+            .gsub(/\s+/, ' ')
         }
       ]
       expect(descriptions.size).to eq(expected.size)

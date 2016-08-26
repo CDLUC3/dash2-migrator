@@ -5,7 +5,7 @@ require 'stash/wrapper'
 require 'time'
 
 module StashDatacite
-  class ResourceBuilder
+  class ResourceBuilder # rubocop:disable Metrics/ClassLength
 
     attr_reader :user_id
     attr_reader :dcs_resource
@@ -28,7 +28,7 @@ module StashDatacite
     def self.stash_files(stash_files)
       return stash_files if stash_files.all? do |file|
         file.is_a?(Stash::Wrapper::StashFile) ||
-          file.to_s =~ /InstanceDouble\(Stash::Wrapper::StashFile\)/ # For RSpec tests
+        file.to_s =~ /InstanceDouble\(Stash::Wrapper::StashFile\)/ # For RSpec tests
       end
       raise ArgumentError, "stash_files does not appear to be an array of Stash::Wrapper::StashFile objects: #{stash_files || 'nil'}"
     end
@@ -51,12 +51,12 @@ module StashDatacite
         se_resource
       end
     end
-    
+
     def se_resource_id
       se_resource.id
     end
 
-    def populate_se_resource!
+    def populate_se_resource! # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       stash_files.each { |stash_file| add_stash_file(stash_file) }
       dcs_resource.creators.each { |dcs_creator| add_sd_creator(dcs_creator) }
       dcs_resource.titles.each { |dcs_title| add_sd_title(dcs_title) }
@@ -80,7 +80,7 @@ module StashDatacite
       se_resource.save!
       se_resource
     end
-    
+
     def add_stash_file(stash_file)
       StashEngine::FileUpload.create(
         resource_id: se_resource_id,
@@ -159,13 +159,10 @@ module StashDatacite
       return nil unless dcs_resource_type
       dcs_resource_type_general = dcs_resource_type.resource_type_general
       se_resource_type = dcs_resource_type_general.value.downcase
+      resource_type_friendly = (ResourceType::ResourceTypesLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
       ResourceType.create(
         resource_id: se_resource_id,
-        resource_type_friendly: if ResourceType::ResourceTypesLimited.values.include?(se_resource_type) then
-                                  se_resource_type
-                                else
-                                  'other'
-                                end
+        resource_type_friendly: resource_type_friendly
       )
     end
 
@@ -177,7 +174,7 @@ module StashDatacite
       )
     end
 
-    def add_sd_related_ident(dcs_related_ident)
+    def add_sd_related_ident(dcs_related_ident) # rubocop:disable Metrics/MethodLength
       ident_type = dcs_related_ident.identifier_type
       rel_type = dcs_related_ident.relation_type
       scheme_uri = dcs_related_ident.scheme_uri
