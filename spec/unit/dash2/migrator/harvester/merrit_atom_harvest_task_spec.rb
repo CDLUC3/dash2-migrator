@@ -21,11 +21,11 @@ module Dash2
           @task = MerrittAtomHarvestTask.new(config: @config)
 
           @feed_uri = base_feed_uri.sub('https://', "https://#{config.username}:#{config.password}@")
-          @feed = File.read('spec/data/ark:-13030-m5709fmd.atom').freeze
+          @feed = File.read('spec/data/harvester/ark:-13030-m5709fmd.atom').freeze
           stub_request(:get, @feed_uri).to_return(body: feed)
 
           @page2_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd&page=2"
-          @page2 = File.read('spec/data/ark:-13030-m5709fmd&page=2.atom').freeze
+          @page2 = File.read('spec/data/harvester/ark:-13030-m5709fmd&page=2.atom').freeze
           stub_request(:get, page2_uri).to_return(body: page2)
         end
 

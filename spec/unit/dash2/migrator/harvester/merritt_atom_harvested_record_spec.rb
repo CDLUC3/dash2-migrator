@@ -19,13 +19,13 @@ module Dash2
           config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
 
           mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
-          stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/mrt-mom.txt'))
+          stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom.txt'))
 
           datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
-          stub_request(:get, datacite_uri).to_return(body: File.read('spec/data/mrt-datacite.xml'))
+          stub_request(:get, datacite_uri).to_return(body: File.read('spec/data/harvester/mrt-datacite.xml'))
 
           feed_uri = config.feed_uri
-          entry_xml = File.read('spec/data/entry-r36p4t.xml')
+          entry_xml = File.read('spec/data/harvester/entry-r36p4t.xml')
           entry = RSS::Parser.parse(entry_xml, false).items[0]
           @record = MerrittAtomHarvestedRecord.new(feed_uri, entry)
           @wrapper = record.as_wrapper

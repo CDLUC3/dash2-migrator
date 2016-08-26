@@ -2,6 +2,7 @@ require 'rss'
 require 'rest-client'
 require 'stash/harvester'
 require 'datacite/mapping'
+require 'datacite/mapping/datacite_extensions'
 
 module Dash2
   module Migrator
