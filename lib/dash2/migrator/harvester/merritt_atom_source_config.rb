@@ -25,10 +25,6 @@ module Dash2
           end
         end
 
-        def tenant_id
-          tenant_config['tenant_id']
-        end
-
         def repo_config
           tenant_config['repository']
         end

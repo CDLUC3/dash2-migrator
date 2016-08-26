@@ -50,7 +50,7 @@ module Dash2
           old_doi_value = stash_wrapper.identifier.value
           new_doi = previously_migrated.identifier.identifier
           resource_id = previously_migrated.id
-          Stash::Harvester.log.info("Skipping already migrated DOI #{old_doi_value} (migrated to #{new_doi}, resource ID #{resource_id}")
+          log.info("Skipping already migrated DOI #{old_doi_value} (migrated to #{new_doi}, resource ID #{resource_id}")
         end
 
         def user_id_for(user_uid)

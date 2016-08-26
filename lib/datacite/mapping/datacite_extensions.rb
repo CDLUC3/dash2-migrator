@@ -141,8 +141,7 @@ module Datacite
         return [[funder_contrib_name], []] unless funding_desc_value
         grant_numbers = funding_desc_value.split(';').map { |s| s.strip.chomp(',') }
         funder_names = funder_contrib_name.split(';').map(&:strip)
-        return [funder_names, grant_numbers] if grant_numbers.size == funder_names.size
-        [[funder_contrib_name], [funding_desc_value]]
+        grant_numbers.size == funder_names.size ? [funder_names, grant_numbers] : [[funder_contrib_name], [funding_desc_value]]
       end
 
       def identifier_for(funder_contrib)
