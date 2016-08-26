@@ -15,7 +15,11 @@ module Dash2
         end
 
         def description
-          "Merritt Atom source for #{tenant_path}"
+          @desc = begin
+            "Merritt Atom source for #{tenant_path} (#{feed_uri})"
+            desc << " #{env_name}" if env_name
+            desc
+          end
         end
 
         def tenant_config
