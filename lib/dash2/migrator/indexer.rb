@@ -13,7 +13,6 @@ module Dash2
         def initialize(tenant_config:)
           super(metadata_mapper: nil)
           @tenant_config = tenant_config
-          @mint_dois = mint_dois
           @production = Migrator.production?
         end
 

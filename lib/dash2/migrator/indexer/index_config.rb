@@ -10,13 +10,15 @@ module Dash2
 
       def initialize(db_config_path:, tenant_path:)
         super(url: URI.join('file:///', File.absolute_path(db_config_path)))
-        @tenant_path = tenant_path
+        @tenant_path = File.absolute_path(tenant_path)
       end
 
       def description
-        desc = "#{self.class}: #{tenant_path} -> #{uri}"
-        desc << ' (production)' if Migrator.production?
-        desc
+        @desc ||= begin
+          desc = "#{self.class}: #{tenant_path} -> #{db_config_path}"
+          desc << ' (production)' if Migrator.production?
+          desc
+        end
       end
 
       def db_config_path
@@ -32,7 +34,7 @@ module Dash2
       end
 
       def create_indexer
-        Indexer.new(db_config_path: db_config_path, tenant_config: tenant_config)
+        Indexer.new(tenant_config: tenant_config)
       end
 
       private
