@@ -10,14 +10,17 @@ module Dash2
 
         attr_reader :tenant_config
 
+        DOIUpdater = Dash2::Migrator::Importer::DOIUpdater
+        SwordPackager = Dash2::Migrator::Importer::SwordPackager
+        Importer = Dash2::Migrator::Importer::Importer
+
         def initialize(tenant_config:)
           super(metadata_mapper: nil)
           @tenant_config = tenant_config
-          @production = Migrator.production?
         end
 
         def demo_mode?
-          !@production
+          !Migrator.production?
         end
 
         def index(harvested_records)
