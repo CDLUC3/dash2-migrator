@@ -6,8 +6,12 @@ module Dash2
   module Migrator
     module Harvester
       describe MerrittAtomHarvestedRecord do
+        attr_reader :config
         attr_reader :record
-        attr_reader :wrapper
+
+        def wrapper
+          @wrapper ||= record.as_wrapper
+        end
 
         before(:all) do
           WebMock.disable_net_connect!
@@ -16,19 +20,15 @@ module Dash2
         before(:each) do
           base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
           tenant_path = File.absolute_path('config/tenants/dataone.yml')
-          config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
+          @config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
 
           mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
           stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom.txt'))
-
-          datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
-          stub_request(:get, datacite_uri).to_return(body: File.read('spec/data/harvester/mrt-datacite.xml'))
 
           feed_uri = config.feed_uri
           entry_xml = File.read('spec/data/harvester/entry-r36p4t.xml')
           entry = RSS::Parser.parse(entry_xml, false).items[0]
           @record = MerrittAtomHarvestedRecord.new(feed_uri, entry)
-          @wrapper = record.as_wrapper
         end
 
         describe '#identifier' do
@@ -48,18 +48,29 @@ module Dash2
 
         describe 'stash_files' do
           it 'limits the number of files' do
-            too_many_files = Array.new(MerrittAtomHarvestedRecord::MAX_FILES * 2) { instance_double(Stash::Wrapper::StashFile)}
+            too_many_files = Array.new(MerrittAtomHarvestedRecord::MAX_FILES * 2) { instance_double(Stash::Wrapper::StashFile) }
             record.instance_variable_set(:@all_stash_files, too_many_files)
             expect(record.stash_files).to eq(too_many_files.take(MerrittAtomHarvestedRecord::MAX_FILES))
           end
         end
 
+        describe 'error handling' do
+          it 'forwards errors' do
+            datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
+            stub_request(:get, datacite_uri).to_return(status: 404)
+            expect { record.as_wrapper }.to raise_error(RestClient::NotFound)
+          end
+        end
+
         describe '#stash_wrapper' do
+
+          before(:each) do
+            datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
+            stub_request(:get, datacite_uri).to_return(body: File.read('spec/data/harvester/mrt-datacite.xml'))
+          end
+
           it 'creates a StashWrapper' do
             expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)
-            # File.open('tmp/harvested-wrapper.xml', 'w') do |f|
-            #   f.write(wrapper.write_xml)
-            # end
           end
 
           it 'sets the embargo date based on the atom <published> tag' do
@@ -172,11 +183,50 @@ module Dash2
             end
           end
 
-          it 'extracts the license' do
-            expect(wrapper.license).to eq(Stash::Wrapper::License::CC_ZERO)
+          describe 'license parsing' do
+
+            attr_reader :dcs_resource
+
+            before(:each) do
+              datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
+              @dcs_resource = Datacite::Mapping::Resource.parse_mrt_datacite(datacite_xml, '10.15146/R3RG6G')
+              allow(record).to receive(:datacite_resource).and_return(@dcs_resource)
+              record.instance_variable_set(:@wrapper, nil)
+            end
+
+            it 'extracts a CC0 license' do
+              expect(wrapper.license).to eq(Stash::Wrapper::License::CC_ZERO)
+            end
+
+            it 'extracts a CC_BY license' do
+              rights = dcs_resource.rights_list[0]
+              rights.uri = URI('http://creativecommons.org/publicdomain/zero/1.0/')
+              rights.value = 'public domain'
+              expect(wrapper.license).to eq(Stash::Wrapper::License::CC_ZERO)
+            end
+
+            it 'converts "publicdomain" URL to a CC0 license' do
+              rights = dcs_resource.rights_list[0]
+              rights.uri = URI('https://creativecommons.org/licenses/by/4.0/')
+              rights.value = 'Creative Commons Attribution 4.0 International (CC-BY 4.0)'
+              expect(wrapper.license).to eq(Stash::Wrapper::License::CC_BY)
+            end
+
+            it 'converts a custom license' do
+              custom_uri = URI('doi:10.5060/D8PP47')
+              custom_value = 'Terms of use are available at: doi:10.5060/D8PP47'
+              rights = dcs_resource.rights_list[0]
+              rights.uri = custom_uri
+              rights.value = custom_value
+              license = wrapper.license
+              expect(license.name).to eq(custom_value)
+              expect(license.uri).to eq(custom_uri)
+            end
           end
+
         end
       end
+
     end
   end
 end
