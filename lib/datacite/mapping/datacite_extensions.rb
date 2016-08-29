@@ -96,11 +96,11 @@ module Datacite
         descriptions.select { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
       end
 
-      def self.parse_mrt_datacite(mrt_datacite_xml, doi)
+      def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
         datacite_xml = mrt_datacite_xml.force_encoding('utf-8')
         SPECIAL_CASES.each { |regex, replacement| datacite_xml.gsub!(regex, replacement) }
         resource = parse_xml(datacite_xml, mapping: :nonvalidating)
-        resource.identifier = Datacite::Mapping::Identifier.new(value: doi) unless resource.identifier && resource.identifier.value
+        resource.identifier = Datacite::Mapping::Identifier.new(value: doi_value) unless resource.identifier && resource.identifier.value
         resource.convert_funding!
         resource.descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
         resource.inject_rights!
