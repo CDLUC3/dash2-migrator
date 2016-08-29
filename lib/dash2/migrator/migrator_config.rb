@@ -8,6 +8,7 @@ module Dash2
 
       MerrittAtomSourceConfig = Harvester::MerrittAtomSourceConfig
       IndexerIndexConfig = Indexer::IndexConfig
+      Environment = Config::Factory::Environment
 
       def initialize(source_config:, index_config:)
         super(
@@ -37,6 +38,14 @@ module Dash2
       def self.from_env(env)
         source_config = Stash::Harvester::SourceConfig.for_environment(env, :source)
         index_config = Stash::Indexer::IndexConfig.for_environment(env, :index)
+        MigratorConfig.new(source_config: source_config, index_config: index_config)
+      end
+
+      def self.from_files(source:, index:)
+        source_env = Environment.load_file(source)
+        index_env = Environment.load_file(index)
+        source_config = Stash::Harvester::SourceConfig.for_environment(source_env, :source)
+        index_config = Stash::Indexer::IndexConfig.for_environment(index_env, :index)
         MigratorConfig.new(source_config: source_config, index_config: index_config)
       end
     end

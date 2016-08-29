@@ -1,0 +1,4 @@
+source:
+  protocol: 'Merritt Atom'
+  tenant_path: config/tenants/dataone.yml
+  feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
