@@ -18,7 +18,7 @@ module Dash2
           base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
           @tenant_path = File.absolute_path('config/tenants/example.yml')
           @config = MerrittAtomSourceConfig.new(tenant_path: @tenant_path, feed_uri: base_feed_uri, env_name: 'test')
-          @task = MerrittAtomHarvestTask.new(config: @config)
+          @task = config.create_harvest_task
 
           @feed_uri = base_feed_uri.sub('https://', "https://#{config.username}:#{config.password}@")
           @feed = File.read('spec/data/harvester/ark:-13030-m5709fmd.atom').freeze
