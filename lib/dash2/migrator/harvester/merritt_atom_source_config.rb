@@ -16,7 +16,7 @@ module Dash2
 
         def description
           @desc = begin
-            "Merritt Atom source for #{tenant_path} (#{feed_uri})"
+            desc = "Merritt Atom source for #{tenant_path} (#{feed_uri})"
             desc << " #{env_name}" if env_name
             desc
           end
