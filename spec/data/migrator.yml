@@ -1,0 +1,25 @@
+defaults: &defaults
+  source:
+    protocol: 'Merritt Atom'
+    tenant_path: config/tenants/example.yml
+    feed_uri: 'https://merritt.example.org/object/recent.atom?collection=ark:/12345/0d0301c2'
+  index:
+    adapter: Dash2
+    db_config_path: spec/data/indexer/database.yml
+    tenant_path: config/tenants/ucop.yml
+
+test:
+  <<: *defaults
+
+development:
+  <<: *defaults
+
+stage:
+  <<: *defaults
+
+production:
+  <<: *defaults
+  index:
+    adapter: Dash2
+    db_config_path: config/database.yml
+    id_mode: always_update

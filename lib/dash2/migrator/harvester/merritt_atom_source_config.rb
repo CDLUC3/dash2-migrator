@@ -45,7 +45,7 @@ module Dash2
           @feed_uri ||= URI.parse(source_uri.to_s.sub('https://', "https://#{username}:#{password}@"))
         end
 
-        def create_harvest_task(from_time = nil, until_time = nil)
+        def create_harvest_task(from_time: nil, until_time: nil)
           MerrittAtomHarvestTask.new(config: self, from_time: from_time, until_time: until_time)
         end
       end

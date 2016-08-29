@@ -4,6 +4,7 @@ require 'stash_ezid/client'
 module Dash2
   module Migrator
     module Indexer
+      # TODO: either rename this or rename MerrittAtomSourceConfig
       class IndexConfig < Stash::Indexer::IndexConfig
         adapter 'Dash2'
 
@@ -42,7 +43,7 @@ module Dash2
           end
         end
 
-        def create_indexer
+        def create_indexer(*_args)
           Indexer.new(db_config: db_config, tenant_config: tenant_config)
         end
 
