@@ -34,8 +34,16 @@ module Dash2
           end
         end
 
+        def db_config
+          @db_config ||= begin
+            stash_env = ENV['STASH_ENV']
+            raise '$STASH_ENV not set' unless stash_env
+            YAML.load_file(db_config_path)[stash_env]
+          end
+        end
+
         def create_indexer
-          Indexer.new(tenant_config: tenant_config)
+          Indexer.new(db_config: db_config, tenant_config: tenant_config)
         end
 
         private

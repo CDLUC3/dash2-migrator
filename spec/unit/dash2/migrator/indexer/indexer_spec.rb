@@ -26,7 +26,14 @@ module Dash2
         end
 
         describe '#index' do
-          it 'indexes' do
+
+          attr_reader :importer
+          attr_reader :wrappers
+          attr_reader :uids
+          attr_reader :records
+
+          before(:each) do
+
             sword_params = {
               collection_uri: 'http://sword-dev.example.org:39001/mrtsword/collection/test',
               username: 'test',
@@ -46,8 +53,8 @@ module Dash2
             ezid_client = instance_double(StashEzid::Client)
             allow(StashEzid::Client).to receive(:new).with(ezid_params).and_return(ezid_client)
 
-            doi_updater = instance_double(Dash2::Migrator::Importer::DOIUpdater)
-            allow(Dash2::Migrator::Importer::DOIUpdater).to receive(:new).with(
+            doi_updater = instance_double(Importer::DOIUpdater)
+            allow(Importer::DOIUpdater).to receive(:new).with(
               ezid_client: ezid_client,
               tenant: tenant,
               mint_dois: true
@@ -56,24 +63,47 @@ module Dash2
             sword_client = instance_double(Stash::Sword::Client)
             allow(Stash::Sword::Client).to receive(:new).with(sword_params).and_return(sword_client)
 
-            sword_packager = instance_double(Dash2::Migrator::Importer::SwordPackager)
-            allow(Dash2::Migrator::Importer::SwordPackager).to receive(:new).with(
+            sword_packager = instance_double(Importer::SwordPackager)
+            allow(Importer::SwordPackager).to receive(:new).with(
               sword_client: sword_client,
               create_placeholder_files: true
             ).and_return(sword_packager)
 
-            importer = instance_double(Dash2::Migrator::Importer::Importer)
-            allow(Dash2::Migrator::Importer::Importer).to receive(:new).with(
+            @importer = instance_double(Importer::Importer)
+            allow(Importer::Importer).to receive(:new).with(
               doi_updater: doi_updater,
               sword_packager: sword_packager,
               tenant: tenant
             ).and_return(importer)
 
-            expect(indexer.importer).to be(importer) # just to be sure
+            @wrappers = Array.new(3) { instance_double(Stash::Wrapper::StashWrapper) }
+            @uids = Array.new(3) { |i| "user#{i}@example.edu" }
+            @records = wrappers.zip(uids).map do |wrapper, uid|
+              record = instance_double(Harvester::MerrittAtomHarvestedRecord)
+              allow(record).to receive(:as_wrapper).and_return(wrapper)
+              allow(record).to receive(:user_uid).and_return(uid)
+              record
+            end
+          end
+
+          it 'indexes' do
+            allow(ActiveRecord::Base).to receive(:connection)
+            allow(ActiveRecord::Base).to(receive(:transaction)) { |_args, &block| block.call }
+
+            wrappers.zip(uids).each do |wrapper, uid|
+              expect(importer).to receive(:import).with(stash_wrapper: wrapper, user_uid: uid)
+            end
+            indexer.index(records)
+          end
+
+          it 'establishes a connection' do
+            expect(ActiveRecord::Base).to receive(:connection).and_raise(ActiveRecord::ConnectionNotEstablished)
+            expect(ActiveRecord::Base).to receive(:establish_connection).with(indexer.db_config)
+            allow(ActiveRecord::Base).to(receive(:transaction)) { |_args, &block| block.call }
+            allow(importer).to receive(:import)
+            indexer.index([records[0]])
           end
         end
-
-
       end
     end
   end

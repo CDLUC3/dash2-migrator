@@ -8,14 +8,16 @@ module Dash2
 
       class Indexer < Stash::Indexer::Indexer
 
-        attr_reader :tenant_config
-
         DOIUpdater = Dash2::Migrator::Importer::DOIUpdater
         SwordPackager = Dash2::Migrator::Importer::SwordPackager
         Importer = Dash2::Migrator::Importer::Importer
 
-        def initialize(tenant_config:)
+        attr_reader :db_config
+        attr_reader :tenant_config
+
+        def initialize(db_config:, tenant_config:)
           super(metadata_mapper: nil)
+          @db_config = db_config
           @tenant_config = tenant_config
         end
 
@@ -25,10 +27,6 @@ module Dash2
 
         def index(harvested_records)
           harvested_records.each { |hr| index_record(hr.as_wrapper, hr.user_uid) }
-        end
-
-        def log
-          Stash::Harvester.log
         end
 
         def ezid_config
@@ -62,6 +60,7 @@ module Dash2
         private
 
         def index_record(stash_wrapper, user_uid)
+          ensure_db_connection!
           ActiveRecord::Base.transaction(requires_new: true) do
             importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
           end
