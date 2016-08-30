@@ -4,6 +4,7 @@ require 'dash2/migrator/indexer/index_config'
 
 module Dash2
   module Migrator
+    # TODO: Rename this to MigrationJobConfig or similar
     class MigratorConfig < Stash::Config
 
       MerrittAtomSourceConfig = Harvester::MerrittAtomSourceConfig

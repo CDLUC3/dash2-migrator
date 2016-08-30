@@ -38,7 +38,7 @@ module Dash2
 
       describe '#from_file' do
         it 'loads a configuration' do
-          config = MigratorConfig.from_file('spec/data/migrator.yml')
+          config = MigratorConfig.from_file('spec/data/migrator-config.yml')
           expect(config).to be_a(MigratorConfig)
 
           expect(config.source_config).to be_a(Harvester::MerrittAtomSourceConfig)
@@ -46,7 +46,7 @@ module Dash2
         end
 
         it 'instantiates a working HarvesterApp::Application' do
-          config = MigratorConfig.from_file('spec/data/migrator.yml')
+          config = MigratorConfig.from_file('spec/data/migrator-config.yml')
           app = Stash::HarvesterApp::Application.with_config(config)
           job = app.send(:create_job)
           expect(job).to be_a(Stash::HarvestAndIndexJob)

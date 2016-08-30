@@ -1,0 +1,10 @@
+sources:
+  - tenant_path: config/tenants/dataone.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
+  - tenant_path: config/tenants/ucsf.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m52j8gvj'
+  - tenant_path: config/tenants/ucsf.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5ng4nz1'
+index:
+  db_config_path: config/database.yml
+  tenant_override: config/tenants/ucop.yml
