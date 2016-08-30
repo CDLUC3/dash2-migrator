@@ -10,6 +10,7 @@ module Dash2
         attr_reader :stash_wrapper
         attr_reader :dcs_resource
         attr_reader :se_resource
+        attr_reader :doi_value
 
         def initialize(stash_wrapper:, dcs_resource:, se_resource:)
           @stash_wrapper = stash_wrapper
@@ -18,7 +19,7 @@ module Dash2
         end
 
         def update!(ezid_client:, tenant:)
-          doi_value = DOIUpdateTask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
+          @doi_value ||= DOIUpdateTask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
           ezid_client.update_metadata(
             "doi:#{doi_value}",
             dcs_resource.write_xml,

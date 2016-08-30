@@ -40,7 +40,8 @@ module Dash2
 
       def migrate!
         sources.each do |source|
-          tenant_path, feed_uri = source[:tenant_path], source[:feed_uri]
+          tenant_path = source[:tenant_path]
+          feed_uri = source[:feed_uri]
           source_config = MerrittAtomSourceConfig.new(
             tenant_path: tenant_path,
             feed_uri: feed_uri,

@@ -8,14 +8,13 @@ module Dash2
 
         def initialize(stash_wrapper:, dcs_resource:, se_resource:)
           super
-          if StashDatacite::AlternateIdentifier.where(alternate_identifier: old_doi)
-            raise ArgumentError, "#{old_doi} already migrated"
-          end
+          ensure_unidentified(se_resource)
+          ensure_not_migrated
         end
 
         def old_doi
           @old_doi ||= begin
-            old_doi_value = DOIUpdateTask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
+            old_doi_value = MintingDOIUpdateTask.doi_value_from(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource)
             old_doi = "doi:#{old_doi_value}"
             old_doi
           end
@@ -27,9 +26,17 @@ module Dash2
 
           stash_wrapper.identifier.value = new_doi_value
           dcs_resource.identifier.value = new_doi_value
-          se_resource.identifier.identifier = new_doi_value
-          se_resource.identifier.save
 
+          se_ident = se_resource.identifier
+          if se_ident
+            se_ident.update(identifier: new_doi_value)
+          else
+            se_ident = StashEngine::Identifier.create(identifier: new_doi_value, identifier_type: 'DOI')
+            se_resource.identifier_id = se_ident.id
+            se_resource.save
+          end
+
+          @doi_value = new_doi_value
           super
         end
 
@@ -39,6 +46,28 @@ module Dash2
           alt_ident = Datacite::Mapping::AlternateIdentifier.new(type: 'migrated from', value: old_doi)
           add_alt_ident_xml(alt_ident)
           add_alt_ident_db(alt_ident)
+        end
+
+        def self.doi_value_from(stash_wrapper:, dcs_resource:)
+          sw_doi_value = stash_wrapper.identifier.value
+          dcs_doi_value = dcs_resource.identifier.value
+          return sw_doi_value if sw_doi_value == dcs_doi_value
+          raise ArgumentError, "Inconsistent DOI values: stash_wrapper: #{sw_doi_value}, dcs_resource: #{dcs_doi_value}"
+        end
+
+        def ensure_not_migrated
+          if StashDatacite::AlternateIdentifier.where(alternate_identifier: old_doi)
+            raise ArgumentError, "#{old_doi} already migrated"
+          end
+        end
+
+        def ensure_unidentified(se_resource)
+          se_ident = se_resource.identifier
+          if se_ident
+            se_ident_value = se_ident.identifier || 'nil'
+            se_ident_id = se_ident.id || 'nil'
+            raise ArgumentError, "Resource with ID #{se_resource.id} should not have an identifier: #{se_ident_value} (id: #{se_ident_id}"
+          end
         end
 
         private

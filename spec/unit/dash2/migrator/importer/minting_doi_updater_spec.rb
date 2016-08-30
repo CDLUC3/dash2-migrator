@@ -18,6 +18,7 @@ module Dash2
         attr_reader :dcs_alt_idents
 
         attr_reader :se_ident
+        attr_reader :se_ident_id
 
         attr_reader :se_resource_id
 
@@ -79,11 +80,20 @@ module Dash2
             allow(dcs_resource).to receive(:alternate_identifiers) { dcs_alt_idents }
             allow(dcs_resource).to receive(:write_xml) { '<resource/>' }
 
-            @se_ident = OpenStruct.new(identifier: old_doi_value)
+            @se_ident_id = 23
+            @se_ident = double(StashEngine::Identifier)
+            allow(se_ident).to receive(:id).and_return(se_ident_id)
+            allow(StashEngine::Identifier).to receive(:create).with(
+              identifier: new_doi_value,
+              identifier_type: 'DOI'
+            ).and_return(se_ident)
+
             @se_resource_id = 17
-            @se_resource = instance_double(StashEngine::Resource)
-            allow(se_resource).to receive(:identifier) { se_ident }
+            @se_resource = double(StashEngine::Resource)
+            allow(se_resource).to receive(:identifier) { nil }
             allow(se_resource).to receive(:id) { @se_resource_id }
+            allow(se_resource).to receive(:identifier_id=).with(se_ident_id)
+            allow(se_resource).to receive(:save)
 
             @sd_alt_ident = double(StashDatacite::AlternateIdentifier)
             allow(StashDatacite::AlternateIdentifier).to receive(:create) { sd_alt_ident }
@@ -112,9 +122,9 @@ module Dash2
             end
 
             it 'sets the DOI on the StashEngine::Resource' do
-              expect(se_ident).to receive(:save)
+              expect(se_resource).to receive(:identifier_id=).with(se_ident_id)
+              expect(se_resource).to receive(:save)
               updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource)
-              expect(se_ident.identifier).to eq(new_doi_value)
             end
           end
 
