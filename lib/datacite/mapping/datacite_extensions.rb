@@ -98,6 +98,22 @@ module Datacite
         '<geoLocationPlace>false</geoLocationPlace>' => ''
       }.freeze
 
+      def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
+        resource = parse_special(mrt_datacite_xml)
+        resource.ensure_doi(doi_value)
+        resource.ensure_resource_type!
+        resource.convert_funding!
+        resource.fix_breaks!
+        resource.inject_rights!
+        resource
+      end
+
+      def self.parse_special(mrt_datacite_xml)
+        datacite_xml = mrt_datacite_xml.force_encoding('utf-8')
+        SPECIAL_CASES.each { |regex, replacement| datacite_xml.gsub!(regex, replacement) }
+        parse_xml(datacite_xml, mapping: :nonvalidating)
+      end
+
       def funder_contribs
         contributors.select { |c| c.type == ContributorType::FUNDER }
       end
@@ -106,16 +122,12 @@ module Datacite
         descriptions.select { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
       end
 
-      def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
-        datacite_xml = mrt_datacite_xml.force_encoding('utf-8')
-        SPECIAL_CASES.each { |regex, replacement| datacite_xml.gsub!(regex, replacement) }
-        resource = parse_xml(datacite_xml, mapping: :nonvalidating)
-        resource.identifier = Datacite::Mapping::Identifier.new(value: doi_value) unless resource.identifier && resource.identifier.value
-        resource.convert_funding!
-        resource.descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
-        resource.inject_rights!
-        resource.resource_type = ResourceType.new(resource_type_general: ResourceTypeGeneral::OTHER) unless resource.resource_type
-        resource
+      def ensure_doi(doi_value)
+        self.identifier = Datacite::Mapping::Identifier.new(value: doi_value) unless identifier && identifier.value
+      end
+
+      def ensure_resource_type!
+        self.resource_type = ResourceType.new(resource_type_general: ResourceTypeGeneral::OTHER) unless resource_type
       end
 
       # Converts deprecated funder contributors to FundingReferences
@@ -126,6 +138,10 @@ module Datacite
           all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
           all_names.zip(all_grants).each { |funder_name, grant_number| add_funding_reference(funder_contrib, funder_name, grant_number) }
         end
+      end
+
+      def fix_breaks!
+        descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
       end
 
       def add_funding_reference(funder_contrib, funder_name, grant_number)

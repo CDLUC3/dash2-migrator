@@ -40,24 +40,17 @@ module Dash2
 
       def migrate!
         sources.each do |source|
-          tenant_path = source[:tenant_path]
-          feed_uri = source[:feed_uri]
-          source_config = MerrittAtomSourceConfig.new(
-            tenant_path: tenant_path,
-            feed_uri: feed_uri,
-            env_name: env_name
-          )
-          index_config = IndexerIndexConfig.new(
-            db_config_path: index_db_config,
-            tenant_path: index_tenant_override || tenant_path
-          )
-          migrator_config = MigratorConfig.new(
-            source_config: source_config,
-            index_config: index_config
-          )
-          app = HarvesterApp.with_config(migrator_config)
+          app = create_app_instance(source[:tenant_path], source[:feed_uri])
           app.start
         end
+      end
+
+      def create_app_instance(tenant_path, feed_uri)
+        index_tenant_path = index_tenant_override || tenant_path
+        source_config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: feed_uri, env_name: env_name)
+        index_config = IndexerIndexConfig.new(db_config_path: index_db_config, tenant_path: index_tenant_path)
+        migrator_config = MigratorConfig.new(source_config: source_config, index_config: index_config)
+        HarvesterApp.with_config(migrator_config)
       end
 
       def self.from_file(config_path)
@@ -69,8 +62,6 @@ module Dash2
           index_tenant_override: index_config[:tenant_override]
         )
       end
-
-      private
 
       def self.deep_symbolize_keys(val)
         if val.is_a?(Hash)
