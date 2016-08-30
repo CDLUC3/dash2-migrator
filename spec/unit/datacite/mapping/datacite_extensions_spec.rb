@@ -32,10 +32,17 @@ module Datacite
           expect(identifier.value).to eq(injected_value)
         end
 
+        it 'injects missing resourcetype' do
+          datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucla-ark+=b5068=d1wc7k-mrt-datacite.xml')
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource_type = resource.resource_type
+          expect(resource_type).not_to be_nil
+          expect(resource_type.resource_type_general).to eq(Datacite::Mapping::ResourceTypeGeneral::OTHER)
+        end
+
         it 'dehyphenates' do
           datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
-          injected_value = '10.123/456'
-          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
           abstract = resource.descriptions.find { |d| d.type == DescriptionType::ABSTRACT }
           expect(abstract.value).to eq('Mammalian esophagus exhibits a remarkable change in epithelial structure during the transition from embryo to adult. However, the molecular mechanisms of esophageal epithelial development are not well understood. Zebrafish (Danio rerio), a common model organism for vertebrate development and gene function, has not previously been characterized as a model system for esophageal epithelial development. In this study, we characterized a piece of non-keratinized stratified squamous epithelium similar to human esophageal epithelium in the upper digestive tract of developing zebrafish. Under the microscope, this piece was detectable at 5dpf and became stratified at 7dpf. Expression of esophageal epithelial marker genes (Krt5, P63, Sox2 and Pax9) was detected by immunohistochemistry and in situ hybridization. Knockdown of P63, a gene known to be critical for esophageal epithelium, disrupted the development of this epithelium. With this model system, we found that Pax9 knockdown resulted in loss or disorganization of the squamous epithelium, as well as down-regulation of the differentiation markers Krt4 and Krt5. In summary, we characterized a region of stratified squamous epithelium in the zebrafish upper digestive tract which can be used for functional studies of candidate genes involved in esophageal epithelial biology.')
         end

@@ -114,6 +114,7 @@ module Datacite
         resource.convert_funding!
         resource.descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
         resource.inject_rights!
+        resource.resource_type = ResourceType.new(resource_type_general: ResourceTypeGeneral::OTHER) unless resource.resource_type
         resource
       end
 
