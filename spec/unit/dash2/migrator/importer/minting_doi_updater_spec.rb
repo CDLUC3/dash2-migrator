@@ -128,6 +128,19 @@ module Dash2
               expect(se_resource).to receive(:save)
               updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource)
             end
+
+            it 'fails on an existing DOI' do
+              se_ident = double(StashEngine::Identifier)
+              allow(se_ident).to receive(:identifier).and_return('10.123/456')
+              allow(se_ident).to receive(:id).and_return(53)
+              allow(se_resource).to receive(:identifier).and_return(se_ident)
+              expect { updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource) }.to raise_error(ArgumentError)
+            end
+
+            it 'fails on inconsistent DOIs' do
+              dcs_ident.value = '10.XYZ/123'
+              expect { updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource) }.to raise_error(ArgumentError)
+            end
           end
 
           it 'updates the metadata for the fake DOI' do
