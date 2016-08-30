@@ -26,7 +26,12 @@ module Dash2
         end
 
         def index(harvested_records)
-          harvested_records.each { |hr| index_record(hr.as_wrapper, hr.user_uid) }
+          count = 0
+          harvested_records.each do |hr|
+            index_record(hr.as_wrapper, hr.user_uid)
+            count += 1
+          end
+          Migrator.log.debug("Migration complete; migrated #{count} records")
         end
 
         def ezid_config

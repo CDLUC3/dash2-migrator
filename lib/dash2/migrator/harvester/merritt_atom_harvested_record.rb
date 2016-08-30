@@ -8,7 +8,7 @@ module Dash2
   module Migrator
     module Harvester
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
-        DOI_PATTERN = %r{10\.[^/]+/[^;]+$}
+        DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
         MAX_FILES = 20
 
         attr_reader :feed_uri

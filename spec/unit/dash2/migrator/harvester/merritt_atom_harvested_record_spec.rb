@@ -62,7 +62,15 @@ module Dash2
           end
         end
 
-        describe 'doi handling' do
+        describe 'DOI handling' do
+          it 'extracts the DOI from mrt-mom.txt' do
+            datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
+            stub_request(:get, datacite_uri).to_return(body: File.read('spec/data/harvester/mrt-datacite.xml'))
+
+            sw_ident = wrapper.identifier
+            expect(sw_ident.value).to eq('10.15146/R3RG6G')
+          end
+
           it 'normalizes DOIs' do
             mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
             stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom-q6bg2kwf.txt'))
