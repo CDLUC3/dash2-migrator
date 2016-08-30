@@ -53,7 +53,7 @@ module Dash2
         describe '#update' do
           before(:each) do
             @old_doi_value = '10.123/456'
-            @new_doi_value = '10.321/abc'
+            @new_doi_value = '10.321/ABC'
 
             @ezid_client = instance_double(StashEzid::Client)
             allow(@ezid_client).to receive(:mint_id) { "doi:#{new_doi_value}" }
@@ -98,7 +98,9 @@ module Dash2
             @sd_alt_ident = double(StashDatacite::AlternateIdentifier)
             allow(StashDatacite::AlternateIdentifier).to receive(:create) { sd_alt_ident }
             allow(sd_alt_ident).to receive(:save)
-            allow(StashDatacite::AlternateIdentifier).to receive(:where)
+            allow(sd_alt_ident).to receive(:resource_id) { se_resource_id }
+
+            allow(StashDatacite::AlternateIdentifier).to receive(:find_by) { nil }
           end
 
           it 'mints a DOI' do
@@ -164,7 +166,7 @@ module Dash2
             end
 
             it 'raises an error for previously migrated records' do
-              expect(StashDatacite::AlternateIdentifier).to receive(:where).with(alternate_identifier: old_doi) { sd_alt_ident }
+              expect(StashDatacite::AlternateIdentifier).to receive(:find_by).with(alternate_identifier: old_doi) { sd_alt_ident }
               expect { updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource) }.to raise_error(ArgumentError)
             end
           end

@@ -76,7 +76,12 @@ module Dash2
               tenant: tenant
             ).and_return(importer)
 
-            @wrappers = Array.new(3) { instance_double(Stash::Wrapper::StashWrapper) }
+            @wrappers = Array.new(3) do |i|
+              wrapper = instance_double(Stash::Wrapper::StashWrapper)
+              sw_ident = Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: "10.123/#{i}")
+              allow(wrapper).to receive(:identifier).and_return(sw_ident)
+              wrapper
+            end
             @uids = Array.new(3) { |i| "user#{i}@example.edu" }
             @records = wrappers.zip(uids).map do |wrapper, uid|
               record = instance_double(Harvester::MerrittAtomHarvestedRecord)

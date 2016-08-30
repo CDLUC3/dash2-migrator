@@ -8,7 +8,7 @@ module Dash2
   module Migrator
     module Harvester
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
-        DOI_PATTERN = %r{10\..+/.+$}
+        DOI_PATTERN = %r{10\.[^/]+/[^;]+$}
         MAX_FILES = 20
 
         attr_reader :feed_uri
@@ -69,7 +69,7 @@ module Dash2
 
         def find_doi
           mrt_mom = content_for('system/mrt-mom.txt')
-          mrt_mom.match(DOI_PATTERN)[0]
+          mrt_mom.match(DOI_PATTERN)[0].strip
         end
 
         def stash_license

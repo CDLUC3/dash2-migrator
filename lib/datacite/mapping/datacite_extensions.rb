@@ -30,6 +30,16 @@ module Datacite
       end
     end
 
+    class Identifier
+      # TODO: consdier pushing this to datacite-mapping
+      def value=(v)
+        v = v.strip.upcase
+        raise ArgumentError, 'Identifier must have a non-nil value' unless v
+        raise ArgumentError, "Identifier value '#{v}' is not a valid DOI" unless v =~ %r{10\..+/.+}
+        @value = v
+      end
+    end
+
     class FundingReference
       def to_description
         article = 'the ' unless name.downcase.start_with?('the') || name.start_with?('Alexandr Kosenkov')

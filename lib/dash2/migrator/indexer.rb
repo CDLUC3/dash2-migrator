@@ -60,6 +60,7 @@ module Dash2
         private
 
         def index_record(stash_wrapper, user_uid)
+          Migrator.log.debug("Migrating #{(sw_ident = stash_wrapper.identifier) && sw_ident.value} for #{user_uid}")
           ensure_db_connection!
           ActiveRecord::Base.transaction(requires_new: true) do
             importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)

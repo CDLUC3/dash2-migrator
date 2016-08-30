@@ -5,6 +5,7 @@ module Dash2
     describe Migrationator do
 
       attr_reader :user_uid
+      attr_reader :last_doi
 
       before(:all) do
         @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
@@ -26,6 +27,7 @@ module Dash2
           time = Time.now
           @last_doi = "doi:10.5072/FK#{time.to_i}.#{time.nsec}"
         end
+        allow(@ezid_client).to receive(:update_metadata)
         allow(StashEzid::Client).to receive(:new) { @ezid_client }
 
         receipt = instance_double(Stash::Sword::DepositReceipt)
