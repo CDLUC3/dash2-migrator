@@ -15,7 +15,7 @@ module Dash2
         attr_reader :entry
 
         def initialize(feed_uri, entry)
-          super(identifier: entry.id.content, timestamp: entry.updated)
+          super(identifier: entry.id.content, timestamp: MerrittAtomHarvestedRecord.extract_timestamp(entry))
           @feed_uri = Stash::Util.to_uri(feed_uri)
           @entry = entry
         end
@@ -44,7 +44,7 @@ module Dash2
         end
 
         def date
-          (updated = entry.updated) && updated.content
+          MerrittAtomHarvestedRecord.extract_timestamp(entry)
         end
 
         def date_published
@@ -116,6 +116,10 @@ module Dash2
             log.error("Error fetching URI #{uri}: #{e}")
             raise
           end
+        end
+
+        def self.extract_timestamp(entry)
+          (updated = entry.updated) && updated.content
         end
 
       end

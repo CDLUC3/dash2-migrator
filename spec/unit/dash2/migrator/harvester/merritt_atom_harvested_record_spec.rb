@@ -37,6 +37,12 @@ module Dash2
           end
         end
 
+        describe '#timestamp' do
+          it 'extracts the timestamp' do
+            expect(record.timestamp).to eq(Time.parse('2015-08-17T13:08:15+00:00'))
+          end
+        end
+
         describe '#user_uid' do
           it 'gets the user info from Dash 1'
           it 'creates a user if needed'
