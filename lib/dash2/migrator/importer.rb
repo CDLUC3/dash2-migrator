@@ -32,6 +32,9 @@ module Dash2
           dcs_resource = stash_wrapper.datacite_resource
           se_resource = build_se_resource(stash_wrapper, dcs_resource, user_uid)
 
+          # TODO: stop doing this once we have Datacite 3/4 sorted out
+          dcs_resource.funding_references = [] # EZID doesn't like fundingReferences
+
           # TODO: stop passing dcs_resource around separately
           doi_updater.update(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
           sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
@@ -50,7 +53,7 @@ module Dash2
           old_doi_value = stash_wrapper.identifier.value
           new_doi = previously_migrated.identifier.identifier
           resource_id = previously_migrated.id
-          log.info("Skipping already migrated DOI #{old_doi_value} (migrated to #{new_doi}, resource ID #{resource_id}")
+          log.info("Skipping already migrated DOI #{old_doi_value} (migrated to #{new_doi}, resource ID #{resource_id})")
         end
 
         def user_id_for(user_uid)
