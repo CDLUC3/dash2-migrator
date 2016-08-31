@@ -51,6 +51,7 @@ module Dash2
         def submit_create(retries = RETRIES)
           return sword_client.create(doi: doi, zipfile: zipfile)
         rescue RestClient::Exceptions::ReadTimeout
+          Migrator.log.warn("Read timeout posting SWORD update for DOI #{doi}; #{retries} retries remaining")
           return submit_create(retries - 1) if retries > 0
           raise RestClient::Exceptions::ReadTimeout, "Unable to submit #{zipfile} for #{doi}: too many timeouts"
         end
@@ -63,6 +64,7 @@ module Dash2
         def submit_update(edit_iri, retries = RETRIES)
           return sword_client.update(edit_iri: edit_iri, zipfile: zipfile)
         rescue RestClient::Exceptions::ReadTimeout
+          Migrator.log.warn("Read timeout posting SWORD update to #{edit_iri}; #{retries} retries remaining")
           return submit_update(edit_iri, retries - 1) if retries > 0
           raise RestClient::Exceptions::ReadTimeout, "Unable to submit #{zipfile} to #{edit_iri}: too many timeouts"
         end

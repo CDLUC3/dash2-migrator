@@ -32,6 +32,7 @@ module Dash2
       attr_reader :env_name
 
       def initialize(sources:, index_db_config:, index_tenant_override: nil, env_name: Dash2::Migrator.env_name)
+        Migrator.log.info("Initializing migrator with DB #{index_db_config} in environment #{env_name}")
         @sources = sources
         @index_db_config = index_db_config
         @index_tenant_override = index_tenant_override

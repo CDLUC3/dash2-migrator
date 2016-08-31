@@ -26,12 +26,14 @@ module Dash2
         end
 
         def index(harvested_records)
+          ensure_db_connection!
+
           count = 0
           harvested_records.each do |hr|
             index_record(hr.as_wrapper, hr.user_uid)
             count += 1
           end
-          Migrator.log.debug("Migration complete; migrated #{count} records")
+          Migrator.log.info("Migration complete; migrated #{count} records")
         end
 
         def ezid_config
@@ -65,8 +67,7 @@ module Dash2
         private
 
         def index_record(stash_wrapper, user_uid)
-          Migrator.log.debug("Migrating #{(sw_ident = stash_wrapper.identifier) && sw_ident.value} for #{user_uid}")
-          ensure_db_connection!
+          Migrator.log.info("Migrating #{(sw_ident = stash_wrapper.identifier) && sw_ident.value} for #{user_uid}")
           ActiveRecord::Base.transaction(requires_new: true) do
             importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
           end
