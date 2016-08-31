@@ -18,7 +18,7 @@ require 'dash2/migrator'
 # ############################################################
 # Configure users
 
-class Dash2::Migrator::MerrittAtomHarvestedRecord
+class Dash2::Migrator::Harvester::MerrittAtomHarvestedRecord
   def self.ucop_users
     @ucop_users ||= begin
       ucop_users = StashEngine::User.where(tenant_id: 'ucop').all
@@ -52,9 +52,10 @@ class Dash2::Migrator::MerrittAtomHarvestedRecord
   end
 
   def user_uid
-    @user_uid ||= Dash2::Migrator::MerrittAtomHarvestedRecord.next_uid
+    @user_uid ||= Dash2::Migrator::Harvester::MerrittAtomHarvestedRecord.next_uid
   end
 end
+
 
 # ############################################################
 # Migrate
