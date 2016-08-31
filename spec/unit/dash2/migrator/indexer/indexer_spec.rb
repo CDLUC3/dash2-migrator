@@ -50,7 +50,11 @@ module Dash2
               id_scheme: 'doi',
               owner: nil
             }
+            # TODO: eliminate these logging hijinks
+            inner_ezid_client = instance_double(Ezid::Client)
+            allow(inner_ezid_client).to receive(:instance_variable_set)
             ezid_client = instance_double(StashEzid::Client)
+            allow(ezid_client).to receive(:instance_variable_get).with(:@ezid_client).and_return(inner_ezid_client)
             allow(StashEzid::Client).to receive(:new).with(ezid_params).and_return(ezid_client)
 
             doi_updater = instance_double(Importer::DOIUpdater)
