@@ -27,14 +27,14 @@ module Dash2
       HarvesterApp = Stash::HarvesterApp::Application
 
       attr_reader :sources
-      attr_reader :index_db_config
+      attr_reader :index_db_config_path
       attr_reader :index_tenant_override
       attr_reader :env_name
 
-      def initialize(sources:, index_db_config:, index_tenant_override: nil, env_name: Dash2::Migrator.env_name)
-        Migrator.log.info("Initializing migrator with DB #{index_db_config} in environment #{env_name}")
+      def initialize(sources:, index_db_config_path:, index_tenant_override: nil, env_name: Dash2::Migrator.env_name)
+        Migrator.log.info("Initializing migrator with DB #{index_db_config_path} in environment #{env_name}")
         @sources = sources
-        @index_db_config = index_db_config
+        @index_db_config_path = index_db_config_path
         @index_tenant_override = index_tenant_override
         @env_name = env_name
       end
@@ -49,7 +49,7 @@ module Dash2
       def create_app_instance(tenant_path, feed_uri)
         index_tenant_path = index_tenant_override || tenant_path
         source_config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: feed_uri, env_name: env_name)
-        index_config = IndexerIndexConfig.new(db_config_path: index_db_config, tenant_path: index_tenant_path)
+        index_config = IndexerIndexConfig.new(db_config_path: index_db_config_path, tenant_path: index_tenant_path)
         migrator_config = MigratorConfig.new(source_config: source_config, index_config: index_config)
         HarvesterApp.with_config(migrator_config)
       end
@@ -59,7 +59,7 @@ module Dash2
         index_config = config[:index]
         Migrationator.new(
           sources: config[:sources],
-          index_db_config: index_config[:db_config_path],
+          index_db_config_path: index_config[:db_config_path],
           index_tenant_override: index_config[:tenant_override]
         )
       end
