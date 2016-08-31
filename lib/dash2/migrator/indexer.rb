@@ -27,11 +27,17 @@ module Dash2
 
         def index(harvested_records)
           ensure_db_connection!
-
           count = 0
           harvested_records.each do |hr|
-            index_record(hr.as_wrapper, hr.user_uid)
-            count += 1
+            begin
+              index_record(hr.as_wrapper, hr.user_uid)
+              count += 1
+              yield Stash::Indexer::IndexResult.success(hr) if block_given?
+            rescue => e
+              Migrator.log.error(e)
+              (backtrace = e.backtrace) && Migrator.log.error(backtrace.join("\n"))
+              yield Stash::Indexer::IndexResult.failure(hr, [e]) if block_given?
+            end
           end
           Migrator.log.info("Migration complete; migrated #{count} records")
         end
@@ -73,7 +79,8 @@ module Dash2
         private
 
         def index_record(stash_wrapper, user_uid)
-          Migrator.log.info("Migrating #{(sw_ident = stash_wrapper.identifier) && sw_ident.value} for #{user_uid}")
+          ident_value = (sw_ident = stash_wrapper.identifier) && sw_ident.value
+          Migrator.log.info("Migrating #{ident_value} for #{user_uid}")
           ActiveRecord::Base.transaction(requires_new: true) do
             importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
           end
