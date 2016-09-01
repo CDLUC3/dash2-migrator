@@ -76,6 +76,8 @@ module Dash2
           expect(imported).to be(se_resource)
         end
 
+        it 'submits with the DOI updater\'s DOI, not the original DOI'
+
         it 'skips previously migrated records' do
           resource_id = 31
           alt_ident = double(StashDatacite::AlternateIdentifier)
