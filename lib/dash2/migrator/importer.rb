@@ -37,6 +37,10 @@ module Dash2
 
           # TODO: stop passing dcs_resource around separately
           doi_updater.update(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource)
+
+          # TODO: stop needing to re-inject this
+          stash_wrapper.datacite_resource = dcs_resource
+
           sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
           se_resource
         end
