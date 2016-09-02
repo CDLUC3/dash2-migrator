@@ -29,8 +29,9 @@ module Dash2
 
         def tenant_config
           @tenant_config ||= begin
+            stash_env = ENV['STASH_ENV']
             full_tenant_config = YAML.load_file(tenant_path)
-            env_tenant_config = full_tenant_config[env_name.to_s]
+            env_tenant_config = full_tenant_config[stash_env]
             deep_symbolize_keys(env_tenant_config)
           end
         end
