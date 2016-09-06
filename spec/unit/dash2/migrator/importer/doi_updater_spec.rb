@@ -77,7 +77,7 @@ module Dash2
 
         end
 
-        describe '#update' do
+        describe 'DOI mismatch' do
 
           before(:each) do
             @ezid_client = instance_double(StashEzid::Client)
@@ -115,7 +115,7 @@ module Dash2
             end
           end
 
-          describe 'successful update' do
+          describe '#{successful }update' do
             attr_reader :stash_wrapper
             attr_reader :dcs_resource
             attr_reader :se_resource
@@ -165,6 +165,11 @@ module Dash2
             it 'documents the migration in the Stash::Wrapper::Version' do
               updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource)
               expect(sw_version.note).to match(/Migrated at #{Time.now.year}/)
+            end
+
+            it 'forwards errors' do
+              expect(ezid_client).to receive(:update_metadata).and_raise(ArgumentError)
+              expect { updater.update(stash_wrapper: stash_wrapper, se_resource: se_resource, dcs_resource: dcs_resource) }.to raise_error(ArgumentError)
             end
           end
         end
