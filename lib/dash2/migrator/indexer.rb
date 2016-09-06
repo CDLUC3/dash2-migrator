@@ -27,19 +27,15 @@ module Dash2
 
         def index(harvested_records)
           ensure_db_connection!
-          count = 0
           harvested_records.each do |hr|
             begin
               index_record(hr.as_wrapper, hr.user_uid)
-              count += 1
               yield Stash::Indexer::IndexResult.success(hr) if block_given?
             rescue => e
-              Migrator.log.error(e)
-              (backtrace = e.backtrace) && Migrator.log.error(backtrace.join("\n"))
+              log_error(e)
               yield Stash::Indexer::IndexResult.failure(hr, [e]) if block_given?
             end
           end
-          Migrator.log.info("Migration complete; migrated #{count} records")
         end
 
         def ezid_config
@@ -48,7 +44,7 @@ module Dash2
 
         def ezid_client
           @ezid_client ||= begin
-                             # TODO: eliminate these logging hijinks
+            # TODO: eliminate these logging hijinks
             client = StashEzid::Client.new(ezid_config)
             inner_client = client.instance_variable_get(:@ezid_client)
             inner_client.instance_variable_set(:@logger, Migrator.log)
@@ -77,6 +73,11 @@ module Dash2
         end
 
         private
+
+        def log_error(e)
+          Migrator.log.error(e)
+          (backtrace = e.backtrace) && Migrator.log.error(backtrace.join("\n"))
+        end
 
         def index_record(stash_wrapper, user_uid)
           ident_value = (sw_ident = stash_wrapper.identifier) && sw_ident.value

@@ -40,6 +40,14 @@ module Datacite
           expect(resource_type.resource_type_general).to eq(Datacite::Mapping::ResourceTypeGeneral::OTHER)
         end
 
+        # it 'injects missing descriptiontype' do
+        #   datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucb-ark+=b6078=d1ms3x-mrt-datacite.xml')
+        #   resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+        #   resource.descriptions.each do |desc|
+        #
+        #   end
+        # end
+
         it 'dehyphenates' do
           datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')

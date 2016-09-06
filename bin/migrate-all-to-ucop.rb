@@ -56,7 +56,6 @@ class Dash2::Migrator::Harvester::MerrittAtomHarvestedRecord
   end
 end
 
-
 # ############################################################
 # Migrate
 

@@ -126,7 +126,7 @@ module Dash2
             expect(result_states).to eq [
               Stash::Indexer::IndexStatus::COMPLETED,
               Stash::Indexer::IndexStatus::FAILED,
-              Stash::Indexer::IndexStatus::COMPLETED,
+              Stash::Indexer::IndexStatus::COMPLETED
             ]
           end
         end

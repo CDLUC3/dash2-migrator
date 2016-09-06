@@ -9,6 +9,7 @@ AllCops:
 Style/ClassAndModuleChildren:
   Exclude:
     - 'migrate_*.rb'
+    - 'bin/*.rb'
 
 Style/AccessorMethodName:
   Exclude:

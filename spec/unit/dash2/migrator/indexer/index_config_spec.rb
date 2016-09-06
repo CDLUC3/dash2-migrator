@@ -39,33 +39,33 @@ module Dash2
         describe '#tenant_config' do
           it 'parses the tenant config for the environment as a symbol-keyed hash' do
             expected = {
-                enabled: true,
-                repository: {
-                    type: 'merritt',
-                    domain: 'merritt-dev.example.org',
-                    endpoint: 'http://sword-dev.example.org:39001/mrtsword/collection/test',
-                    username: 'test',
-                    password: 'test'
-                },
-                contact_email: ['contact1@example.edu', 'contact2@example.edu'],
-                abbreviation: 'DataONE',
-                short_name: 'DataONE',
-                long_name: 'DataONE',
-                full_domain: 'example-dev.example.org',
-                domain_regex: 'example-dev.example.org$',
-                tenant_id: 'dataone',
-                identifier_service: {
-                    shoulder: 'doi:10.5072/FK2',
-                    account: 'test',
-                    password: 'test',
-                    id_scheme: 'doi',
-                    owner: nil
-                },
-                authentication: {
-                    strategy: 'google'
-                },
-                default_license: 'cc0',
-                dash_logo_after_tenant: false
+              enabled: true,
+              repository: {
+                type: 'merritt',
+                domain: 'merritt-dev.example.org',
+                endpoint: 'http://sword-dev.example.org:39001/mrtsword/collection/test',
+                username: 'test',
+                password: 'test'
+              },
+              contact_email: ['contact1@example.edu', 'contact2@example.edu'],
+              abbreviation: 'DataONE',
+              short_name: 'DataONE',
+              long_name: 'DataONE',
+              full_domain: 'example-dev.example.org',
+              domain_regex: 'example-dev.example.org$',
+              tenant_id: 'dataone',
+              identifier_service: {
+                shoulder: 'doi:10.5072/FK2',
+                account: 'test',
+                password: 'test',
+                id_scheme: 'doi',
+                owner: nil
+              },
+              authentication: {
+                strategy: 'google'
+              },
+              default_license: 'cc0',
+              dash_logo_after_tenant: false
             }
 
             tenant_config = config.tenant_config

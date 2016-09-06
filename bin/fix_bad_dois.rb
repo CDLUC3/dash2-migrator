@@ -67,7 +67,6 @@ class Dash2::Migrator::Importer
   end
 end
 
-
 # ############################################################
 # Migrate
 

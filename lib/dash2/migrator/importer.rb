@@ -24,10 +24,7 @@ module Dash2
 
         def import(stash_wrapper:, user_uid:)
           previously_migrated = previously_migrated(stash_wrapper)
-          if previously_migrated
-            log_previously_migrated(stash_wrapper, previously_migrated)
-            return previously_migrated
-          end
+          return previously_migrated if previously_migrated
 
           dcs_resource = stash_wrapper.datacite_resource
           se_resource = build_se_resource(stash_wrapper, dcs_resource, user_uid)
@@ -50,7 +47,9 @@ module Dash2
         def previously_migrated(stash_wrapper)
           old_doi = "doi:#{stash_wrapper.identifier.value}"
           migration_record = StashDatacite::AlternateIdentifier.find_by(alternate_identifier: old_doi)
-          StashEngine::Resource.find_by(id: migration_record.resource_id) if migration_record
+          previously_migrated = (StashEngine::Resource.find_by(id: migration_record.resource_id) if migration_record)
+          log_previously_migrated(stash_wrapper, previously_migrated) if previously_migrated
+          previously_migrated
         end
 
         def log_previously_migrated(stash_wrapper, previously_migrated)
