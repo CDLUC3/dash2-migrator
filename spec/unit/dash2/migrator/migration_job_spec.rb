@@ -43,7 +43,7 @@ module Dash2
         }
       ].freeze
 
-      EXPECTED_DB_PATH = 'config/database.yml'.freeze
+      EXPECTED_DB_PATH = 'spec/data/indexer/database.yml'.freeze
       EXPECTED_TENANT_OVERRIDE = 'config/tenants/ucop.yml'.freeze
 
       attr_reader :job

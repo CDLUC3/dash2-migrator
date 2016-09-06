@@ -1,4 +1,4 @@
 index:
   adapter: Dash2
-  db_config_path: config/database.yml
+  db_config_path: spec/data/indexer/database.yml
   tenant_path: config/tenants/example.yml
