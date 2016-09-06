@@ -104,7 +104,7 @@ module Dash2
               expect(se_resource).to receive(:download_uri=).with(em_iri)
               expect(se_resource).to receive(:update_uri=).with(edit_iri)
 
-              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:current_state=).with('published')
               expect(se_resource).to receive(:update_version).with(expected_zipfile)
               expect(se_resource).to receive(:save)
 
@@ -128,7 +128,7 @@ module Dash2
               expect(se_resource).to receive(:download_uri=).with(em_iri)
               expect(se_resource).to receive(:update_uri=).with(edit_iri)
 
-              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:current_state=).with('published')
               expect(se_resource).to receive(:update_version).with(expected_zipfile)
               expect(se_resource).to receive(:save)
 
@@ -172,7 +172,7 @@ module Dash2
 
               expect(sword_client).to receive(:update).with(edit_iri: edit_iri, zipfile: expected_zipfile) { '200' }
 
-              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:current_state=).with('published')
               expect(se_resource).to receive(:update_version).with(expected_zipfile)
               expect(se_resource).to receive(:save)
 
@@ -187,7 +187,7 @@ module Dash2
                 '200'
               end
 
-              expect(se_resource).to receive(:set_state).with('published')
+              expect(se_resource).to receive(:current_state=).with('published')
               expect(se_resource).to receive(:update_version).with(expected_zipfile)
               expect(se_resource).to receive(:save)
 
