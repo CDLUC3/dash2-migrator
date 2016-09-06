@@ -1,0 +1,59 @@
+default: &default
+  enabled: true
+  repository:
+    type: merritt
+    domain: merritt-dev.example.com
+    endpoint: "http://sword-dev.example.com:39001/mrtsword/collection/test"
+    username: "test"
+    password: "test"
+  contact_email: ["contact1@example.com", "contact2@example.com"]
+  abbreviation: "Tenant"
+  short_name: "Tenant"
+  long_name: "Tenant"
+  full_domain: "example-dev.example.com"
+  domain_regex: "example-dev.example.com$"
+  tenant_id: tenant
+  identifier_service:
+    shoulder: "doi:10.5072/FK2"
+    account: test
+    password: test
+    id_scheme: doi
+    owner: null
+  authentication:
+    strategy: google
+  default_license: cc0
+  dash_logo_after_tenant: false
+
+development:
+  <<: *default
+  #Add any items that need to override the defaults here
+
+stage:
+  <<: *default
+  #Add any items that need to override the defaults here
+  repository:
+    type: merritt
+    domain: merritt-stage.example.com
+    endpoint: "http://sword-stg.example.com:39001/mrtsword/collection/stage"
+    username: "test"
+    password: "test"
+  full_domain: "example-stg.example.com"
+  domain_regex: "example-stg.example.com$"
+  tenant_id: tenant
+  identifier_service:
+    shoulder: "doi:10.5072/FK2"
+    account: test
+    password: test
+    owner: null
+    id_scheme: doi
+  authentication:
+    strategy: google
+  default_license: cc0
+
+production:
+  <<: *default
+  #Add any items that need to override the defaults here
+
+test:
+  <<: *default
+  #Add any items that need to override the defaults here

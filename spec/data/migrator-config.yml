@@ -6,7 +6,7 @@ defaults: &defaults
   index:
     adapter: Dash2
     db_config_path: spec/data/indexer/database.yml
-    tenant_path: config/tenants/ucop.yml
+    tenant_path: spec/data/tenant.yml
 
 test:
   <<: *defaults
@@ -21,5 +21,5 @@ production:
   <<: *defaults
   index:
     adapter: Dash2
-    db_config_path: config/database.yml
+    db_config_path: spec/data/indexer/database.yml
     id_mode: always_update
