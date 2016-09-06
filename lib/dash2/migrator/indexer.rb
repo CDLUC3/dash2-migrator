@@ -48,7 +48,7 @@ module Dash2
 
         def ezid_client
           @ezid_client ||= begin
-            # TODO: eliminate these logging hijinks
+                             # TODO: eliminate these logging hijinks
             client = StashEzid::Client.new(ezid_config)
             inner_client = client.instance_variable_get(:@ezid_client)
             inner_client.instance_variable_set(:@logger, Migrator.log)

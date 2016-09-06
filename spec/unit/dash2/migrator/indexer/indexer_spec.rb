@@ -112,6 +112,23 @@ module Dash2
             allow(importer).to receive(:import)
             indexer.index([records[0]])
           end
+
+          it 'yield success and failure' do
+            allow(ActiveRecord::Base).to receive(:connection)
+            allow(ActiveRecord::Base).to(receive(:transaction)) { |_args, &block| block.call }
+
+            expect(importer).to receive(:import)
+            expect(importer).to receive(:import).and_raise('Oops')
+            expect(importer).to receive(:import)
+
+            result_states = []
+            indexer.index(records) { |result| result_states << result.status }
+            expect(result_states).to eq [
+              Stash::Indexer::IndexStatus::COMPLETED,
+              Stash::Indexer::IndexStatus::FAILED,
+              Stash::Indexer::IndexStatus::COMPLETED,
+            ]
+          end
         end
       end
     end
