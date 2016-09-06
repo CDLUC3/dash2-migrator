@@ -2,7 +2,7 @@ require 'db_spec_helper'
 
 module Dash2
   module Migrator
-    describe Migrationator do
+    describe MigrationJob do
 
       attr_reader :user_uid
       attr_reader :last_doi
@@ -40,7 +40,7 @@ module Dash2
       end
 
       it 'harvests and imports' do
-        migrator = Migrationator.from_file('spec/data/migrator-full.yml')
+        migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
         migrator.migrate!
         expect(StashEngine::Resource.count).to eq(131)
       end

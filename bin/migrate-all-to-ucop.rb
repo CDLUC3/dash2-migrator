@@ -59,5 +59,5 @@ end
 # ############################################################
 # Migrate
 
-migrator = Dash2::Migrator::Migrationator.from_file('config/migrate-all-to-ucop.yml')
-migrator.migrate!
+job = Dash2::Migrator::MigrationJob.from_file('config/migrate-all-to-ucop.yml')
+job.migrate!
