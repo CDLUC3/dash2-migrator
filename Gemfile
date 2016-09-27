@@ -5,7 +5,7 @@ gem 'rest-client', '2.0.0'
 gem 'mysql2', '~> 0.3'
 
 gem 'config-factory', '~> 0.0', '>= 0.0.9'
-gem 'datacite-mapping', '~> 0.1', '>= 0.1.17.2'
+gem 'datacite-mapping', '~> 0.2', '>= 0.2.0'
 gem 'stash-wrapper', '~> 0.1', '>= 0.1.11.1'
 gem 'xml-mapping_extensions', '~> 0.4', '>= 0.4.6'
 gem 'stash-sword', '~> 0.1', '>= 0.1.3'
