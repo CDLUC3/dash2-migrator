@@ -24,7 +24,7 @@ PATH
   remote: ../stash_engines/stash_datacite
   specs:
     stash_datacite (0.0.5)
-      datacite-mapping (~> 0.2, >= 0.2.0)
+      datacite-mapping (~> 0.2, >= 0.2.1)
       kaminari
       leaflet-rails
       rails (~> 4.2.4)
@@ -108,7 +108,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     database_cleaner (1.5.3)
-    datacite-mapping (0.2.0)
+    datacite-mapping (0.2.1)
       typesafe_enum (~> 0.1, >= 0.1.7)
       xml-mapping_extensions (~> 0.4, >= 0.4.7)
     diff-lcs (1.2.5)
@@ -333,7 +333,7 @@ PLATFORMS
 DEPENDENCIES
   config-factory (~> 0.0, >= 0.0.9)
   database_cleaner (~> 1.5)
-  datacite-mapping (~> 0.2, >= 0.2.0)
+  datacite-mapping (~> 0.2, >= 0.2.1)
   equivalent-xml (~> 0.6.0)
   mysql2 (~> 0.3)
   nokogiri (= 1.6.7.2)

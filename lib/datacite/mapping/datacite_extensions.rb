@@ -95,7 +95,8 @@ module Datacite
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
         '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
           "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
-        '<geoLocationPlace>false</geoLocationPlace>' => ''
+        '<geoLocationPlace>false</geoLocationPlace>' => '',
+        "<identifier identifierType=\"DOI\"/>" => ''
       }.freeze
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
@@ -111,7 +112,7 @@ module Datacite
       def self.parse_special(mrt_datacite_xml)
         datacite_xml = mrt_datacite_xml.force_encoding('utf-8')
         SPECIAL_CASES.each { |regex, replacement| datacite_xml.gsub!(regex, replacement) }
-        parse_xml(datacite_xml, mapping: :nonvalidating)
+        parse_xml(datacite_xml)
       end
 
       def funder_contribs
