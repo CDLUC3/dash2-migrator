@@ -66,7 +66,7 @@ module Datacite
     class Resource
 
       SPECIAL_CASES = {
-        %r{<(identifier|subject)[^>]+/>} => '', # remove empty tags
+        %r{<(identifier|subject|description)[^>]+/>} => '', # remove empty tags
         %r{<(identifier|subject)[^>]+>\s+</\1>} => '', # remove empty tag pairs
         %r{(<date[^>]*>)(\d{4})-(\d{4})(</date>)} => '\\1\\2/\\3\\4', # fix date ranges
         %r{(<contributor[^>/]+>\s*)<contributor>([^<]+)</contributor>(\s*</contributor>)} => '\\1<contributorName>\\2</contributorName>\\3', # fix broken contributors
@@ -85,7 +85,6 @@ module Datacite
         'National Institutes of Health. National' => 'National Institutes of Health, National',
         '. Select a sub-organization' => '',
         'US Bureau of Reclamation Cooperative Agreement' => 'Cooperative Agreement',
-        '<description descriptionType="Other"/>' => '',
         '<description descriptionType="Other">0</description>' => '',
         'rightsURI="http:' => 'rightsURI="https:',
         'https://creativecommons.org/about/cc0' => Rights::CC_ZERO.uri.to_s,
@@ -93,9 +92,10 @@ module Datacite
         'Creative Commons Public Domain Dedication (CC0)' => Rights::CC_ZERO.value,
         'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
-        '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
-          "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
-        '<geoLocationPlace>false</geoLocationPlace>' => ''
+        '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' => "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
+        '<geoLocationPlace>false</geoLocationPlace>' => '',
+        %r{<geoLocationPlace>Orange County (Calif.)</geoLocationPlace/>} => "\1\n      <geoLocationBox>33.3869 -118.1174 33.9473 -117.4127</geoLocationBox>\n      <geoLocationPoint>33.6671 -117.7651</geoLocationPoint>",
+        %r{<geoLocationPlace>Providence Creek (Lower, Upper and P301)</geoLocationPlace>} => "\1\n      <geoLocationPoint>37.047756 -119.221094</geoLocationPoint>"
       }.freeze
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
