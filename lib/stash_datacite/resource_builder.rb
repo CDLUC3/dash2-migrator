@@ -76,7 +76,6 @@ module StashDatacite
       dcs_resource.descriptions.each { |dcs_description| add_sd_description(dcs_description) }
       dcs_resource.geo_locations.each { |dcs_geo_location| add_sd_geo_location(dcs_geo_location) }
       dcs_resource.funding_references.each { |dcs_funding_reference| add_funding(dcs_funding_reference) }
-      se_resource.geolocation = true unless dcs_resource.geo_locations.empty?
       se_resource.save!
       se_resource
     end
@@ -222,34 +221,38 @@ module StashDatacite
     end
 
     def add_sd_geo_location(dcs_geo_location)
-      add_sd_geo_location_place(dcs_geo_location.place)
-      add_sd_geo_location_point(dcs_geo_location.point)
-      add_sd_geo_location_box(dcs_geo_location.box)
+      return unless dcs_geo_location.location?
+      loc = Geolocation.create(resource_id: se_resource_id)
+      add_sd_geo_location_place(loc, dcs_geo_location.place)
+      add_sd_geo_location_point(loc, dcs_geo_location.point)
+      add_sd_geo_location_box(loc, dcs_geo_location.box)
+      loc.save
     end
 
-    def add_sd_geo_location_place(dcs_geo_location_place)
+    def add_sd_geo_location_place(se_geo_location, dcs_geo_location_place)
       return if dcs_geo_location_place.blank?
-      GeolocationPlace.create(geo_location_place: dcs_geo_location_place, resource_id: se_resource_id)
+      se_place = GeolocationPlace.create(geo_location_place: dcs_geo_location_place)
+      se_geo_location.place_id = se_place.id
     end
 
-    def add_sd_geo_location_point(dcs_geo_location_point)
+    def add_sd_geo_location_point(se_geo_location, dcs_geo_location_point)
       return unless dcs_geo_location_point
-      GeolocationPoint.create(
+      se_point = GeolocationPoint.create(
         latitude: dcs_geo_location_point.latitude,
-        longitude: dcs_geo_location_point.longitude,
-        resource_id: se_resource_id
+        longitude: dcs_geo_location_point.longitude
       )
+      se_geo_location.point_id = se_point.id
     end
 
-    def add_sd_geo_location_box(dcs_geo_location_box)
+    def add_sd_geo_location_box(se_geo_location, dcs_geo_location_box)
       return unless dcs_geo_location_box
-      GeolocationBox.create(
+      se_box = GeolocationBox.create(
         sw_latitude: dcs_geo_location_box.south_latitude,
         sw_longitude: dcs_geo_location_box.west_longitude,
         ne_latitude: dcs_geo_location_box.north_latitude,
-        ne_longitude: dcs_geo_location_box.east_longitude,
-        resource_id: se_resource_id
+        ne_longitude: dcs_geo_location_box.east_longitude
       )
+      se_geo_location.box_id = se_box.id
     end
 
     def add_funding(dcs_funding_reference)

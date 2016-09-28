@@ -253,11 +253,13 @@ module StashDatacite
     end
 
     it 'extracts the geolocations' do
+      se_locations = se_resource.geolocations
       expected_places = [
         'Providence Creek (Lower, Upper and P301)',
         'Atlantic Ocean'
       ]
-      places = se_resource.geolocation_places
+      se_place_ids = se_locations.map(&:place_id).compact
+      places = GeolocationPlace.find(se_place_ids)
       expect(places.size).to eq(expected_places.size)
       places.each_with_index do |p, i|
         expect(p.geo_location_place).to eq(expected_places[i])
@@ -267,7 +269,8 @@ module StashDatacite
         [37.046, -119.211, 37.075, -119.182],
         [41.09, -71.032, 42.893, -68.211]
       ]
-      boxes = se_resource.geolocation_boxes
+      se_box_ids = se_locations.map(&:box_id).compact
+      boxes = GeolocationBox.find(se_box_ids)
       expect(boxes.size).to eq(expected_boxes.size)
       boxes.each_with_index do |b, i|
         coords = [b.sw_latitude, b.sw_longitude, b.ne_latitude, b.ne_longitude]
@@ -276,7 +279,8 @@ module StashDatacite
         end
       end
 
-      points = se_resource.geolocation_points
+      se_point_ids = se_locations.map(&:point_id).compact
+      points = GeolocationPoint.find(se_point_ids)
       expect(points.size).to eq(1)
       point = points[0]
       expect(point.latitude).to be_within(0.0001).of(31.233)
