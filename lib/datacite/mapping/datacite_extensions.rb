@@ -84,7 +84,8 @@ module Datacite
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
         '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' => "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
         '<geoLocationPlace>false</geoLocationPlace>' => '',
-        %r{<geoLocationPlace>Orange County (Calif.)</geoLocationPlace/>} => "\1\n      <geoLocationBox>33.3869 -118.1174 33.9473 -117.4127</geoLocationBox>\n      <geoLocationPoint>33.6671 -117.7651</geoLocationPoint>",
+
+        %r{<geoLocationPlace>Orange County (Calif.)</geoLocationPlace/>} => "\1\n      <geoLocationBox>33.947514 -118.1259 33.333992 -117.412987</geoLocationBox>\n      <geoLocationPoint>33.676911 -117.776166</geoLocationPoint>",
         %r{<geoLocationPlace>Providence Creek (Lower, Upper and P301)</geoLocationPlace>} => "\1\n      <geoLocationPoint>37.047756 -119.221094</geoLocationPoint>"
       }.freeze
 
