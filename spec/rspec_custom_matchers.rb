@@ -35,12 +35,12 @@ module Stash
     end
 
     def self.failure_message(expected, actual)
-      expected_string = to_xml_string(expected)
-      actual_string = to_xml_string(actual) || actual
+      expected_string = to_pretty(to_nokogiri(expected))
+      actual_string = to_pretty(to_nokogiri(actual)) || actual
 
-      # now = Time.now.to_i
-      # File.open("tmp/#{now}-expected.xml", 'w') { |f| f.write(expected_string) }
-      # File.open("tmp/#{now}-actual.xml", 'w') { |f| f.write(actual_string) }
+      now = Time.now.to_i
+      File.open("tmp/#{now}-expected.xml", 'w') { |f| f.write(expected_string) }
+      File.open("tmp/#{now}-actual.xml", 'w') { |f| f.write(actual_string) }
 
       "expected XML:\n#{expected_string}\n\nbut was:\n#{actual_string}"
     end

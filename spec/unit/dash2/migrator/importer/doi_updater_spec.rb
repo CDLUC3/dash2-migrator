@@ -132,7 +132,7 @@ module Dash2
 
               @dcs_resource = instance_double(Datacite::Mapping::Resource)
               expect(dcs_resource).to receive(:identifier) { Datacite::Mapping::Identifier.new(value: doi_value) }
-              expect(dcs_resource).to receive(:write_xml) { '<resource/>' }
+              expect(dcs_resource).to receive(:write_xml).with(mapping: :datacite_3).and_return('<resource/>')
 
               @se_resource = instance_double(StashEngine::Resource)
               expect(se_resource).to receive(:identifier) {

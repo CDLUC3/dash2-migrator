@@ -103,7 +103,7 @@ module Dash2
           end)
 
           @expected_metadata = {
-            'mrt-datacite.xml' => datacite_xml,
+            'mrt-datacite.xml' => @dcs_resource.write_xml,
             'stash-wrapper.xml' => wrapper_xml,
             'mrt-oaidc.xml' => File.read('spec/data/generated-oaidc.xml'),
             'mrt-dataone-manifest.txt' => File.read('spec/data/generated-dataone-manifest.txt')

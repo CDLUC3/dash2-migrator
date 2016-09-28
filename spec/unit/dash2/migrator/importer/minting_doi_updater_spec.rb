@@ -78,7 +78,7 @@ module Dash2
             @dcs_resource = instance_double(Datacite::Mapping::Resource)
             allow(dcs_resource).to receive(:identifier) { dcs_ident }
             allow(dcs_resource).to receive(:alternate_identifiers) { dcs_alt_idents }
-            allow(dcs_resource).to receive(:write_xml) { '<resource/>' }
+            allow(dcs_resource).to receive(:write_xml).with(mapping: :datacite_3).and_return('<resource/>')
 
             @se_ident_id = 23
             @se_ident = double(StashEngine::Identifier)

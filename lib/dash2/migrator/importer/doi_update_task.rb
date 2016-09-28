@@ -23,7 +23,7 @@ module Dash2
           do_update(
             ezid_client: ezid_client,
             doi: "doi:#{doi_value}",
-            dcs_xml: dcs_resource.write_xml,
+            dcs_xml: dcs_resource.write_xml(mapping: :datacite_3),
             landing_url: tenant.landing_url("/stash/dataset/doi:#{doi_value}")
           )
           document_migration!
