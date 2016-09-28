@@ -114,9 +114,7 @@ module StashDatacite
     end
 
     def set_sd_publisher(dcs_publisher)
-      unless dcs_publisher.blank?
-        Publisher.create(publisher: dcs_publisher, resource_id: se_resource_id)
-      end
+      Publisher.create(publisher: dcs_publisher, resource_id: se_resource_id) unless dcs_publisher.blank?
     end
 
     def set_sd_pubyear(dcs_publication_year)

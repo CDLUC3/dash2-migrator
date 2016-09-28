@@ -61,18 +61,13 @@ module Dash2
         end
 
         def ensure_not_migrated
-          if (alt_ident = StashDatacite::AlternateIdentifier.find_by(alternate_identifier: old_doi))
-            raise ArgumentError, "#{old_doi} already migrated with ID: #{alt_ident.resource_id}"
-          end
+          alt_ident = StashDatacite::AlternateIdentifier.find_by(alternate_identifier: old_doi)
+          raise ArgumentError, "#{old_doi} already migrated with ID: #{alt_ident.resource_id}" if alt_ident
         end
 
         def ensure_unidentified(se_resource)
           se_ident = se_resource.identifier
-          if se_ident
-            se_ident_value = se_ident.identifier || 'nil'
-            se_ident_id = se_ident.id || 'nil'
-            raise ArgumentError, "Resource with ID #{se_resource.id} should not have an identifier: #{se_ident_value} (id: #{se_ident_id}"
-          end
+          raise ArgumentError, "Resource with ID #{se_resource.id} should not have an identifier: #{se_ident.identifier || 'nil'} (id: #{se_ident.id || 'nil'}" if se_ident
         end
 
         private

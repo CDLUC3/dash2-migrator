@@ -71,14 +71,12 @@ module Datacite
         %r{(<date[^>]*>)(\d{4})-(\d{4})(</date>)} => '\\1\\2/\\3\\4', # fix date ranges
         %r{(<contributor[^>/]+>\s*)<contributor>([^<]+)</contributor>(\s*</contributor>)} => '\\1<contributorName>\\2</contributorName>\\3', # fix broken contributors
         'Affaits, National Institutes of Health,' => 'Affairs; National Institutes of Health;',
-        'NIH RO1 HL31113, VA BX001970' => 'VA BX001970; NIH RO1 HL31113; nil',
+        'NIH RO1 HL31113, VA BX001970' => 'VA BX001970; NIH RO1 HL31113; nil', # the string 'nil' is special in add_funding_reference()
         'Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation.' =>
           'Bill &amp; Melinda Gates Foundation; MacArthur Foundation; National Institutes of Health; Bill &amp; Melinda Gates Foundation',
-        'Current dataset preparation: Bill and Melinda Gates Foundation (OPP1086183). Original data collection: MacArthur Foundation (05-84956-000-GSS), National Institutes of Health (R01HD053129) and Bill and Melinda Gates Foundation (48541).' =>
-          'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541',
+        'Current dataset preparation: Bill and Melinda Gates Foundation (OPP1086183). Original data collection: MacArthur Foundation (05-84956-000-GSS), National Institutes of Health (R01HD053129) and Bill and Melinda Gates Foundation (48541).' => 'OPP1086183; 05-84956-000-GSS; R01HD053129; 48541',
         'National Institute of Health' => 'National Institutes of Health',
-        'National Geographic Society and National Eye Institute, NIH, US.' =>
-          'National Geographic Society; National Institutes of Health, National Eye Institute',
+        'National Geographic Society and National Eye Institute, NIH, US.' => 'National Geographic Society; National Institutes of Health, National Eye Institute',
         'NGS W104-10 and NIH EY022087' => 'NGS W104-10; NIH EY022087',
         'National Institutes of Health and National Science Foundation' => 'National Institutes of Health; National Science Foundation',
         '1R01GM108889-01 (NIH), CHE 1352608 and CHE-0840513 (NSF)' => '1R01GM108889-01; CHE 1352608 and CHE-0840513',
