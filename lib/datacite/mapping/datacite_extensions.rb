@@ -66,8 +66,10 @@ module Datacite
     class Resource
 
       SPECIAL_CASES = {
-        Regexp.new('<contributor contributorType="([^"]+)">\p{Space}*<contributor>([^<]+)</contributor>\p{Space}*</contributor>', Regexp::MULTILINE) =>
-          "<contributor contributorType=\"\\1\">\n<contributorName>\\2</contributorName>\n</contributor>",
+        %r{<(identifier|subject)[^>]+/>} => '', # remove empty tags
+        %r{<(identifier|subject)[^>]+>\s+</\1>} => '', # remove empty tag pairs
+        %r{(<date[^>]*>)(\d{4})-(\d{4})(</date>)} => '\\1\\2/\\3\\4', # fix date ranges
+        %r{(<contributor[^>/]+>\s*)<contributor>([^<]+)</contributor>(\s*</contributor>)} => '\\1<contributorName>\\2</contributorName>\\3', # fix broken contributors
         'Affaits, National Institutes of Health,' => 'Affairs; National Institutes of Health;',
         'NIH RO1 HL31113, VA BX001970' => 'VA BX001970; NIH RO1 HL31113; nil',
         'Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation.' =>
@@ -95,8 +97,7 @@ module Datacite
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
         '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' =>
           "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
-        '<geoLocationPlace>false</geoLocationPlace>' => '',
-        "<identifier identifierType=\"DOI\"/>" => ''
+        '<geoLocationPlace>false</geoLocationPlace>' => ''
       }.freeze
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
