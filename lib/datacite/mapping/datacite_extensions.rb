@@ -17,32 +17,23 @@ module Datacite
     end
 
     class Description
-      # TODO: consdier pushing this to datacite-mapping
       def value=(v)
-        @value = v.strip.squeeze(' ').gsub(/-[ \n]+/, '')
+        new_value = v && v.strip
+        raise ArgumentError, 'Value cannot be empty or nil' unless new_value && !new_value.empty?
+        @value = new_value.gsub(/-[ \n]+/, '')
       end
     end
 
     class Rights
-      # TODO: consdier pushing this to datacite-mapping
+      # TODO: consider pushing this to datacite-mapping
       def value=(v)
         @value = v.strip.tr("\n", ' ').squeeze(' ')
       end
     end
 
-    class Identifier
-      # TODO: consdier pushing this to datacite-mapping
-      def value=(v)
-        v = v.strip.upcase
-        raise ArgumentError, 'Identifier must have a non-nil value' unless v
-        raise ArgumentError, "Identifier value '#{v}' is not a valid DOI" unless v =~ %r{10\..+/.+}
-        @value = v
-      end
-    end
-
     class FundingReference
       def to_description
-        article = 'the ' unless name.downcase.start_with?('the') || name.start_with?('Alexandr Kosenkov')
+        article = name.downcase.start_with?('the') || name.start_with?('Alexandr Kosenkov') ? '' : 'the '
         desc_text = "Data were created with funding from #{article}#{name}#{grant_info}."
         Description.new(type: DescriptionType::OTHER, value: desc_text)
       end
@@ -64,7 +55,6 @@ module Datacite
     end
 
     class Resource
-
       SPECIAL_CASES = {
         %r{<(identifier|subject|description)[^>]+/>} => '', # remove empty tags
         %r{<(identifier|subject)[^>]+>\s+</\1>} => '', # remove empty tag pairs
