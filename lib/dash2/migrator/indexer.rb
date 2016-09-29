@@ -47,7 +47,7 @@ module Dash2
             # TODO: eliminate these logging hijinks
             client = StashEzid::Client.new(ezid_config)
             inner_client = client.instance_variable_get(:@ezid_client)
-            inner_client.instance_variable_set(:@logger, Migrator.log)
+            inner_client.instance_variable_set(:@logger, Migrator.log) if inner_client
             client
           end
         end
