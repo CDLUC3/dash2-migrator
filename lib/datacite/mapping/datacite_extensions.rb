@@ -4,15 +4,13 @@ module Datacite
   module Mapping
 
     class Rights
-      # TODO: get real URL
       UCSF_DUA = Rights.new(
-        uri: URI('https://datashare.ucsf.edu/xtf/search?smode=dataUseAgreementUCSF'),
+        uri: URI('https://dx.doi.org/10.5060/D8TG65'),
         value: 'UCSF Datashare Data Use Agreement'
       )
-      # TODO: get real URL
       UCSF_FEB_13 = Rights.new(
-        uri:  URI('https://merritt.cdlib.org/d/ark%3A%2Fb7272%2Fq6bg2kwf/6/producer%2FDUA_formal_BMJopen_female%20condomt.docx'),
-        value: 'custom Data Use Agreement'
+        uri:  URI('https://dx.doi.org/10.5060/D8PP47'),
+        value: 'Terms of use are available at: doi:10.5060/D8PP47'
       )
     end
 
@@ -62,6 +60,7 @@ module Datacite
         %r{<(identifier|subject|description)[^>]+>\s*</\1>} => '', # remove empty tag pairs
         %r{(<date[^>]*>)(\d{4})-(\d{4})(</date>)} => '\\1\\2/\\3\\4', # fix date ranges
         %r{(<contributor[^>/]+>\s*)<contributor>([^<]+)</contributor>(\s*</contributor>)} => '\\1<contributorName>\\2</contributorName>\\3', # fix broken contributors
+        'rightsURI="doi:' => 'rightsURI="https://dx.doi.org/',
         'Affaits, National Institutes of Health,' => 'Affairs; National Institutes of Health;',
         'NIH RO1 HL31113, VA BX001970' => 'VA BX001970; NIH RO1 HL31113; nil', # the string 'nil' is special in add_funding_reference()
         'Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation.' =>
@@ -84,7 +83,6 @@ module Datacite
         'Creative Commons Public Domain Dedication (CC0)' => Rights::CC_ZERO.value,
         'Creative Commons Attribution 4.0 License' => Rights::CC_BY.value,
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
-        '<rights>Terms of Use for these data are outlined in the associated Data Use Agreement</rights>' => "<rights rightsURI=\"#{Rights::UCSF_FEB_13.uri}\">#{Rights::UCSF_FEB_13.value}</rights>",
         '<geoLocationPlace>false</geoLocationPlace>' => '',
 
         %r{<geoLocationPlace>Orange County (Calif.)</geoLocationPlace/>} => "\1\n      <geoLocationBox>33.947514 -118.1259 33.333992 -117.412987</geoLocationBox>\n      <geoLocationPoint>33.676911 -117.776166</geoLocationPoint>",

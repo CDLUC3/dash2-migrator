@@ -253,8 +253,6 @@ module Datacite
           end
         end
 
-        it 'uses real URLs for UCSF DUAs'
-
       end
 
     end
