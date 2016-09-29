@@ -52,6 +52,7 @@ uci-ark+=b7280=d1qg6x-mrt-datacite.xml
 uci-ark+=b7280=d1qp47-mrt-datacite.xml
 uci-ark+=b7280=d1rg67-mrt-datacite.xml
 uci-ark+=b7280=d1rp4j-mrt-datacite.xml
+uci-ark+=b7280=d1s887-mrt-datacite.xml
 uci-ark+=b7280=d1sg6j-mrt-datacite.xml
 uci-ark+=b7280=d1t88j-mrt-datacite.xml
 uci-ark+=b7280=d1tg6v-mrt-datacite.xml
@@ -59,6 +60,7 @@ uci-ark+=b7280=d1v88v-mrt-datacite.xml
 uci-ark+=b7280=d1vc7h-mrt-datacite.xml
 uci-ark+=b7280=d1w885-mrt-datacite.xml
 uci-ark+=b7280=d1wc7t-mrt-datacite.xml
+uci-ark+=b7280=d1x30q-mrt-datacite.xml
 uci-ark+=b7280=d1x59t-mrt-datacite.xml
 uci-ark+=b7280=d1z594-mrt-datacite.xml
 ucla-ark+=b5068=d1cc7x-mrt-datacite.xml

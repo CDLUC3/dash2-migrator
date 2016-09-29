@@ -19,7 +19,9 @@ module Datacite
     class Description
       def value=(v)
         new_value = v && v.strip
-        raise ArgumentError, 'Value cannot be empty or nil' unless new_value && !new_value.empty?
+        unless new_value && !new_value.empty?
+          raise ArgumentError, 'Value cannot be empty or nil'
+        end
         @value = new_value.gsub(/-[ \n]+/, '')
       end
     end
@@ -57,7 +59,7 @@ module Datacite
     class Resource
       SPECIAL_CASES = {
         %r{<(identifier|subject|description)[^>]+/>} => '', # remove empty tags
-        %r{<(identifier|subject)[^>]+>\s+</\1>} => '', # remove empty tag pairs
+        %r{<(identifier|subject|description)[^>]+>\s*</\1>} => '', # remove empty tag pairs
         %r{(<date[^>]*>)(\d{4})-(\d{4})(</date>)} => '\\1\\2/\\3\\4', # fix date ranges
         %r{(<contributor[^>/]+>\s*)<contributor>([^<]+)</contributor>(\s*</contributor>)} => '\\1<contributorName>\\2</contributorName>\\3', # fix broken contributors
         'Affaits, National Institutes of Health,' => 'Affairs; National Institutes of Health;',
