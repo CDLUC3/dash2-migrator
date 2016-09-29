@@ -42,7 +42,7 @@ module Dash2
       it 'harvests and imports' do
         migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
         migrator.migrate!
-        expect(StashEngine::Resource.count).to eq(131)
+        expect(StashEngine::Resource.count).to eq(147)
       end
 
     end
