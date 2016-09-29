@@ -17,9 +17,7 @@ module Datacite
     class Description
       def value=(v)
         new_value = v && v.strip
-        unless new_value && !new_value.empty?
-          raise ArgumentError, 'Value cannot be empty or nil'
-        end
+        raise ArgumentError, 'Value cannot be empty or nil' unless new_value && !new_value.empty?
         @value = new_value.gsub(/-[ \n]+/, '')
       end
     end
