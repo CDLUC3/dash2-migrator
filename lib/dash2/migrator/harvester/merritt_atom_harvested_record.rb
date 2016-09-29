@@ -11,11 +11,13 @@ module Dash2
         DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
         MAX_FILES = 20
 
+        attr_reader :tenant_id
         attr_reader :feed_uri
         attr_reader :entry
 
-        def initialize(feed_uri, entry)
+        def initialize(tenant_id, feed_uri, entry)
           super(identifier: entry.id.content, timestamp: MerrittAtomHarvestedRecord.extract_timestamp(entry))
+          @tenant_id = tenant_id
           @feed_uri = Stash::Util.to_uri(feed_uri)
           @entry = entry
         end
@@ -57,6 +59,15 @@ module Dash2
 
         def datacite_resource
           @datacite_resource ||= begin
+            # id_string = identifier
+            #              .sub('http://n2t.net/', "#{tenant_id}-")
+            #              .sub(':', '+')
+            #              .gsub('/', '=')
+            # filename = "tmp/#{id_string}-mrt-datacite.xml"
+            # File.open(filename, 'wb') do |f|
+            #   warn("Writing #{filename}")
+            #   f.write(mrt_datacite_xml)
+            # end
             resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, doi)
             resource.dates = [Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published)] unless resource.dates && !resource.dates.empty?
             resource

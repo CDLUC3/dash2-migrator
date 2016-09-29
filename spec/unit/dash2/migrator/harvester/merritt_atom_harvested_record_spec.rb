@@ -28,7 +28,7 @@ module Dash2
           feed_uri = config.feed_uri
           entry_xml = File.read('spec/data/harvester/entry-r36p4t.xml')
           entry = RSS::Parser.parse(entry_xml, false).items[0]
-          @record = MerrittAtomHarvestedRecord.new(feed_uri, entry)
+          @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
         end
 
         describe '#identifier' do

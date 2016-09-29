@@ -15,11 +15,15 @@ module Dash2
           config.feed_uri
         end
 
+        def tenant_id
+          config.tenant_id
+        end
+
         def harvest_records
           # options = {username: config.username, password: config.password}
           pages = enum_for(:pages, query_uri, parse_rss(query_uri)).lazy
           pages.flat_map(&:items).map do |entry|
-            MerrittAtomHarvestedRecord.new(query_uri, entry)
+            MerrittAtomHarvestedRecord.new(tenant_id, query_uri, entry)
           end
         end
 
