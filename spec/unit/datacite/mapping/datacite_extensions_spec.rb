@@ -56,6 +56,50 @@ module Datacite
           expect(identifier.value).to eq('10.6071/H8RN35SM')
         end
 
+        describe '#contributor' do
+          it 'fixes semicolonized contributor names'
+          it 'doesn\'t mess with incidental semicolons'
+        end
+
+        # Leave as-is:
+        #
+        # spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r36p4t-mrt-datacite.xml:      <contributorName>U.S. Environmental Protection Agency; CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants; CI-Team Grant</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3pp45-mrt-datacite.xml:      <contributorName>European Research Council (ERC); UC Institute for the Study of Ecological and Evolutionary Climate Impacts (ISEECI); China Scholarship Council (CSC)</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/ucsf-ark+=b7272=q6ms3qnx-mrt-datacite.xml:      <contributorName>Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation. </contributorName>
+
+        # Fix:
+        #
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1001p-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d11010-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d12s30-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d13s39-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d14s3m-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d15k5m-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d16k5x-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d17g6k-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d18g6w-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1988w-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1b886-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1c88h-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1d595-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1f30c-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1g011-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1h01b-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1j01n-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1js3b-mrt-datacite.xml:      <contributorName>Lim;Lim, Nathan</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1ks3n-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1ms3z-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1np4m-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1pk58-mrt-datacite.xml:      <contributorName>Saberi;Saberi, Kourosh</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1qg6x-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1rg67-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1s887-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1t88j-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1v88v-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1w885-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
+        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x59t-mrt-datacite.xml:      <contributorName>Drew;Drew, Nancy</contributorName>
+
         it 'creates a FundingReference from a description' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3059p-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
@@ -162,14 +206,6 @@ module Datacite
 
             funder_contribs = resource.funder_contribs
             expect(funder_contribs).to be_empty, "Expected no funder contributors for #{file.strip}, but got: #{funder_contribs}"
-
-            # frefs.zip(fdescs) do |fref, fdesc|
-            #   puts '<!-- ____________________________________________________________ -->'
-            #   puts "<!-- #{file.strip} -->"
-            #   puts fref.save_to_xml
-            #   puts fdesc.save_to_xml
-            #   puts
-            # end
           end
         end
 
