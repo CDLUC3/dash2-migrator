@@ -6,6 +6,14 @@ AllCops:
     - 'spec.old/**/*'
     - 'vendor/**/*'
 
+# Confusing and weird
+Style/VariableNumber:
+  Enabled: False
+
+# Meaningful variable names are a feature
+Style/SingleLineBlockParams:
+  Enabled: False
+
 Style/ClassAndModuleChildren:
   Exclude:
     - 'migrate_*.rb'

@@ -36,7 +36,7 @@ module Datacite
           total = 0
           aggregate_failures 'writing all resources' do
             StashEngine::Resource.where.not(download_uri: nil).each do |se_resource|
-              total = total + 1
+              total += 1
               id = se_resource.id
               titles = se_resource.titles
               puts "writing #{id}: '#{titles.map(&:title).join(': ')}'"
