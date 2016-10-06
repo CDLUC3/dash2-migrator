@@ -31,29 +31,35 @@ module Datacite
         )
       end
 
-      it 'writes all DB resources as DC4' do
+      it 'writes all DB resources as DC4 and DC3' do
         ActiveRecord::Base.transaction do
+          total = 0
           aggregate_failures 'writing all resources' do
-            StashEngine::Resource.find_each do |se_resource|
-              builder = create_builder(se_resource)
-              resource_dc4 = builder.build_resource
-              expect(resource_dc4).to be_a(Resource)
-              resource_dc4.write_to_file("tmp/#{se_resource.id}-dc4.xml", pretty: true)
-            end
-          end
-        end
-      end
+            StashEngine::Resource.where.not(download_uri: nil).each do |se_resource|
+              total = total + 1
+              id = se_resource.id
+              titles = se_resource.titles
+              puts "writing #{id}: '#{titles.map(&:title).join(': ')}'"
 
-      it 'writes all DB resources as DC4' do
-        ActiveRecord::Base.transaction do
-          aggregate_failures 'writing all resources' do
-            StashEngine::Resource.find_each do |se_resource|
-              builder = create_builder(se_resource)
-              resource_dc3 = builder.build_resource(datacite_3: true)
-              expect(resource_dc3).to be_a(Resource)
-              resource_dc3.write_to_file("tmp/#{se_resource.id}-dc3.xml", pretty: true, options: { mapping: :datacite_3 })
+              begin
+                builder = create_builder(se_resource)
+                resource_dc4 = builder.build_resource
+                expect(resource_dc4).to be_a(Resource)
+                resource_dc4.write_to_file("tmp/#{se_resource.id}-dc4.xml", pretty: true)
+
+                resource_dc3 = builder.build_resource(datacite_3: true)
+                expect(resource_dc3).to be_a(Resource)
+                resource_dc3.write_to_file("tmp/#{id}-dc3.xml", pretty: true, options: { mapping: :datacite_3 })
+              rescue NoMethodError => e
+                warn "#{e}\n#{e.backtrace.join("\n")}"
+                raise
+              rescue ArgumentError => e
+                warn "#{e}\n#{e.backtrace.join("\n")}"
+                expect(e).to be_nil, "ArgumentError writing resource #{id}: #{e}"
+              end
             end
           end
+          expect(total).to eq(297)
         end
       end
 

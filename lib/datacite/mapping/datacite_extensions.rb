@@ -17,7 +17,7 @@ module Datacite
     class Description
       def value=(v)
         new_value = v && v.strip
-        raise ArgumentError, 'Value cannot be empty or nil' unless new_value && !new_value.empty?
+        raise ArgumentError, "Invalid description value #{v.nil? ? 'nil' : "'#{v}'"}" unless new_value && !new_value.empty?
         @value = new_value.gsub(/-[ \n]+/, '')
       end
     end
