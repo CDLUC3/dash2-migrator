@@ -336,7 +336,7 @@ PLATFORMS
 DEPENDENCIES
   config-factory (~> 0.0, >= 0.0.9)
   database_cleaner (~> 1.5)
-  datacite-mapping (~> 0.2, >= 0.2.1)
+  datacite-mapping (~> 0.2, >= 0.2.3)
   equivalent-xml (~> 0.6.0)
   mysql2 (~> 0.3)
   nokogiri (= 1.6.7.2)
