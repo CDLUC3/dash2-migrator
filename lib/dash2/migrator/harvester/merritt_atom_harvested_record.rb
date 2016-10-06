@@ -53,6 +53,10 @@ module Dash2
           (published = entry.published) && published.content
         end
 
+        def mrt_eml
+          @mrt_eml ||= content_for('producer/mrt-eml.xml')
+        end
+
         def mrt_datacite_xml
           @mrt_datacite_xml ||= content_for('producer/mrt-datacite.xml')
         end
@@ -80,7 +84,10 @@ module Dash2
 
         def find_doi
           mrt_mom = content_for('system/mrt-mom.txt')
-          mrt_mom.match(DOI_PATTERN)[0].strip
+          fail "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
+          doi_match_data = mrt_mom.match(DOI_PATTERN)
+          fail 'no DOI found in mrt-mom.txt' unless doi_match_data
+          doi_match_data[0].strip
         end
 
         def stash_license
