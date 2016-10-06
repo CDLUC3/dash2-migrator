@@ -1,0 +1,63 @@
+<eml:eml packageId="doi:10.5072/12345?" system="DCXL" xmlns:eml="eml://ecoinformatics.org/eml2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 eml.xsd">
+  <dataset id="doi:10.5072/12345">
+    <creator>
+      <!-- http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-resource.html#creator -->
+      <!-- multiple creators allowed -->
+      <individualName>
+        <givenName>Zhang</givenName>
+        <surName>Yuanjun</surName>
+      </individualName>
+      <electronicMailAddress>Bupt.aajjnn@gmail.com</electronicMailAddress>
+    </creator>
+    <title>CT Network error reports</title>
+    <pubDate>2014-05-10</pubDate>
+    <keywordSet>
+      <keyword>Warnings, Switch, Optical Network</keyword>
+    </keywordSet>
+    <coverage>
+      <!-- http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-resource.html#coverage -->
+      <geographicCoverage>
+        <boundingCoordinates>
+          <westBoundingCoordinate>0.0</westBoundingCoordinate>
+          <eastBoundingCoordinate>0.0</eastBoundingCoordinate>
+          <northBoundingCoordinate>0.0</northBoundingCoordinate>
+          <southBoundingCoordinate>0.0</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+    </coverage>
+    <project>
+      <!-- http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-dataset.html#project -->
+      <title>Missing required element</title>
+      <abstract>
+        <para>This is an collection of China Telecom Optical Transmitting Network error reports from the Government and company customers.</para>
+      </abstract>
+    </project>
+    <dataTable>
+      <!-- http://knb.ecoinformatics.org/software/eml/eml-2.1.0/eml-dataTable.html#dataTable -->
+      <!-- dataTable is equivalent to a single tab in the excel spreadsheet.         One can have multiple data tables within the document. -->
+      <entityName>month - ??</entityName>
+      <entityDescription>Report ID</entityDescription>
+      <attributeList>
+        <attribute>
+  <attributeName>ID</attributeName>
+  <attributeDefinition>Null</attributeDefinition>
+  <measurementScale>
+    <interval>
+      <unit>
+        <customUnit>bushelsPerAcre</customUnit>
+      </unit>
+      <numericDomain>
+        <numberType>real</numberType>
+      </numericDomain>
+    </interval>
+  </measurementScale>
+</attribute>
+</attributeList>
+    </dataTable>
+  </dataset>
+  <additionalMetadata>
+    <describes>tempcov</describes>
+  </additionalMetadata>
+  <additionalMetadata>
+  </additionalMetadata>
+</eml:eml>

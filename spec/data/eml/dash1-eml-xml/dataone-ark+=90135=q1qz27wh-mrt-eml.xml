@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packageId="UC3/CDL" system="DataUp" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 eml.xsd">
+  <dataset>
+    <title>DirectoryInfo</title>
+    <creator>
+      <individualName>
+        <givenName>JanakiRam</givenName>
+        <surName>Reddy</surName>
+      </individualName>
+      <organizationName>No organization name for creator provided</organizationName>
+      <address>
+        <deliveryPoint>No street address for creator provided</deliveryPoint>
+        <city>No city for creator provided</city>
+        <administrativeArea>No state for creator provided</administrativeArea>
+        <postalCode>No postal code for creator provided</postalCode>
+        <country>No country for creator provided</country>
+      </address>
+      <phone>+0 (000) 000-0000</phone>
+      <electronicMailAddress>janakiramreddy3@gmail.com</electronicMailAddress>
+    </creator>
+    <pubDate>2014-01-20</pubDate>
+    <abstract>StudyNets</abstract>
+    <keywordSet>
+      <keyword>metadata</keyword>
+    </keywordSet>
+    <intellectualRights>
+      <para>No statement of intellectual rights provided</para>
+    </intellectualRights>
+    <distribution>
+      <online>
+        <url>No url for data provided</url>
+      </online>
+    </distribution>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>No description of geographic coverage provided</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>0</westBoundingCoordinate>
+          <eastBoundingCoordinate>0</eastBoundingCoordinate>
+          <northBoundingCoordinate>0</northBoundingCoordinate>
+          <southBoundingCoordinate>0</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage id="tempcov">
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>0001-01-01</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>0001-01-01</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact>
+      <individualName>
+        <givenName>No given name for contact provided</givenName>
+        <surName>No surname for contact provided</surName>
+      </individualName>
+      <organizationName>No organization name for contact provided</organizationName>
+      <address>
+        <deliveryPoint>No street address for contact provided</deliveryPoint>
+        <city>No city for contact provided</city>
+        <administrativeArea>No state for contact provided</administrativeArea>
+        <postalCode>No postal code for contact provided</postalCode>
+        <country>No country for contact provided</country>
+      </address>
+      <phone>+0 (000) 000-0000</phone>
+      <electronicMailAddress>noemail@noemail.com</electronicMailAddress>
+    </contact>
+    <publisher>
+      <organizationName>No publisher name provided</organizationName>
+    </publisher>
+    <project>
+      <title>No project title provided</title>
+      <personnel>
+        <individualName>
+          <surName>No project personnel surname provided</surName>
+        </individualName>
+        <organizationName>No project organization name provided</organizationName>
+        <role>No project personnel role provided</role>
+      </personnel>
+      <abstract>
+        <para>No project abstract provided</para>
+      </abstract>
+      <funding>
+        <para>No project funding described</para>
+      </funding>
+    </project>
+    <dataTable>
+      <entityName>DI - DirInfo</entityName>
+      <attributeList>
+        <attribute>
+          <attributeName>UNITID</attributeName>
+          <measurementScale>
+            <interval>
+              <numericDomain>
+                <numberType>real</numberType>
+              </numericDomain>
+            </interval>
+          </measurementScale>
+        </attribute>
+        <attribute>
+          <attributeName>INSTNM</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>ADDR</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CITY</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>STABBR</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>ZIP</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>FIPS</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>OBEREG</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CHFNM</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CHFTITLE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>GENTELE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>EIN</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>OPEID</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>OPEFLAG</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>WEBADDR</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>ADMINURL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>FAIDURL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>APPLURL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>NPRICURL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>SECTOR</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>ICLEVEL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CONTROL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>HLOFFER</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>UGOFFER</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>GROFFER</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>HDEGOFR1</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>DEGGRANT</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>HBCU</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>HOSPITAL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>MEDICAL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>TRIBAL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>LOCALE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>OPENPUBL</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>ACT</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>NEWID</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>DEATHYR</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CLOSEDAT</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CYACTIVE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>POSTSEC</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>PSEFLAG</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>PSET4FLG</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>RPTMTH</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>IALIAS</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>INSTCAT</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCBASIC</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCIPUG</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCIPGRAD</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCUGPROF</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCENRPRF</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CCSIZSET</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CARNEGIE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>LANDGRNT</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>INSTSIZE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CBSA</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CBSATYPE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CSA</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>NECTA</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>F1SYSTYP</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>F1SYSNAM</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>FAXTELE</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>COUNTYCD</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>COUNTYNM</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>CNGDSTCD</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>LONGITUD</attributeName>
+        </attribute>
+        <attribute>
+          <attributeName>LATITUDE</attributeName>
+        </attribute>
+      </attributeList>
+    </dataTable>
+  </dataset>
+  <additionalMetadata>
+    <describes>tempcov</describes>
+    <metadata>
+      <description>No description of temporal coverage provided</description>
+    </metadata>
+  </additionalMetadata>
+  <additionalMetadata>
+    <metadata>
+      <formattedCitation>No data citation generated</formattedCitation>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
+
