@@ -11,7 +11,7 @@ PATH
     stash-harvester (0.0.1)
       activerecord (~> 4.2, >= 4.2.3)
       config-factory (~> 0.0, >= 0.0.8)
-      datacite-mapping (~> 0.1, >= 0.1.12)
+      datacite-mapping (~> 0.2, >= 0.2.3)
       factory_girl (~> 4.0)
       oai (~> 0.3, >= 0.3.1)
       resync-client (~> 0.4, >= 0.4.5)
@@ -24,7 +24,7 @@ PATH
   remote: ../stash_engines/stash_datacite
   specs:
     stash_datacite (0.0.5)
-      datacite-mapping (~> 0.2, >= 0.2.1)
+      datacite-mapping (~> 0.2, >= 0.2.2)
       kaminari
       leaflet-rails
       rails (~> 4.2.4)
@@ -40,6 +40,7 @@ PATH
       carrierwave (~> 0.10.0)
       concurrent-ruby (~> 1.0)
       filesize (~> 0.1.1)
+      font-awesome-rails
       jquery-fileupload-rails (~> 0.4.6)
       jquery-rails
       jquery-turbolinks
@@ -108,7 +109,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     database_cleaner (1.5.3)
-    datacite-mapping (0.2.1)
+    datacite-mapping (0.2.3)
       typesafe_enum (~> 0.1, >= 0.1.7)
       xml-mapping_extensions (~> 0.4, >= 0.4.7)
     diff-lcs (1.2.5)
@@ -127,12 +128,14 @@ GEM
     faraday_middleware (0.10.0)
       faraday (>= 0.7.4, < 0.10)
     filesize (0.1.1)
+    font-awesome-rails (4.6.3.1)
+      railties (>= 3.2, < 5.1)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hashdiff (0.3.0)
     hashie (3.4.6)
     hirb (0.7.3)
-    http-cookie (1.0.2)
+    http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.7.0)
     jquery-fileupload-rails (0.4.7)
@@ -249,7 +252,7 @@ GEM
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
       rspec-mocks (~> 3.5.0)
-    rspec-core (3.5.3)
+    rspec-core (3.5.4)
       rspec-support (~> 3.5.0)
     rspec-expectations (3.5.0)
       diff-lcs (>= 1.2.0, < 2.0)
