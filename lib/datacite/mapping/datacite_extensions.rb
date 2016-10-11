@@ -83,8 +83,8 @@ module Datacite
         'Creative Commons Attribution 4.0 International (CC-BY 4.0)' => Rights::CC_BY.value,
         '<geoLocationPlace>false</geoLocationPlace>' => '',
 
-        %r{<geoLocationPlace>Orange County (Calif.)</geoLocationPlace/>} => "\1\n      <geoLocationBox>33.947514 -118.1259 33.333992 -117.412987</geoLocationBox>\n      <geoLocationPoint>33.676911 -117.776166</geoLocationPoint>",
-        %r{<geoLocationPlace>Providence Creek (Lower, Upper and P301)</geoLocationPlace>} => "\1\n      <geoLocationPoint>37.047756 -119.221094</geoLocationPoint>"
+        %r{(<geoLocationPlace>\s*Orange County \(Calif\.\)\s*</geoLocationPlace>)} => "\\1\n      <geoLocationBox>33.947514 -118.1259 33.333992 -117.412987</geoLocationBox>\n      <geoLocationPoint>33.676911 -117.776166</geoLocationPoint>",
+        %r{(<geoLocationPlace>\s*Providence Creek \(Lower, Upper and P301\)\s*</geoLocationPlace>)} => "\\1\n      <geoLocationPoint>37.047756 -119.221094</geoLocationPoint>"
       }.freeze
 
       def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)

@@ -32,6 +32,30 @@ module Datacite
           expect(identifier.value).to eq(injected_value)
         end
 
+        it 'injects OC locations' do
+          datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml')
+          injected_value = '10.123/456'
+          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          locs = resource.geo_locations
+          expect(locs.size).to eq(2)
+          oc = locs[0]
+          expect(oc.place).to eq('Orange County (Calif.)')
+          expect(oc.box).to eq(GeoLocationBox.new(33.947514, -118.1259, 33.333992, -117.412987))
+          expect(oc.point).to eq(GeoLocationPoint.new(33.676911, -117.776166))
+        end
+
+        it 'injects Providence Creek locations' do
+          datacite_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/datacite/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
+          injected_value = '10.123/456'
+          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          locs = resource.geo_locations
+          expect(locs.size).to eq(1)
+          pc = locs[0]
+          expect(pc.place).to eq('Providence Creek (Lower, Upper and P301)')
+          expect(pc.box).to eq(GeoLocationBox.new(37.046, -119.211, 37.075, -119.182))
+          expect(pc.point).to eq(GeoLocationPoint.new(37.047756, -119.221094))
+        end
+
         it 'injects missing resourcetype' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucla-ark+=b5068=d1wc7k-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
