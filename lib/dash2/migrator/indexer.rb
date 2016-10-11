@@ -29,18 +29,19 @@ module Dash2
           ensure_db_connection!
           harvested_records.each do |hr|
             begin
-              mrt_eml = hr.mrt_eml
-              if mrt_eml
-                yield Stash::Indexer::IndexResult.failure(hr, [ArgumentError.new("Can't migrate EML record #{hr.identifier}")]) if block_given?
-              else
-                index_record(hr.as_wrapper, hr.user_uid)
-                yield Stash::Indexer::IndexResult.success(hr) if block_given?
-              end
+              result = do_index(hr)
+              yield result if block_given?
             rescue => e
               log_error(e)
               yield Stash::Indexer::IndexResult.failure(hr, [e]) if block_given?
             end
           end
+        end
+
+        def do_index(hr)
+          return Stash::Indexer::IndexResult.failure(hr, [ArgumentError.new("Can't migrate EML record #{hr.identifier}")]) if hr.mrt_eml
+          index_record(hr.as_wrapper, hr.user_uid)
+          Stash::Indexer::IndexResult.success(hr)
         end
 
         def ezid_config

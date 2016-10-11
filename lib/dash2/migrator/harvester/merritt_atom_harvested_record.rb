@@ -84,9 +84,9 @@ module Dash2
 
         def find_doi
           mrt_mom = content_for('system/mrt-mom.txt')
-          fail "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
+          raise "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
           doi_match_data = mrt_mom.match(DOI_PATTERN)
-          fail 'no DOI found in mrt-mom.txt' unless doi_match_data
+          raise 'no DOI found in mrt-mom.txt' unless doi_match_data
           doi_match_data[0].strip
         end
 
@@ -120,15 +120,13 @@ module Dash2
         end
 
         def uri_for(title)
-          link = link_for(title)
-          return nil unless link
+          return nil unless (link = link_for(title))
           href = URI(link.href)
           href.relative? ? feed_uri + href : href
         end
 
         def content_for(title)
-          uri = uri_for(title)
-          return nil unless uri
+          return nil unless (uri = uri_for(title))
           begin
             RestClient.get(uri.to_s).body
           rescue => e

@@ -8,7 +8,7 @@ ActiveRecord::Base.logger = Logger.new(logfile) if defined?(ActiveRecord::Base)
 db_config = YAML.load_file('config/database.yml')['test']
 
 host = db_config['host']
-fail("Can't run destructive tests against non-local database #{host}") unless host == 'localhost'
+raise("Can't run destructive tests against non-local database #{host}") unless host == 'localhost'
 
 ActiveRecord::Base.establish_connection(db_config)
 ActiveRecord::Migration.verbose = false
