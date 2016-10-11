@@ -121,6 +121,7 @@ module Dash2
 
         def uri_for(title)
           link = link_for(title)
+          return nil unless link
           href = URI(link.href)
           href.relative? ? feed_uri + href : href
         end

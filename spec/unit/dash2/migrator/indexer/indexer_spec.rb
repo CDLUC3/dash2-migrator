@@ -89,6 +89,7 @@ module Dash2
             @uids = Array.new(3) { |i| "user#{i}@example.edu" }
             @records = wrappers.zip(uids).map do |wrapper, uid|
               record = instance_double(Harvester::MerrittAtomHarvestedRecord)
+              allow(record).to receive(:mrt_eml).and_return(nil)
               allow(record).to receive(:as_wrapper).and_return(wrapper)
               allow(record).to receive(:user_uid).and_return(uid)
               record
