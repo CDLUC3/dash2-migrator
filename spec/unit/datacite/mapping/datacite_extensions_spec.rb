@@ -40,7 +40,7 @@ module Datacite
           expect(identifier).not_to be_nil
           expect(identifier.identifier_type).to eq('ARK')
           expect(identifier.value).to eq(injected_value)
-        end          
+        end
 
         it 'injects OC locations' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml')

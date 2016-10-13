@@ -59,6 +59,7 @@ module Datacite
         warn "Identifier value #{"'#{new_value}'" || 'nil'} is not a valid DOI" unless new_value.match(DOI_PATTERN)
         @value = new_value
       end
+
       def identifier_type=(v)
         warn "Identifier type '#{v}' should be 'DOI'" unless DOI == v
         @identifier_type = v
@@ -105,7 +106,7 @@ module Datacite
 
       def self.parse_mrt_datacite(mrt_datacite_xml, identifier_value = nil)
         resource = parse_special(mrt_datacite_xml)
-        resource.ensure_identifier(identifier_value)
+        resource.ensure_identifier(identifier_value) if identifier_value
         resource.ensure_resource_type!
         resource.convert_funding!
         resource.fix_breaks!
@@ -128,11 +129,15 @@ module Datacite
       end
 
       def ensure_identifier(identifier_value)
-        if identifier && identifier.value && identifier_value != identifier.value
-          warn("Preserving existing identifier #{identifier.value}; ignoring new value #{"'#{identifier_value}'" || 'nil'}")
-          return
+        existing_ident_value = identifier && identifier.value
+        if existing_ident_value
+          warn("Preserving existing identifier #{existing_ident_value}; ignoring new value #{"'#{identifier_value}'" || 'nil'}") unless existing_ident_value == identifier_value
+        else
+          inject_identifier(identifier_value)
         end
+      end
 
+      def inject_identifier(identifier_value)
         if (doi_match_data = DOI_PATTERN.match(identifier_value))
           self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
         elsif ARK_PATTERN.match(identifier_value)
