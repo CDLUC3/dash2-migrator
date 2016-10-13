@@ -1,70 +1,12 @@
 require 'datacite/mapping'
+require 'datacite/mapping/description_extensions'
+require 'datacite/mapping/funding_reference_extensions'
+require 'datacite/mapping/identifier_extensions'
+require 'datacite/mapping/resource_extensions'
+require 'datacite/mapping/rights_extensions'
 
 module Datacite
   module Mapping
-
-    class Rights
-      UCSF_DUA = Rights.new(
-        uri: URI('https://dx.doi.org/10.5060/D8TG65'),
-        value: 'UCSF Datashare Data Use Agreement'
-      )
-      UCSF_FEB_13 = Rights.new(
-        uri:  URI('https://dx.doi.org/10.5060/D8PP47'),
-        value: 'Terms of use are available at: doi:10.5060/D8PP47'
-      )
-    end
-
-    class Description
-      def value=(v)
-        new_value = v && v.strip
-        raise ArgumentError, "Invalid description value #{v.nil? ? 'nil' : "'#{v}'"}" unless new_value && !new_value.empty?
-        @value = new_value.gsub(/-[ \n]+/, '')
-      end
-    end
-
-    class Rights
-      # TODO: consider pushing this to datacite-mapping
-      def value=(v)
-        @value = v.strip.tr("\n", ' ').squeeze(' ')
-      end
-    end
-
-    class FundingReference
-      def to_description
-        article = name.downcase.start_with?('the') || name.start_with?('Alexandr Kosenkov') ? '' : 'the '
-        desc_text = "Data were created with funding from #{article}#{name}#{grant_info}."
-        Description.new(type: DescriptionType::OTHER, value: desc_text)
-      end
-
-      def grant_number
-        award_number && award_number.value
-      end
-
-      def grant_info
-        grant_number &&
-          if grant_number.include?('and')
-            " under grants #{grant_number}"
-          elsif grant_number.downcase.include?('grant') || grant_number.downcase.include?('agreement')
-            " under #{grant_number}"
-          else
-            " under grant #{grant_number}"
-          end
-      end
-    end
-
-    class Identifier
-      def value=(v)
-        new_value = v && v.strip
-        warn 'Identifier should have a non-nil value' unless new_value
-        warn "Identifier value #{"'#{new_value}'" || 'nil'} is not a valid DOI" unless new_value.match(DOI_PATTERN)
-        @value = new_value
-      end
-
-      def identifier_type=(v)
-        warn "Identifier type '#{v}' should be 'DOI'" unless DOI == v
-        @identifier_type = v
-      end
-    end
 
     class Resource
       DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
@@ -120,87 +62,6 @@ module Datacite
         parse_xml(datacite_xml)
       end
 
-      def funder_contribs
-        contributors.select { |c| c.type == ContributorType::FUNDER }
-      end
-
-      def funding_descriptions
-        descriptions.select { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
-      end
-
-      def ensure_identifier(identifier_value)
-        existing_ident_value = identifier && identifier.value
-        if existing_ident_value
-          warn("Preserving existing identifier #{existing_ident_value}; ignoring new value #{"'#{identifier_value}'" || 'nil'}") unless existing_ident_value == identifier_value
-        else
-          inject_identifier(identifier_value)
-        end
-      end
-
-      def inject_identifier(identifier_value)
-        if (doi_match_data = DOI_PATTERN.match(identifier_value))
-          self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
-        elsif ARK_PATTERN.match(identifier_value)
-          identifier = Datacite::Mapping::Identifier.new(value: identifier_value)
-          identifier.identifier_type = 'ARK' # allowed by EZID, if not Datacite
-          self.identifier = identifier
-        else
-          warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK")
-        end
-      end
-
-      def ensure_resource_type!
-        self.resource_type = ResourceType.new(resource_type_general: ResourceTypeGeneral::OTHER) unless resource_type
-      end
-
-      # Converts deprecated funder contributors to FundingReferences
-      def convert_funding!
-        funder_contribs.zip(funding_descriptions) do |funder_contrib, funding_desc|
-          contributors.delete(funder_contrib)
-          descriptions.delete(funding_desc)
-          all_names, all_grants = names_and_grants(funder_contrib, funding_desc)
-          all_names.zip(all_grants).each { |funder_name, grant_number| add_funding_reference(funder_contrib, funder_name, grant_number) }
-        end
-      end
-
-      def fix_breaks!
-        descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
-      end
-
-      def add_funding_reference(funder_contrib, funder_name, grant_number)
-        award_number = grant_number && grant_number != 'nil' && grant_number !~ /^\s*$/ ? grant_number : nil
-        fref = FundingReference.new(name: funder_name, identifier: identifier_for(funder_contrib), award_number: award_number)
-        funding_references << fref
-        descriptions << fref.to_description
-      end
-
-      def inject_rights!
-        return if rights_list && !rights_list.empty?
-        if publisher == 'University of California, San Francisco'
-          self.rights_list = [Rights::UCSF_DUA]
-        elsif identifier && identifier.value == '10.6071/H8RN35SM'
-          self.rights_list = [Rights::CC_BY]
-        end
-      end
-
-      private
-
-      def names_and_grants(funder_contrib, funding_desc)
-        funder_contrib_name = funder_contrib.name.strip
-        funding_desc_value = funding_desc && funding_desc.value
-        return [[funder_contrib_name], []] unless funding_desc_value
-        grant_numbers = funding_desc_value.split(';').map { |s| s.strip.chomp(',') }
-        funder_names = funder_contrib_name.split(';').map(&:strip)
-        grant_numbers.size == funder_names.size ? [funder_names, grant_numbers] : [[funder_contrib_name], [funding_desc_value]]
-      end
-
-      def identifier_for(funder_contrib)
-        funder_name_id = funder_contrib.identifier
-        return unless funder_name_id
-        funder_id_scheme = funder_name_id.scheme
-        funder_id_type = FunderIdentifierType.find_by_value_str(funder_id_scheme) || FunderIdentifierType::OTHER
-        FunderIdentifier.new(type: funder_id_type, value: funder_name_id.value)
-      end
     end
   end
 end
