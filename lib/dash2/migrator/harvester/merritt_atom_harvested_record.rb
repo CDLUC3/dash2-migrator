@@ -3,6 +3,7 @@ require 'rest-client'
 require 'stash/harvester'
 require 'datacite/mapping'
 require 'datacite/mapping/datacite_extensions'
+require 'dash2/migrator/harvester/stash_wrapper_builder'
 
 module Dash2
   module Migrator
@@ -10,7 +11,6 @@ module Dash2
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
         DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
         ARK_PATTERN = %r{ark:/[a-z0-9]+/[a-z0-9]+}
-        MAX_FILES = 20
 
         attr_reader :tenant_id
         attr_reader :feed_uri
@@ -28,14 +28,13 @@ module Dash2
         end
 
         def as_wrapper
-          @wrapper ||= Stash::Wrapper::StashWrapper.new(
-            identifier: Stash::Wrapper::Identifier.new(type: sw_ident_type, value: sw_ident_value),
-            version: Stash::Wrapper::Version.new(number: 1, date: date),
-            embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
-            license: stash_license,
-            inventory: Stash::Wrapper::Inventory.new(files: stash_files),
-            descriptive_elements: [datacite_xml]
-          )
+          @wrapper ||= begin
+            builder = StashWrapperBuilder.new(
+              entry: entry,
+              datacite_resource: datacite_resource
+            )
+            builder.build
+          end
         end
 
         def user_uid
@@ -58,20 +57,12 @@ module Dash2
           end
         end
 
-        def sw_ident_type
-          doi ? Stash::Wrapper::IdentifierType::DOI : Stash::Wrapper::IdentifierType::ARK
-        end
-
-        def sw_ident_value
-          doi ? doi : ark
-        end
-
-        def date
-          MerrittAtomHarvestedRecord.extract_timestamp(entry)
-        end
-
         def date_published
-          (published = entry.published) && published.content
+          @date_published ||= begin
+            published = entry.published
+            warn 'no published date for entry' unless published
+            published.content
+          end
         end
 
         def mrt_eml
@@ -83,16 +74,13 @@ module Dash2
         end
 
         def datacite_resource
-          identifier_value = doi ? doi : ark
           @datacite_resource ||= begin
+            identifier_value = doi ? doi : ark
             resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, identifier_value)
-            resource.dates = [Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published)] unless resource.dates && !resource.dates.empty?
+            date_available = resource.dates.find { |d| d.type == Datacite::Mapping::DateType::AVAILABLE }
+            resource.dates << Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published) unless date_available
             resource
           end
-        end
-
-        def datacite_xml
-          @datacite_xml ||= datacite_resource.save_to_xml
         end
 
         def mrt_mom
@@ -101,36 +89,6 @@ module Dash2
             raise "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
             mrt_mom
           end
-        end
-
-        def rights_url
-          @rights_uri ||= begin
-            rights_list = datacite_resource.rights_list
-            rights = rights_list[0]
-            rights.uri.to_s
-          end
-        end
-
-        def stash_license
-          return Stash::Wrapper::License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
-          return Stash::Wrapper::License::CC_BY if rights_url.include?('licenses/by')
-          Stash::Wrapper::License.new(name: rights.value, uri: rights.uri)
-        end
-
-        def stash_files
-          @stash_files ||= begin
-            return all_stash_files unless all_stash_files.size > MAX_FILES && !Migrator.production?
-            log.warn "#{doi}: Taking only first #{MAX_FILES} of #{file_links.size} files"
-            all_stash_files.first(MAX_FILES)
-          end
-        end
-
-        def file_links
-          @file_links ||= entry.links.select { |l| (title = l.title) && title.start_with?('producer/') && !title.start_with?('producer/mrt-') }
-        end
-
-        def all_stash_files
-          @all_stash_files ||= file_links.map { |l| Stash::Wrapper::StashFile.new(pathname: l.title.match(%r{(?<=/)(.*)})[0], size_bytes: l.length.to_i, mime_type: l.type) }
         end
 
         def link_for(title)

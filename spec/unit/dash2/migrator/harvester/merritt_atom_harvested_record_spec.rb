@@ -1,5 +1,4 @@
 require 'spec_helper'
-
 require 'webmock/rspec'
 
 module Dash2
@@ -52,14 +51,6 @@ module Dash2
           it 'doesn\'t create duplicate users'
           it 'throws NoMethodError for now till we get the above finished' do
             expect { record.user_uid }.to raise_error(NoMethodError)
-          end
-        end
-
-        describe 'stash_files' do
-          it 'limits the number of files' do
-            too_many_files = Array.new(MerrittAtomHarvestedRecord::MAX_FILES * 2) { instance_double(Stash::Wrapper::StashFile) }
-            record.instance_variable_set(:@all_stash_files, too_many_files)
-            expect(record.stash_files).to eq(too_many_files.take(MerrittAtomHarvestedRecord::MAX_FILES))
           end
         end
 
@@ -244,6 +235,7 @@ module Dash2
             before(:each) do
               datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
               @dcs_resource = Datacite::Mapping::Resource.parse_mrt_datacite(datacite_xml, '10.15146/R3RG6G')
+              dcs_resource.dates << Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: Date.today)
               allow(record).to receive(:datacite_resource).and_return(@dcs_resource)
               record.instance_variable_set(:@wrapper, nil)
             end
