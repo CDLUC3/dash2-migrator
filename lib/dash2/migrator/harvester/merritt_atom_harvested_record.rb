@@ -28,11 +28,8 @@ module Dash2
         end
 
         def as_wrapper
-          identifier = doi ?
-            Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi) :
-            Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::ARK, value: ark)
           @wrapper ||= Stash::Wrapper::StashWrapper.new(
-            identifier: identifier,
+            identifier: Stash::Wrapper::Identifier.new(type: sw_ident_type, value: sw_ident_value),
             version: Stash::Wrapper::Version.new(number: 1, date: date),
             embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
             license: stash_license,
@@ -46,11 +43,27 @@ module Dash2
         end
 
         def doi
-          @doi ||= find_doi
+          @doi ||= begin
+            doi_match_data = mrt_mom.match(DOI_PATTERN)
+            warn 'no DOI found in mrt-mom.txt' unless doi_match_data
+            doi_match_data[0].strip if doi_match_data
+          end
         end
 
         def ark
-          @ark ||= find_ark
+          @ark ||= begin
+            ark_match_data = mrt_mom.match(ARK_PATTERN)
+            warn 'no ARK found in mrt-mom.txt' unless ark_match_data
+            ark_match_data[0].strip if ark_match_data
+          end
+        end
+
+        def sw_ident_type
+          doi ? Stash::Wrapper::IdentifierType::DOI : Stash::Wrapper::IdentifierType::ARK
+        end
+
+        def sw_ident_value
+          doi ? doi : ark
         end
 
         def date
@@ -90,22 +103,15 @@ module Dash2
           end
         end
 
-        def find_ark
-          ark_match_data = mrt_mom.match(ARK_PATTERN)
-          warn 'no ARK found in mrt-mom.txt' unless ark_match_data
-          ark_match_data[0].strip if ark_match_data
-        end
-
-        def find_doi
-          doi_match_data = mrt_mom.match(DOI_PATTERN)
-          warn 'no DOI found in mrt-mom.txt' unless doi_match_data
-          doi_match_data[0].strip if doi_match_data
+        def rights_url
+          @rights_uri ||= begin
+            rights_list = datacite_resource.rights_list
+            rights = rights_list[0]
+            rights.uri.to_s
+          end
         end
 
         def stash_license
-          rights_list = datacite_resource.rights_list
-          rights = rights_list[0]
-          rights_url = rights.uri.to_s
           return Stash::Wrapper::License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
           return Stash::Wrapper::License::CC_BY if rights_url.include?('licenses/by')
           Stash::Wrapper::License.new(name: rights.value, uri: rights.uri)
