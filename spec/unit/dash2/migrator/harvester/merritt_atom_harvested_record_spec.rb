@@ -8,6 +8,9 @@ module Dash2
       describe MerrittAtomHarvestedRecord do
         attr_reader :config
         attr_reader :record
+        attr_reader :mrt_mom_uri
+        attr_reader :feed_uri
+        attr_reader :entry
 
         def wrapper
           @wrapper ||= record.as_wrapper
@@ -22,12 +25,12 @@ module Dash2
           tenant_path = File.absolute_path('config/tenants/example.yml')
           @config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
 
-          mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
+          @mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
           stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom.txt'))
 
-          feed_uri = config.feed_uri
+          @feed_uri = config.feed_uri
           entry_xml = File.read('spec/data/harvester/entry-r36p4t.xml')
-          entry = RSS::Parser.parse(entry_xml, false).items[0]
+          @entry = RSS::Parser.parse(entry_xml, false).items[0]
           @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
         end
 
@@ -92,6 +95,11 @@ module Dash2
           end
         end
 
+        describe '#datacite_resource' do
+          it 'parses mrt-datacite.xml'
+          it 'converts mrt-eml.xml'
+        end
+
         describe '#stash_wrapper' do
 
           before(:each) do
@@ -101,6 +109,22 @@ module Dash2
 
           it 'creates a StashWrapper' do
             expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)
+          end
+
+          it 'sets the identifier to the DOI from mrt-mom.txt' do
+            stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom.txt'))
+            @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
+            identifier = wrapper.identifier
+            expect(identifier.value).to eq('10.15146/R3RG6G')
+            expect(identifier.type).to eq(Stash::Wrapper::IdentifierType::DOI)
+          end
+
+          it 'sets the identifier to the ARK from mrt-mom.txt when the DOI is not present' do
+            stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/eml/mrt-mom.txt'))
+            @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
+            identifier = wrapper.identifier
+            expect(identifier.value).to eq('ark:/90135/q1f769jn')
+            expect(identifier.type).to eq(Stash::Wrapper::IdentifierType::ARK)
           end
 
           it 'sets the embargo date based on the atom <published> tag' do

@@ -6,7 +6,7 @@ module Datacite
       describe '#parse_mrt_datacite' do
         it 'fixes bad contributors' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
 
           contribs = resource.contributors
           expect(contribs.size).to eq(4)
@@ -32,10 +32,19 @@ module Datacite
           expect(identifier.value).to eq(injected_value)
         end
 
+        it 'injects ARKs' do
+          datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3g591-mrt-datacite.xml')
+          injected_value = 'ark:/1234/5678'
+          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          identifier = resource.identifier
+          expect(identifier).not_to be_nil
+          expect(identifier.identifier_type).to eq('ARK')
+          expect(identifier.value).to eq(injected_value)
+        end          
+
         it 'injects OC locations' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml')
-          injected_value = '10.123/456'
-          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           locs = resource.geo_locations
           expect(locs.size).to eq(2)
           oc = locs[0]
@@ -46,8 +55,7 @@ module Datacite
 
         it 'injects Providence Creek locations' do
           datacite_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/datacite/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
-          injected_value = '10.123/456'
-          resource = Resource.parse_mrt_datacite(datacite_xml, injected_value)
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           locs = resource.geo_locations
           expect(locs.size).to eq(1)
           pc = locs[0]
@@ -58,7 +66,7 @@ module Datacite
 
         it 'injects missing resourcetype' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucla-ark+=b5068=d1wc7k-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           resource_type = resource.resource_type
           expect(resource_type).not_to be_nil
           expect(resource_type.resource_type_general).to eq(Datacite::Mapping::ResourceTypeGeneral::OTHER)
@@ -66,14 +74,14 @@ module Datacite
 
         it 'dehyphenates' do
           datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           abstract = resource.descriptions.find { |d| d.type == DescriptionType::ABSTRACT }
           expect(abstract.value).to eq('Mammalian esophagus exhibits a remarkable change in epithelial structure during the transition from embryo to adult. However, the molecular mechanisms of esophageal epithelial development are not well understood. Zebrafish (Danio rerio), a common model organism for vertebrate development and gene function, has not previously been characterized as a model system for esophageal epithelial development. In this study, we characterized a piece of non-keratinized stratified squamous epithelium similar to human esophageal epithelium in the upper digestive tract of developing zebrafish. Under the microscope, this piece was detectable at 5dpf and became stratified at 7dpf. Expression of esophageal epithelial marker genes (Krt5, P63, Sox2 and Pax9) was detected by immunohistochemistry and in situ hybridization. Knockdown of P63, a gene known to be critical for esophageal epithelium, disrupted the development of this epithelium. With this model system, we found that Pax9 knockdown resulted in loss or disorganization of the squamous epithelium, as well as down-regulation of the differentiation markers Krt4 and Krt5. In summary, we characterized a region of stratified squamous epithelium in the zebrafish upper digestive tract which can be used for functional studies of candidate genes involved in esophageal epithelial biology.')
         end
 
         it 'preserves existing DOIs' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucm-ark+=13030=m51g217t-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           identifier = resource.identifier
           expect(identifier).not_to be_nil
           expect(identifier.identifier_type).to eq('DOI')
@@ -126,7 +134,7 @@ module Datacite
 
         it 'creates a FundingReference from a description' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3059p-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
 
           funding_references = resource.funding_references
           expect(funding_references.size).to eq(1)
@@ -147,7 +155,7 @@ module Datacite
 
         it 'creates a FundingReference from an identified funder' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
 
           funding_references = resource.funding_references
           expect(funding_references.size).to eq(1)
@@ -189,7 +197,7 @@ module Datacite
 
             cases.each do |file, expected|
               datacite_xml = File.read("spec/data/datacite/dash1-datacite-xml/#{file}")
-              resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+              resource = Resource.parse_mrt_datacite(datacite_xml)
 
               frefs = resource.funding_references
               expect(frefs.size).to eq(expected.size), "Expected #{frefs} (size #{frefs.size}) to have size #{expected.size}"
@@ -221,7 +229,7 @@ module Datacite
         it 'parses all funder contributors' do
           File.readlines('spec/data/datacite/funded-datasets.txt').each do |file|
             datacite_xml = File.read("spec/data/datacite/dash1-datacite-xml/#{file.strip}")
-            resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+            resource = Resource.parse_mrt_datacite(datacite_xml)
             frefs = resource.funding_references
             expect(frefs).not_to be_empty
 
@@ -236,7 +244,7 @@ module Datacite
         it 'doesn\'t add funding references to datasets without funder contributors' do
           File.readlines('spec/data/datacite/all-no-funding.txt').each do |file|
             datacite_xml = File.read("spec/data/datacite/dash1-datacite-xml/#{file.strip}")
-            resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+            resource = Resource.parse_mrt_datacite(datacite_xml)
             frefs = resource.funding_references
             expect(frefs).to be_empty
 
@@ -250,7 +258,7 @@ module Datacite
 
         it 'handles ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucsf-ark+=b7272=q6bg2kwf-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           rights_list = resource.rights_list
           expect(rights_list).to be_an(Array)
           expect(rights_list.size).to eq(1)
@@ -260,7 +268,7 @@ module Datacite
 
         it 'handles ucsf-ark+=b7272=q6057cv6-mrt-datacite.xml' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucsf-ark+=b7272=q6057cv6-mrt-datacite.xml')
-          resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+          resource = Resource.parse_mrt_datacite(datacite_xml)
           rights_list = resource.rights_list
           expect(rights_list).to be_an(Array)
           expect(rights_list.size).to eq(1)
@@ -289,7 +297,7 @@ module Datacite
             Dir.glob('spec/data/datacite/dash1-datacite-xml/*.xml').sort.each do |f|
 
               datacite_xml = File.read(f)
-              resource = Resource.parse_mrt_datacite(datacite_xml, '10.123/456')
+              resource = Resource.parse_mrt_datacite(datacite_xml)
 
               rights_list = resource.rights_list
               expect(rights_list).not_to be_nil, "Expected #{f} to have rights information, but it didn't"

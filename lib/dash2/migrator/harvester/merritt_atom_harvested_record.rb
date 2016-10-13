@@ -9,6 +9,7 @@ module Dash2
     module Harvester
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
         DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
+        ARK_PATTERN = %r{ark:/[a-z0-9]+/[a-z0-9]+}
         MAX_FILES = 20
 
         attr_reader :tenant_id
@@ -27,8 +28,11 @@ module Dash2
         end
 
         def as_wrapper
+          identifier = doi ?
+            Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi) :
+            Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::ARK, value: ark)
           @wrapper ||= Stash::Wrapper::StashWrapper.new(
-            identifier: Stash::Wrapper::Identifier.new(type: Stash::Wrapper::IdentifierType::DOI, value: doi),
+            identifier: identifier,
             version: Stash::Wrapper::Version.new(number: 1, date: date),
             embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
             license: stash_license,
@@ -43,6 +47,10 @@ module Dash2
 
         def doi
           @doi ||= find_doi
+        end
+
+        def ark
+          @ark ||= find_ark
         end
 
         def date
@@ -62,17 +70,9 @@ module Dash2
         end
 
         def datacite_resource
+          identifier_value = doi ? doi : ark
           @datacite_resource ||= begin
-            # id_string = identifier
-            #              .sub('http://n2t.net/', "#{tenant_id}-")
-            #              .sub(':', '+')
-            #              .gsub('/', '=')
-            # filename = "tmp/#{id_string}-mrt-datacite.xml"
-            # File.open(filename, 'wb') do |f|
-            #   warn("Writing #{filename}")
-            #   f.write(mrt_datacite_xml)
-            # end
-            resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, doi)
+            resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, identifier_value)
             resource.dates = [Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published)] unless resource.dates && !resource.dates.empty?
             resource
           end
@@ -82,12 +82,24 @@ module Dash2
           @datacite_xml ||= datacite_resource.save_to_xml
         end
 
+        def mrt_mom
+          @mrt_mom ||= begin
+            mrt_mom = content_for('system/mrt-mom.txt')
+            raise "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
+            mrt_mom
+          end
+        end
+
+        def find_ark
+          ark_match_data = mrt_mom.match(ARK_PATTERN)
+          warn 'no ARK found in mrt-mom.txt' unless ark_match_data
+          ark_match_data[0].strip if ark_match_data
+        end
+
         def find_doi
-          mrt_mom = content_for('system/mrt-mom.txt')
-          raise "mrt-mom.txt not found at #{uri_for('system/mrt-mom.txt')}" unless mrt_mom
           doi_match_data = mrt_mom.match(DOI_PATTERN)
-          raise 'no DOI found in mrt-mom.txt' unless doi_match_data
-          doi_match_data[0].strip
+          warn 'no DOI found in mrt-mom.txt' unless doi_match_data
+          doi_match_data[0].strip if doi_match_data
         end
 
         def stash_license

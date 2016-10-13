@@ -52,7 +52,23 @@ module Datacite
       end
     end
 
+    class Identifier
+      def value=(v)
+        new_value = v && v.strip
+        warn 'Identifier should have a non-nil value' unless new_value
+        warn "Identifier value #{"'#{new_value}'" || 'nil'} is not a valid DOI" unless new_value.match(DOI_PATTERN)
+        @value = new_value
+      end
+      def identifier_type=(v)
+        warn "Identifier type '#{v}' should be 'DOI'" unless DOI == v
+        @identifier_type = v
+      end
+    end
+
     class Resource
+      DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
+      ARK_PATTERN = %r{ark:/[a-z0-9]+/[a-z0-9]+}
+
       SPECIAL_CASES = {
         %r{<(identifier|subject|description)[^>]+/>} => '', # remove empty tags
         %r{<(identifier|subject|description)[^>]+>\s*</\1>} => '', # remove empty tag pairs
@@ -87,9 +103,9 @@ module Datacite
         %r{(<geoLocationPlace>\s*Providence Creek \(Lower, Upper and P301\)\s*</geoLocationPlace>)} => "\\1\n      <geoLocationPoint>37.047756 -119.221094</geoLocationPoint>"
       }.freeze
 
-      def self.parse_mrt_datacite(mrt_datacite_xml, doi_value)
+      def self.parse_mrt_datacite(mrt_datacite_xml, identifier_value = nil)
         resource = parse_special(mrt_datacite_xml)
-        resource.ensure_doi(doi_value)
+        resource.ensure_identifier(identifier_value)
         resource.ensure_resource_type!
         resource.convert_funding!
         resource.fix_breaks!
@@ -111,8 +127,21 @@ module Datacite
         descriptions.select { |desc| desc.type == DescriptionType::OTHER && !desc.value.start_with?('Lower and upper Providence Creek') }
       end
 
-      def ensure_doi(doi_value)
-        self.identifier = Datacite::Mapping::Identifier.new(value: doi_value) unless identifier && identifier.value
+      def ensure_identifier(identifier_value)
+        if identifier && identifier.value && identifier_value != identifier.value
+          warn("Preserving existing identifier #{identifier.value}; ignoring new value #{"'#{identifier_value}'" || 'nil'}")
+          return
+        end
+
+        if (doi_match_data = DOI_PATTERN.match(identifier_value))
+          self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
+        elsif ARK_PATTERN.match(identifier_value)
+          identifier = Datacite::Mapping::Identifier.new(value: identifier_value)
+          identifier.identifier_type = 'ARK' # allowed by EZID, if not Datacite
+          self.identifier = identifier
+        else
+          warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK")
+        end
       end
 
       def ensure_resource_type!
