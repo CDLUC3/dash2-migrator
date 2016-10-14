@@ -4,6 +4,7 @@ require 'eml/mapping'
 module Eml
   module Mapping
     describe Dataset do
+
       it 'round-trips a file' do
         f = 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q1bk1994-mrt-eml.xml'
         eml_xml = File.read(f)

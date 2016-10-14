@@ -4,7 +4,9 @@ module Eml
   module Mapping
 
     FILTER_PATTERNS = [
-      %r{<([A-Za-z]+)>No.*provided</\1>},
+      %r{<([A-Za-z]+)>No[^<]*provided</\1>},
+      %r{<([A-Za-z]+)>No[^<]*described</\1>},
+      %r{<([A-Za-z]+)>[^<]*No standard is specified[^<]*</\1>},
       %r{<([A-Za-z]+)>noemail@noemail.com</\1>},
       %r{<([A-Za-z]+)>\s*</\1>},
       %r{<([A-Za-z]+)/>}
@@ -12,8 +14,8 @@ module Eml
 
     def self.filter(xml_text)
       utf8_encoded = xml_text.force_encoding('utf-8')
-      namespace_fixed = utf8_encoded.gsub('eml://ecoinformatics.org/eml2.1.0', 'eml://ecoinformatics.org/eml-2.1.1')
-      filtered = FILTER_PATTERNS.inject(namespace_fixed) { |xml, pattern| deep_filter(xml, pattern) }
+      namespace_ignored = utf8_encoded.gsub(%r{<(/?)eml:eml[^>]*>}, '<\1eml>')
+      filtered = FILTER_PATTERNS.inject(namespace_ignored) { |xml, pattern| deep_filter(xml, pattern) }
       no_tabs = filtered.tr("\t", ' ')
       no_line_ending_whitespace = no_tabs.gsub(/ *(\n|\r)+/, "\n")
       no_line_ending_whitespace.gsub(/\n+/, "\n")
@@ -25,7 +27,7 @@ module Eml
       deep_filter(filtered, pattern)
     end
 
-    class ParaContainer
+    class ParaContainer # TODO: can we just use qualified XPaths?
       include XML::Mapping
       text_node :para, 'para', default_value: nil
     end
@@ -106,54 +108,68 @@ module Eml
       text_node :organization_name, 'organization_name', default_value: nil
     end
 
-    # node :project, 'project'
-    # node :title, 'title'
-    # node :personnel, 'personnel'
-    # node :individual_name, 'individualName'
-    # node :sur_name, 'surName'
-    # node :organization_name, 'organizationName'
-    # node :role, 'role'
-    # node :abstract, 'abstract'
-    # node :para, 'para'
-    # node :funding, 'funding'
-    # node :para, 'para'
-    # node :data_table, 'dataTable'
-    # node :entity_name, 'entityName'
-    # node :entity_description, 'entityDescription'
-    # node :attribute_list, 'attributeList'
-    # node :attribute, 'attribute'
-    # node :attribute_name, 'attributeName'
-    # node :attribute_definition, 'attributeDefinition'
-    # node :measurement_scale, 'measurementScale'
-    # node :date_time, 'dateTime'
-    # node :format_string, 'formatString'
-    # node :attribute, 'attribute'
-    # node :attribute_name, 'attributeName'
-    # node :attribute_definition, 'attributeDefinition'
-    # node :measurement_scale, 'measurementScale'
-    # node :interval, 'interval'
-    # node :unit, 'unit'
-    # node :standard_unit, 'standardUnit'
-    # node :numeric_domain, 'numericDomain'
-    # node :number_type, 'numberType'
-    # node :attribute, 'attribute'
-    # node :attribute_name, 'attributeName'
-    # node :attribute_definition, 'attributeDefinition'
-    # node :measurement_scale, 'measurementScale'
-    # node :interval, 'interval'
-    # node :unit, 'unit'
-    # node :standard_unit, 'standardUnit'
-    # node :numeric_domain, 'numericDomain'
-    # node :number_type, 'numberType'
-    # node :attribute, 'attribute'
-    # node :attribute_name, 'attributeName'
-    # node :attribute_definition, 'attributeDefinition'
-    # node :measurement_scale, 'measurementScale'
-    # node :interval, 'interval'
-    # node :unit, 'unit'
-    # node :standard_unit, 'standardUnit'
-    # node :numeric_domain, 'numericDomain'
-    # node :number_type, 'numberType'
+    class Personnel
+      include XML::Mapping
+      object_node :individual_name, 'individualName', class: IndividualName, default_value: nil
+      text_node :organization_name, 'organizationName', default_value: nil
+      text_node :role, 'role', default_value: nil
+    end
+
+    class Project
+      include XML::Mapping
+
+      text_node :title, 'title', default_value: nil
+      object_node :personnel, 'personnel', class: Personnel, default_value: nil
+      object_node :abstract, 'abstract', class: ParaContainer, default_value: nil
+      object_node :funding, 'funding', class: ParaContainer, default_value: nil
+    end
+
+    class DateTime
+      include XML::Mapping
+
+      text_node :format_string, 'formatString', default_value: nil
+    end
+
+    class Unit
+      include XML::Mapping
+      text_node :standard_unit, 'standardUnit', default_value: nil
+    end
+
+    class NumericDomain
+      include XML::Mapping
+      text_node :number_type, 'numberType', default_value: nil
+    end
+
+    class Interval
+      include XML::Mapping
+
+      object_node :unit, 'unit', class: Unit, default_value: nil
+      object_node :numeric_domain, 'numericDomain', class: NumericDomain, default_value: nil
+    end
+
+    class MeasurementScale
+      include XML::Mapping
+
+      object_node :date_time, 'dateTime', class: DateTime, default_value: nil
+      object_node :interval, 'interval', class: Interval, default_value: nil
+      text_node :format_string, 'formatString', default_value: nil
+    end
+
+    class Attribute
+      include XML::Mapping
+
+      text_node :attribute_name, 'attributeName', default_value: nil
+      text_node :attribute_definition, 'attributeDefinition', default_value: nil
+      object_node :measurement_scale, 'measurementScale', class: MeasurementScale, default_value: nil
+    end
+
+    class DataTable
+      include XML::Mapping
+
+      text_node :entity_name, 'entityName', default_value: nil
+      text_node :entity_description, 'entityDescription', default_value: nil
+      array_node :attribute_list, 'attributeList', 'attribute', default_value: []
+    end
 
     class Dataset
       include XML::Mapping
@@ -170,6 +186,8 @@ module Eml
       object_node :coverage, 'coverage', class: Coverage, default_value: nil
       object_node :contact, 'contact', class: Person, default_value: nil
       object_node :publisher, 'publisher', class: Publisher, default_value: nil
+      object_node :project, 'project', class: Project, default_value: nil
+      object_node :data_table, 'dataTable', class: DataTable, default_value: nil
     end
 
     class Metadata
@@ -187,8 +205,8 @@ module Eml
     end
 
     class Eml
-      include XML::MappingExtensions::Namespaced
-      # namespace XML::MappingExtensions::Namespace.new(uri: 'eml://ecoinformatics.org/eml-2.1.1', prefix: 'eml')
+      include XML::Mapping
+
       root_element_name 'eml'
 
       object_node :dataset, 'dataset', class: Dataset, default_value: nil
