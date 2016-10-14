@@ -1,29 +1,198 @@
 require 'xml/mapping_extensions'
-require 'eml/mapping/eml_text_node'
 
 module Eml
   module Mapping
-    class Dataset
-      include XML::MappingExtensions
 
-      root_element_name 'eml'
+    FILTER_PATTERNS = [
+      %r{<([A-Za-z]+)>No.*provided</\1>},
+      %r{<([A-Za-z]+)>noemail@noemail.com</\1>},
+      %r{<([A-Za-z]+)>\s*</\1>},
+      %r{<([A-Za-z]+)/>}
+    ].freeze
 
-      eml_text_node :title, 'title'
-      object_node :creator, 'creator'
-      eml_text_node :organization_name, 'organization_name'
+    def self.filter(xml_text)
+      utf8_encoded = xml_text.force_encoding('utf-8')
+      namespace_fixed = utf8_encoded.gsub('eml://ecoinformatics.org/eml2.1.0', 'eml://ecoinformatics.org/eml-2.1.1')
+      filtered = FILTER_PATTERNS.inject(namespace_fixed) { |xml, pattern| deep_filter(xml, pattern) }
+      no_tabs = filtered.tr("\t", ' ')
+      no_line_ending_whitespace = no_tabs.gsub(/ *(\n|\r)+/, "\n")
+      no_line_ending_whitespace.gsub(/\n+/, "\n")
     end
 
-    class Creator
-      object_node :individual_name, 'individualName', class: IndividualName
+    def self.deep_filter(text, pattern)
+      filtered = text.gsub(pattern, '')
+      return filtered if filtered == text
+      deep_filter(filtered, pattern)
+    end
+
+    class ParaContainer
+      include XML::Mapping
+      text_node :para, 'para', default_value: nil
     end
 
     class IndividualName
-      eml_text_node :given_name, 'givenName'
-      eml_text_node :surname, 'surName'
+      include XML::Mapping
+      text_node :given_name, 'givenName', default_value: nil
+      text_node :surname, 'surName', default_value: nil
     end
 
     class Address
-      eml_text_node :delivery_point, 'deliveryPoint'
+      include XML::Mapping
+      text_node :delivery_point, 'deliveryPoint', default_value: nil
+      text_node :city, 'city', default_value: nil
+      text_node :administrative_area, 'administrativeArea', default_value: nil
+      text_node :postal_code, 'postalCode', default_value: nil
+      text_node :country, 'country', default_value: nil
+    end
+
+    class Person
+      include XML::Mapping
+      object_node :individual_name, 'individualName', class: IndividualName, default_value: nil
+      text_node :organization_name, 'organizationName', default_value: nil
+      object_node :address, 'address', class: Address, default_value: nil
+      text_node :phone, 'phone', default_value: nil
+      text_node :electronic_mail_address, 'electronicMailAddress', default_value: nil
+    end
+
+    class Online
+      include XML::Mapping
+      text_node :url, 'url', default_value: nil
+    end
+
+    class Distribution
+      include XML::Mapping
+      object_node :online, 'online', class: Online, default_value: nil
+    end
+
+    class BoundingCoordinates
+      include XML::Mapping
+      text_node :west_bounding_coordinate, 'westBoundingCoordinate', default_value: nil
+      text_node :east_bounding_coordinate, 'eastBoundingCoordinate', default_value: nil
+      text_node :north_bounding_coordinate, 'northBoundingCoordinate', default_value: nil
+      text_node :south_bounding_coordinate, 'southBoundingCoordinate', default_value: nil
+    end
+
+    class GeographicCoverage
+      include XML::Mapping
+      text_node :geographic_description, 'geographicDescription', default_value: nil
+      object_node :bounding_coordinates, 'boundingCoordinates', class: BoundingCoordinates, default_value: nil
+    end
+
+    class DateContainer
+      include XML::Mapping
+      date_node :calendar_date, 'calendarDate', default_value: nil
+    end
+
+    class RangeOfDates
+      include XML::Mapping
+      object_node :begin_date, 'beginDate', class: DateContainer, default_value: nil
+      object_node :end_date, 'endDate', class: DateContainer, default_value: nil
+    end
+
+    class TemporalCoverage
+      include XML::Mapping
+      text_node :id, '@id', default_value: nil
+      object_node :range_of_dates, 'rangeOfDates', class: RangeOfDates, default_value: nil
+    end
+
+    class Coverage
+      include XML::Mapping
+      object_node :geographic_coverage, 'geographicCoverage', class: GeographicCoverage, default_value: nil
+      object_node :temporal_coverage, 'temporalCoverage', class: TemporalCoverage, default_value: nil
+    end
+
+    class Publisher
+      include XML::Mapping
+      text_node :organization_name, 'organization_name', default_value: nil
+    end
+
+    # node :project, 'project'
+    # node :title, 'title'
+    # node :personnel, 'personnel'
+    # node :individual_name, 'individualName'
+    # node :sur_name, 'surName'
+    # node :organization_name, 'organizationName'
+    # node :role, 'role'
+    # node :abstract, 'abstract'
+    # node :para, 'para'
+    # node :funding, 'funding'
+    # node :para, 'para'
+    # node :data_table, 'dataTable'
+    # node :entity_name, 'entityName'
+    # node :entity_description, 'entityDescription'
+    # node :attribute_list, 'attributeList'
+    # node :attribute, 'attribute'
+    # node :attribute_name, 'attributeName'
+    # node :attribute_definition, 'attributeDefinition'
+    # node :measurement_scale, 'measurementScale'
+    # node :date_time, 'dateTime'
+    # node :format_string, 'formatString'
+    # node :attribute, 'attribute'
+    # node :attribute_name, 'attributeName'
+    # node :attribute_definition, 'attributeDefinition'
+    # node :measurement_scale, 'measurementScale'
+    # node :interval, 'interval'
+    # node :unit, 'unit'
+    # node :standard_unit, 'standardUnit'
+    # node :numeric_domain, 'numericDomain'
+    # node :number_type, 'numberType'
+    # node :attribute, 'attribute'
+    # node :attribute_name, 'attributeName'
+    # node :attribute_definition, 'attributeDefinition'
+    # node :measurement_scale, 'measurementScale'
+    # node :interval, 'interval'
+    # node :unit, 'unit'
+    # node :standard_unit, 'standardUnit'
+    # node :numeric_domain, 'numericDomain'
+    # node :number_type, 'numberType'
+    # node :attribute, 'attribute'
+    # node :attribute_name, 'attributeName'
+    # node :attribute_definition, 'attributeDefinition'
+    # node :measurement_scale, 'measurementScale'
+    # node :interval, 'interval'
+    # node :unit, 'unit'
+    # node :standard_unit, 'standardUnit'
+    # node :numeric_domain, 'numericDomain'
+    # node :number_type, 'numberType'
+
+    class Dataset
+      include XML::Mapping
+
+      root_element_name 'dataset'
+
+      text_node :title, 'title', default_value: nil
+      object_node :creator, 'creator', class: Person, default_value: nil
+      text_node :pub_date, 'pubDate', default_value: nil
+      text_node :abstract, 'abstract', default_value: nil
+      array_node :keyword_set, 'keywordSet', 'keyword', class: String, default_value: []
+      object_node :intellectual_rights, 'intellectualRights', class: ParaContainer, default_value: nil
+      object_node :distribution, 'distribution', class: Distribution, default_value: nil
+      object_node :coverage, 'coverage', class: Coverage, default_value: nil
+      object_node :contact, 'contact', class: Person, default_value: nil
+      object_node :publisher, 'publisher', class: Publisher, default_value: nil
+    end
+
+    class Metadata
+      include XML::Mapping
+
+      text_node :description, 'description', default_value: nil
+      text_node :formatted_citation, 'formattedCitation', default_value: nil
+    end
+
+    class AdditionalMetadata
+      include XML::Mapping
+
+      text_node :describes, 'describes', default_value: 'nil'
+      object_node :metadata, 'metadata', class: Metadata, default_value: 'nil'
+    end
+
+    class Eml
+      include XML::MappingExtensions::Namespaced
+      # namespace XML::MappingExtensions::Namespace.new(uri: 'eml://ecoinformatics.org/eml-2.1.1', prefix: 'eml')
+      root_element_name 'eml'
+
+      object_node :dataset, 'dataset', class: Dataset, default_value: nil
+      array_node :additional_metadata, 'additionalMetadata', class: AdditionalMetadata, default_value: []
     end
 
   end
