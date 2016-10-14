@@ -24,6 +24,7 @@ gem 'rubocop', '~> 0.42', group: :development
 # Test
 
 group :test do
+  gem 'diffy', '~> 3.1'
   gem 'equivalent-xml', '~> 0.6.0'
   gem 'database_cleaner', '~> 1.5'
   gem 'rspec', '~> 3.5'
