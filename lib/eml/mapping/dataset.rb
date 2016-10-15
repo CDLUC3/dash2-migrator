@@ -15,7 +15,8 @@ module Eml
     def self.filter(xml_text)
       utf8_encoded = xml_text.force_encoding('utf-8')
       namespace_ignored = utf8_encoded.gsub(%r{<(/?)eml:eml[^>]*>}, '<\1eml>')
-      filtered = FILTER_PATTERNS.inject(namespace_ignored) { |xml, pattern| deep_filter(xml, pattern) }
+      paras_fixed = namespace_ignored.gsub(%r{<(intellectualRights|funding|abstract)>([^<]+)</\1>}, '<\1><para>\2</para></\1>')
+      filtered = FILTER_PATTERNS.inject(paras_fixed) { |xml, pattern| deep_filter(xml, pattern) }
       no_tabs = filtered.tr("\t", ' ')
       no_line_ending_whitespace = no_tabs.gsub(/ *(\n|\r)+/, "\n")
       no_line_ending_whitespace.gsub(/\n+/, "\n")
@@ -105,7 +106,7 @@ module Eml
 
     class Publisher
       include XML::Mapping
-      text_node :organization_name, 'organization_name', default_value: nil
+      text_node :organization_name, 'organizationName', default_value: nil
     end
 
     class Personnel
@@ -126,13 +127,13 @@ module Eml
 
     class DateTime
       include XML::Mapping
-
       text_node :format_string, 'formatString', default_value: nil
     end
 
     class Unit
       include XML::Mapping
       text_node :standard_unit, 'standardUnit', default_value: nil
+      text_node :custom_unit, 'customUnit', default_value: nil
     end
 
     class NumericDomain
@@ -147,12 +148,28 @@ module Eml
       object_node :numeric_domain, 'numericDomain', class: NumericDomain, default_value: nil
     end
 
+    class TextDomain
+      include XML::Mapping
+      text_node :definition, 'definition', default_value: nil
+    end
+
+    class NonNumericDomain
+      include XML::Mapping
+      object_node :text_domain, 'textDomain', class: TextDomain, default_value: nil
+    end
+
+    class Nominal
+      include XML::Mapping
+      object_node :non_numeric_domain, 'nonNumericDomain', class: NonNumericDomain, default_value: nil
+    end
+
     class MeasurementScale
       include XML::Mapping
 
       object_node :date_time, 'dateTime', class: DateTime, default_value: nil
       object_node :interval, 'interval', class: Interval, default_value: nil
       text_node :format_string, 'formatString', default_value: nil
+      object_node :nominal, 'nominal', class: Nominal, default_value: nil
     end
 
     class Attribute
@@ -176,10 +193,11 @@ module Eml
 
       root_element_name 'dataset'
 
+      text_node :id, '@id', default_value: nil
       text_node :title, 'title', default_value: nil
       object_node :creator, 'creator', class: Person, default_value: nil
       text_node :pub_date, 'pubDate', default_value: nil
-      text_node :abstract, 'abstract', default_value: nil
+      object_node :abstract, 'abstract', class: ParaContainer, default_value: nil
       array_node :keyword_set, 'keywordSet', 'keyword', class: String, default_value: []
       object_node :intellectual_rights, 'intellectualRights', class: ParaContainer, default_value: nil
       object_node :distribution, 'distribution', class: Distribution, default_value: nil

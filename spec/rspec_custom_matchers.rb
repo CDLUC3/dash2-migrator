@@ -28,47 +28,47 @@ module Stash
       out.string
     end
 
-    def self.equivalent?(expected, actual)
-      expected_xml = to_nokogiri(expected) || raise("expected value #{expected} does not appear to be XML")
+    def self.equivalent?(expected, actual, filename = nil)
+      expected_xml = to_nokogiri(expected) || raise("expected value #{expected || 'nil'} does not appear to be XML#{" in #{filename}" if filename}")
       actual_xml = to_nokogiri(actual)
 
       EquivalentXml.equivalent?(expected_xml, actual_xml, element_order: false, normalize_whitespace: true)
     end
 
-    def self.failure_message(expected, actual)
+    def self.failure_message(expected, actual, filename = nil)
       expected_string = to_pretty(to_nokogiri(expected))
       actual_string = to_pretty(to_nokogiri(actual)) || actual
 
-      # now = Time.now.to_i
-      # File.open("tmp/#{now}-expected.xml", 'w') { |f| f.write(expected_string) }
-      # File.open("tmp/#{now}-actual.xml", 'w') { |f| f.write(actual_string) }
+      now = Time.now.to_i
+      File.open("tmp/#{now}-expected.xml", 'w') { |f| f.write(expected_string) }
+      File.open("tmp/#{now}-actual.xml", 'w') { |f| f.write(actual_string) }
 
       diff = Diffy::Diff.new(expected_string, actual_string).to_s(:text)
 
-      "expected XML differs from actual:\n#{diff}"
+      "expected XML differs from actual#{" in #{filename}" if filename}:\n#{diff}"
     end
 
     def self.to_xml_string(actual)
       to_pretty(to_nokogiri(actual))
     end
 
-    def self.failure_message_when_negated(actual)
-      "expected not to get XML:\n\t#{to_xml_string(actual) || 'nil'}"
+    def self.failure_message_when_negated(actual, filename = nil)
+      "expected not to get XML#{" in #{filename}" if filename}:\n\t#{to_xml_string(actual) || 'nil'}"
     end
   end
 end
 
-RSpec::Matchers.define :be_xml do |expected|
+RSpec::Matchers.define :be_xml do |expected, filename = nil|
   match do |actual|
-    Stash::XMLMatchUtils.equivalent?(expected, actual)
+    Stash::XMLMatchUtils.equivalent?(expected, actual, filename)
   end
 
   failure_message do |actual|
-    Stash::XMLMatchUtils.failure_message(expected, actual)
+    Stash::XMLMatchUtils.failure_message(expected, actual, filename)
   end
 
   failure_message_when_negated do |actual|
-    Stash::XMLMatchUtils.failure_message_when_negated(actual)
+    Stash::XMLMatchUtils.failure_message_when_negated(actual, filename)
   end
 end
 
