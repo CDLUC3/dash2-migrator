@@ -45,6 +45,12 @@ module Dash2
           end
         end
 
+        describe '#mrt_eml' do
+          it 'returns nil for a non-EML record' do
+            expect(record.mrt_eml).to be_nil
+          end
+        end
+
         describe '#user_uid' do
           it 'gets the user info from Dash 1'
           it 'creates a user if needed'
@@ -83,6 +89,28 @@ module Dash2
 
             sw_ident = wrapper.identifier
             expect(sw_ident.value).to eq(dcs_ident.value)
+          end
+        end
+
+        describe 'EML handling' do
+          attr_reader :mrt_eml_uri
+          attr_reader :eml_path
+          attr_reader :eml_xml
+
+          before(:each) do
+            @eml_path = 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q1bk1994-mrt-eml.xml'
+            @eml_xml = File.read(eml_path).freeze
+
+            entry_xml = File.read('spec/data/harvester/eml/entry-q1f769jn.xml')
+            @entry = RSS::Parser.parse(entry_xml, false).items[0]
+            @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
+
+            @mrt_eml_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark:%2F90135%2Fq1f769jn/2/producer%2Fmrt-eml.xml"
+            stub_request(:get, mrt_eml_uri).to_return(body: eml_xml)
+          end
+
+          it 'returns the EML XML' do
+            expect(record.mrt_eml).to eq(eml_xml)
           end
         end
 

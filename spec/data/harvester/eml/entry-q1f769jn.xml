@@ -1,0 +1,26 @@
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dct="http://purl.org/dc/terms/">
+  <entry>
+    <id>http://n2t.net/ark:/90135/q1f769jn</id>
+    <link rel="alternate" type="application/zip" href="/d/ark%3A%2F90135%2Fq1f769jn"/>
+    <dct:extent>115665</dct:extent>
+    <title>Federal_Libraries</title>
+    <author>
+      <name>Birch, William</name>
+    </author>
+    <updated>2014-06-24T15:08:52+00:00</updated>
+    <published>2014-06-01T15:39:24+00:00</published>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-mom.txt" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-mom.txt" length="80" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/producer%2FFile-metadata.csv" rel="http://purl.org/dc/terms/hasPart" title="producer/File-metadata.csv" length="9833" type="text/csv"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/producer%2Fmrt-dataone-manifest.txt" rel="http://purl.org/dc/terms/hasPart" title="producer/mrt-dataone-manifest.txt" length="592" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-owner.txt" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-owner.txt" length="19" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-erc.txt" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-erc.txt" length="118" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/producer%2Fmrt-eml.xml" rel="http://purl.org/dc/terms/hasPart" title="producer/mrt-eml.xml" length="37264" type="application/xml"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-dataone-map.rdf" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-dataone-map.rdf" length="3269" type="application/rdf+xml"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-membership.txt" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-membership.txt" length="20" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-dc.xml" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-dc.xml" length="149" type="application/xml"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-ingest.txt" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-ingest.txt" length="1636" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/producer%2Fmrt-erc.txt" rel="http://purl.org/dc/terms/hasPart" title="producer/mrt-erc.txt" length="107" type="text/plain"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/system%2Fmrt-object-map.ttl" rel="http://purl.org/dc/terms/hasPart" title="system/mrt-object-map.ttl" length="3946" type="plain/turtle"/>
+    <link href="/d/ark%3A%2F90135%2Fq1f769jn/2/producer%2FFederal_Libraries.csv" rel="http://purl.org/dc/terms/hasPart" title="producer/Federal_Libraries.csv" length="11897" type="text/csv"/>
+  </entry>
+</feed>
