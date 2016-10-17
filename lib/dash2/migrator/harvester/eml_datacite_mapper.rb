@@ -19,10 +19,11 @@ module Dash2
         def to_datacite
           Resource.new(
             identifier: identifier,
-            creators: creators,
+            creators: [creator],
             titles: titles,
             publisher: publisher,
-            publication_year: publication_year
+            publication_year: publication_year,
+            dates: dates
           )
         end
 
@@ -37,15 +38,15 @@ module Dash2
           (stripped = s.strip) == '' ? nil : stripped
         end
 
-        def creators
+        def creator
           individual_name = eml_creator.individual_name
-          [Creator.new(
+          Creator.new(
             name: individual_name.full_name,
             given_name: individual_name.given_name,
             family_name: individual_name.surname,
             identifier: creator_identifier,
             affiliations: creator_org_name ? [creator_org_name] : []
-          )]
+          )
         end
 
         def creator_identifier
@@ -97,6 +98,23 @@ module Dash2
 
         def publication_year
           pub_date.year
+        end
+
+        def dates
+          dates = [
+            Date.new(type: DateType::AVAILABLE, value: pub_date)
+          ]
+
+          range_start = dataset.coverage_start
+          range_end = dataset.coverage_end
+
+          if range_start || range_end
+            iso_range = range_start ? "#{range_start.xmlschema}/" : ''
+            iso_range << range_end.xmlschema if range_end
+            dates << Date.new(type: DateType::COLLECTED, value: iso_range)
+          end
+
+          dates
         end
 
       end

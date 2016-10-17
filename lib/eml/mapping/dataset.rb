@@ -104,12 +104,28 @@ module Eml
       include XML::Mapping
       object_node :begin_date, 'beginDate', class: DateContainer, default_value: nil
       object_node :end_date, 'endDate', class: DateContainer, default_value: nil
+
+      def range_start
+        begin_date && begin_date.calendar_date
+      end
+
+      def range_end
+        end_date && end_date.calendar_date
+      end
     end
 
     class TemporalCoverage
       include XML::Mapping
       non_blank_text_node :id, '@id', default_value: nil
       object_node :range_of_dates, 'rangeOfDates', class: RangeOfDates, default_value: nil
+
+      def range_start
+        range_of_dates && range_of_dates.range_start
+      end
+
+      def range_end
+        range_of_dates && range_of_dates.range_end
+      end
     end
 
     class Coverage
@@ -231,6 +247,14 @@ module Eml
 
       def contact_org_name
         contact.organization_name if contact
+      end
+
+      def coverage_start
+        coverage && (temporal = coverage.temporal_coverage) && temporal.range_start
+      end
+
+      def coverage_end
+        coverage && (temporal = coverage.temporal_coverage) && temporal.range_end
       end
     end
 
