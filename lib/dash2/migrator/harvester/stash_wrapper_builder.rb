@@ -16,6 +16,10 @@ module Dash2
           @datacite_resource = datacite_resource
         end
 
+        def log
+          ::Stash::Harvester.log
+        end
+
         def build
           Stash::Wrapper::StashWrapper.new(
             identifier: sw_ident,
@@ -60,8 +64,9 @@ module Dash2
 
         def stash_files
           @stash_files ||= begin
-            return all_stash_files unless all_stash_files.size > MAX_FILES && !Migrator.production?
-            log.warn "#{doi}: Taking only first #{MAX_FILES} of #{file_links.size} files"
+            num_files = all_stash_files.size
+            return all_stash_files unless num_files > MAX_FILES && !Migrator.production?
+            log.warn "#{sw_ident.value}: Taking only first #{MAX_FILES} of #{num_files} files"
             all_stash_files.first(MAX_FILES)
           end
         end

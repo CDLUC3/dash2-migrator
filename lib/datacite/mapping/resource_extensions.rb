@@ -58,12 +58,12 @@ module Datacite
       private
 
       def inject_identifier!(identifier_value)
-        if (doi_match_data = DOI_PATTERN.match(identifier_value))
-          self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
-        elsif ARK_PATTERN.match(identifier_value)
+        if ARK_PATTERN.match(identifier_value)
           identifier = Datacite::Mapping::Identifier.new(value: identifier_value)
           identifier.identifier_type = 'ARK' # allowed by EZID, if not Datacite
           self.identifier = identifier
+        elsif (doi_match_data = DOI_PATTERN.match(identifier_value))
+          self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
         else
           warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK")
         end
