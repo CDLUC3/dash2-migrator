@@ -55,18 +55,23 @@ module Datacite
         end
       end
 
-      private
-
-      def inject_identifier!(identifier_value)
+      def self.to_identifier(identifier_value)
         if ARK_PATTERN.match(identifier_value)
           identifier = Datacite::Mapping::Identifier.new(value: identifier_value)
           identifier.identifier_type = 'ARK' # allowed by EZID, if not Datacite
-          self.identifier = identifier
+          return identifier
         elsif (doi_match_data = DOI_PATTERN.match(identifier_value))
-          self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
-        else
-          warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK; ignoring")
+          return Datacite::Mapping::Identifier.new(value: doi_match_data[0])
         end
+        warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK; ignoring")
+        nil
+      end
+
+      private
+
+      def inject_identifier!(identifier_value)
+        ident = Resource.to_identifier(identifier_value)
+        self.identifier = ident if ident
       end
 
       def names_and_grants(funder_contrib, funding_desc)

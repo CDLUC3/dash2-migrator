@@ -3,6 +3,32 @@ require 'eml/mapping'
 
 module Eml
   module Mapping
+
+    describe IndividualName do
+      describe '#full_name' do
+        it 'assembles full names' do
+          name = IndividualName.new
+          name.given_name = 'Given'
+          name.surname = 'Sur'
+          expect(name.full_name).to eq('Sur, Given')
+        end
+        it 'handles missing given names' do
+          name = IndividualName.new
+          name.surname = 'Sur'
+          expect(name.full_name).to eq('Sur')
+        end
+        it 'handles missing surnames' do
+          name = IndividualName.new
+          name.given_name = 'Given'
+          expect(name.full_name).to eq('Given')
+        end
+        it 'handles missing names' do
+          name = IndividualName.new
+          expect(name.full_name).to be_nil
+        end
+      end
+    end
+
     describe Dataset do
 
       it 'round-trips a file' do
@@ -12,11 +38,10 @@ module Eml
         expect(eml_xml).not_to be_nil, "File.binread('#{f}') returned nil"
         expect(eml_xml.strip).not_to eq(''), "File.binread('#{f}') returned blank"
 
-        filtered_xml = Mapping.filter(eml_xml)
-
-        dataset = Eml.parse_xml(filtered_xml)
+        dataset = Eml.parse_filtered(eml_xml)
         output_xml = dataset.write_xml
 
+        filtered_xml = Mapping.filter(eml_xml)
         filtered_output_xml = Mapping.filter(output_xml)
         expect(filtered_output_xml).to be_xml(filtered_xml, f)
       end
@@ -29,11 +54,10 @@ module Eml
             expect(eml_xml).not_to be_nil, "File.binread('#{f}') returned nil"
             expect(eml_xml.strip).not_to eq(''), "File.binread('#{f}') returned blank"
 
-            filtered_xml = Mapping.filter(eml_xml)
-
-            dataset = Eml.parse_xml(filtered_xml)
+            dataset = Eml.parse_filtered(eml_xml)
             output_xml = dataset.write_xml
 
+            filtered_xml = Mapping.filter(eml_xml)
             filtered_output_xml = Mapping.filter(output_xml)
             expect(filtered_output_xml).to be_xml(filtered_xml, f)
           end
