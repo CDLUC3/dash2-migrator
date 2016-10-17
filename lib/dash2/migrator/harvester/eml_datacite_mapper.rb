@@ -2,6 +2,17 @@ require 'eml/mapping'
 require 'datacite/mapping'
 require 'datacite/mapping/datacite_extensions'
 
+module Datacite
+  module Mapping
+    class Rights
+      CC_BY_3 = Rights.new(
+        uri: URI('https://creativecommons.org/licenses/by/3.0/'),
+        value: 'Creative Commons Attribution 3.0 International (CC BY 3.0)'
+      )
+    end
+  end
+end
+
 module Dash2
   module Migrator
     module Harvester
@@ -23,7 +34,10 @@ module Dash2
             titles: titles,
             publisher: publisher,
             publication_year: publication_year,
-            dates: dates
+            dates: dates,
+            descriptions: descriptions,
+            subjects: dataset.keyword_set.map { |kw| Subject.new(value: kw) },
+            rights_list: [rights]
           )
         end
 
@@ -76,6 +90,7 @@ module Dash2
               return org_name
             end
           end
+
           # special cases
           return 'IFCA' if /ifca\.unican\.es/.match(creator_email)
           return 'Cornell University' if /cornell\.edu/.match(creator_email)
@@ -84,12 +99,9 @@ module Dash2
             wbirch@utk.edu
             benbirch7@gmail.com
           ).include?(creator_email)
-          return 'DataONE' if %w(
-            Bupt.aajjnn@gmail.com
-            sebastian.nizan@googlemail.com
-            janakiramreddy3@gmail.com
-          ).include?(creator_email)
-          nil
+
+          # default
+          'DataONE'
         end
 
         def pub_date
@@ -117,6 +129,21 @@ module Dash2
           dates
         end
 
+        def descriptions
+          descriptions = []
+          descriptions << Description.new(type: DescriptionType::ABSTRACT, value: abstract) if abstract
+          descriptions
+        end
+
+        def abstract
+          dataset.abstract_text
+        end
+
+        def rights
+          rights_text = dataset.rights_text
+          return Rights::CC_BY_3 if 'creative commons license' == rights_text
+          Rights::CC_ZERO
+        end
       end
     end
   end

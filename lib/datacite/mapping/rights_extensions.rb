@@ -14,6 +14,7 @@ module Datacite
 
       # TODO: consider pushing this to datacite-mapping
       def value=(v)
+        raise 'Nil rights value' unless v
         @value = v.strip.tr("\n", ' ').squeeze(' ')
       end
     end

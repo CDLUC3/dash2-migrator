@@ -45,10 +45,28 @@ module Dash2
 
               expect(resource.publication_year).to eq(date_available.date_value.year)
 
-              next unless dataset.coverage && dataset.coverage.temporal_coverage
-              date_collected = resource.dates.find { |d| d.type == Datacite::Mapping::DateType::COLLECTED }
-              expect(date_collected.range_start.date).to eq(dataset.coverage_start)
-              expect(date_collected.range_end.date).to eq(dataset.coverage_end)
+              if dataset.coverage && dataset.coverage.temporal_coverage
+                date_collected = resource.dates.find { |d| d.type == Datacite::Mapping::DateType::COLLECTED }
+                expect(date_collected.range_start.date).to eq(dataset.coverage_start)
+                expect(date_collected.range_end.date).to eq(dataset.coverage_end)
+              end
+
+              if dataset.abstract_text
+                abstract = resource.descriptions.find { |d| d.type = Datacite::Mapping::DescriptionType::ABSTRACT }
+                expect(abstract.value).to eq(dataset.abstract_text)
+              end
+
+              expect(resource.subjects.map(&:value)).to eq(dataset.keyword_set.map(&:strip))
+
+              rights = resource.rights_list[0]
+              expect(rights).not_to be_nil, "No rights in #{f}"
+              next unless rights
+
+              if f == 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q1930r39-mrt-eml.xml'
+                expect(rights).to eq(Datacite::Mapping::Rights::CC_BY_3)
+              else
+                expect(rights).to eq(Datacite::Mapping::Rights::CC_ZERO)
+              end
             end
           end
         end

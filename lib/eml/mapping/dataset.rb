@@ -39,7 +39,14 @@ module Eml
 
     class ParaContainer # TODO: can we just use qualified XPaths?
       include XML::Mapping
+      non_blank_text_node :text, '@text', default_value: nil
       non_blank_text_node :para, 'para', default_value: nil
+
+      def full_text
+        texts = [text, para].compact
+        return if texts.empty?
+        texts.join("\n")
+      end
     end
 
     class IndividualName
@@ -255,6 +262,14 @@ module Eml
 
       def coverage_end
         coverage && (temporal = coverage.temporal_coverage) && temporal.range_end
+      end
+
+      def abstract_text
+        abstract && abstract.full_text
+      end
+
+      def rights_text
+        intellectual_rights && intellectual_rights.full_text
       end
     end
 

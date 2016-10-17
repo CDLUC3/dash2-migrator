@@ -38,8 +38,8 @@ module Eml
         expect(eml_xml).not_to be_nil, "File.binread('#{f}') returned nil"
         expect(eml_xml.strip).not_to eq(''), "File.binread('#{f}') returned blank"
 
-        dataset = Eml.parse_filtered(eml_xml)
-        output_xml = dataset.write_xml
+        eml = Eml.parse_filtered(eml_xml)
+        output_xml = eml.write_xml
 
         filtered_xml = Mapping.filter(eml_xml)
         filtered_output_xml = Mapping.filter(output_xml)
@@ -54,8 +54,8 @@ module Eml
             expect(eml_xml).not_to be_nil, "File.binread('#{f}') returned nil"
             expect(eml_xml.strip).not_to eq(''), "File.binread('#{f}') returned blank"
 
-            dataset = Eml.parse_filtered(eml_xml)
-            output_xml = dataset.write_xml
+            eml = Eml.parse_filtered(eml_xml)
+            output_xml = eml.write_xml
 
             filtered_xml = Mapping.filter(eml_xml)
             filtered_output_xml = Mapping.filter(output_xml)
@@ -63,6 +63,17 @@ module Eml
           end
         end
       end
+
+      describe '#rights_text' do
+        it 'extracts the text' do
+          f = 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q13j39xf-mrt-eml.xml'
+          eml_xml = File.binread(f)
+          eml = Eml.parse_filtered(eml_xml)
+          dataset = eml.dataset
+          expect(dataset.rights_text).to eq('Creative Commons Zero License')
+        end
+      end
+
     end
   end
 end
