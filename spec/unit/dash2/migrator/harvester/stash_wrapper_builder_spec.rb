@@ -26,10 +26,20 @@ module Dash2
               Stash::Wrapper::StashFile.new(pathname: "file#{i}", size_bytes: i, mime_type: 'text/plain')
             end
             builder.instance_variable_set(:@all_stash_files, too_many_files)
-            # builder.instance_variable_set(:@stash_files, nil)
             wrapper = builder.build
             expect(wrapper.stash_files).to eq(too_many_files.take(StashWrapperBuilder::MAX_FILES))
           end
+
+          it 'doesn\'t limit the number of files in production' do
+            allow(Migrator).to receive(:production?).and_return(true)
+            too_many_files = Array.new(StashWrapperBuilder::MAX_FILES * 2) do |i|
+              Stash::Wrapper::StashFile.new(pathname: "file#{i}", size_bytes: i, mime_type: 'text/plain')
+            end
+            builder.instance_variable_set(:@all_stash_files, too_many_files)
+            wrapper = builder.build
+            expect(wrapper.stash_files).to eq(too_many_files)
+          end
+
         end
 
       end
