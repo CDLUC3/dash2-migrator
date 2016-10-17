@@ -6,6 +6,8 @@ module Dash2
   module Migrator
     module Harvester
       class StashWrapperBuilder
+        include Stash::Wrapper
+
         MAX_FILES = 20
 
         attr_reader :entry
@@ -21,12 +23,12 @@ module Dash2
         end
 
         def build
-          Stash::Wrapper::StashWrapper.new(
+          StashWrapper.new(
             identifier: sw_ident,
-            version: Stash::Wrapper::Version.new(number: 1, date: date),
-            embargo: Stash::Wrapper::Embargo.new(type: Stash::Wrapper::EmbargoType::NONE, period: Stash::Wrapper::EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
+            version: Version.new(number: 1, date: date),
+            embargo: Embargo.new(type: EmbargoType::NONE, period: EmbargoType::NONE.value, start_date: date_published, end_date: date_published),
             license: stash_license,
-            inventory: Stash::Wrapper::Inventory.new(files: stash_files),
+            inventory: Inventory.new(files: stash_files),
             descriptive_elements: [datacite_xml]
           )
         end
@@ -34,9 +36,9 @@ module Dash2
         def sw_ident
           @sw_ident ||= begin
             dcs_ident = datacite_resource.identifier
-            sw_ident_type = Stash::Wrapper::IdentifierType.find_by_value_str(dcs_ident.identifier_type)
+            sw_ident_type = IdentifierType.find_by_value_str(dcs_ident.identifier_type)
             sw_ident_value = dcs_ident.value
-            Stash::Wrapper::Identifier.new(type: sw_ident_type, value: sw_ident_value)
+            Identifier.new(type: sw_ident_type, value: sw_ident_value)
           end
         end
 
@@ -57,9 +59,9 @@ module Dash2
         end
 
         def stash_license
-          return Stash::Wrapper::License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
-          return Stash::Wrapper::License::CC_BY if rights_url.include?('licenses/by')
-          Stash::Wrapper::License.new(name: rights.value, uri: rights.uri)
+          return License::CC_ZERO if rights_url.include?('cc0') || rights_url.include?('publicdomain')
+          return License::CC_BY if rights_url.include?('licenses/by')
+          License.new(name: rights.value, uri: rights.uri)
         end
 
         def stash_files
@@ -94,7 +96,7 @@ module Dash2
           @all_stash_files ||= begin
             file_links = entry.links.select { |l| data_file?(l) }
             file_links.map do |link|
-              Stash::Wrapper::StashFile.new(
+              StashFile.new(
                 pathname: link.title.match(%r{(?<=/)(.*)})[0],
                 size_bytes: link.length.to_i,
                 mime_type: link.type
