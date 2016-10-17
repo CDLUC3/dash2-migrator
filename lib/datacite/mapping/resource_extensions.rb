@@ -65,7 +65,7 @@ module Datacite
         elsif (doi_match_data = DOI_PATTERN.match(identifier_value))
           self.identifier = Datacite::Mapping::Identifier.new(value: doi_match_data[0])
         else
-          warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK")
+          warn("Identifier value #{"'#{identifier_value}'" || 'nil'} does not appear to be a DOI or ARK; ignoring")
         end
       end
 

@@ -42,6 +42,12 @@ module Datacite
           expect(identifier.value).to eq(injected_value)
         end
 
+        it 'ignores goofy IDs' do
+          datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
+          resource = Datacite::Mapping::Resource.parse_mrt_datacite(datacite_xml, 'elvis://presley')
+          expect(resource.identifier).to be_nil
+        end
+
         it 'injects OC locations' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml)
