@@ -16,7 +16,7 @@ end
 module Dash2
   module Migrator
     module Harvester
-      class EmlDataciteMapper
+      class EmlDataciteMapper # rubocop:disable Metrics/ClassLength
         include Datacite::Mapping
 
         attr_reader :dataset
@@ -27,7 +27,7 @@ module Dash2
           @ident_value = ident_value
         end
 
-        def to_datacite
+        def to_datacite # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           @datacite_resource ||= Resource.new(
             identifier: identifier,
             creators: [creator],
@@ -48,11 +48,6 @@ module Dash2
           # we ignore any dataset ID attributes since they're either junk (fake DOIs)
           # or redundant (same ARK we already have), and 98% don't have them anyway
           Resource.to_identifier(ident_value)
-        end
-
-        def non_blank(s)
-          return unless s
-          (stripped = s.strip) == '' ? nil : stripped
         end
 
         def creator
@@ -93,17 +88,18 @@ module Dash2
               return org_name
             end
           end
+          fallback_publisher
+        end
 
+        def fallback_publisher
           # special cases
-          return 'IFCA' if /ifca\.unican\.es/.match(creator_email)
-          return 'Cornell University' if /cornell\.edu/.match(creator_email)
+          return 'IFCA' if creator_email =~ /ifca\.unican\.es/
+          return 'Cornell University' if creator_email =~ /cornell\.edu/
           return 'Universidad Popular Autónoma del Estado de Puebla' if 'victorcuevasv@gmail.com' == creator_email
           return 'University of Tennessee, Knoxville' if %w(
             wbirch@utk.edu
             benbirch7@gmail.com
           ).include?(creator_email)
-
-          # default
           'DataONE'
         end
 
@@ -116,20 +112,21 @@ module Dash2
         end
 
         def dates
-          dates = [
-            Date.new(type: DateType::AVAILABLE, value: pub_date)
-          ]
+          @dates ||= begin
+            dates = [Date.new(type: DateType::AVAILABLE, value: pub_date)]
+            add_coverage(dates)
+            dates
+          end
+        end
 
+        def add_coverage(dates)
           range_start = dataset.coverage_start
           range_end = dataset.coverage_end
+          return unless range_start || range_end
 
-          if range_start || range_end
-            iso_range = range_start ? "#{range_start.xmlschema}/" : ''
-            iso_range << range_end.xmlschema if range_end
-            dates << Date.new(type: DateType::COLLECTED, value: iso_range)
-          end
-
-          dates
+          iso_range = range_start ? "#{range_start.xmlschema}/" : ''
+          iso_range << range_end.xmlschema if range_end
+          dates << Date.new(type: DateType::COLLECTED, value: iso_range)
         end
 
         def descriptions
@@ -164,15 +161,19 @@ module Dash2
           @location ||= begin
             loc = GeoLocation.new(place: geo_coverage.geographic_description)
             if (coords = geo_coverage.bounding_coordinates)
-              loc.box = GeoLocationBox.new(
-                south_latitude: coords.south_bounding_coordinate.to_f,
-                west_longitude: coords.west_bounding_coordinate.to_f,
-                north_latitude: coords.north_bounding_coordinate.to_f,
-                east_longitude: coords.east_bounding_coordinate.to_f
-              )
+              loc.box = to_box(coords)
             end
             loc
           end
+        end
+
+        def to_box(coords)
+          GeoLocationBox.new(
+            south_latitude: coords.south_bounding_coordinate.to_f,
+            west_longitude: coords.west_bounding_coordinate.to_f,
+            north_latitude: coords.north_bounding_coordinate.to_f,
+            east_longitude: coords.east_bounding_coordinate.to_f
+          )
         end
 
         def fundref
