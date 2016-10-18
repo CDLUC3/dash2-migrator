@@ -52,11 +52,12 @@ module Dash2
           end
         end
 
-        it 'creates a resource' do
+        it 'creates a writable resource' do
           aggregate_failures 'all files' do
             id_to_dataset.keys.each do |id_value|
               resource = id_to_resource[id_value]
               expect(resource).to be_a(Datacite::Mapping::Resource), "Expected resource for #{id_value}, got #{resource || 'nil'}"
+              expect(resource.save_to_xml).to be_a(REXML::Element)
             end
           end
         end
