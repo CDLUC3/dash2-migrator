@@ -28,7 +28,7 @@ module Dash2
         end
 
         def to_datacite
-          Resource.new(
+          @datacite_resource ||= Resource.new(
             identifier: identifier,
             creators: [creator],
             titles: titles,
@@ -37,7 +37,9 @@ module Dash2
             dates: dates,
             descriptions: descriptions,
             subjects: dataset.keyword_set.map { |kw| Subject.new(value: kw) },
-            rights_list: [rights]
+            rights_list: [rights],
+            alternate_identifiers: url_alt_ident ? [url_alt_ident] : [],
+            geo_locations: location ? [location] : []
           )
         end
 
@@ -130,9 +132,11 @@ module Dash2
         end
 
         def descriptions
-          descriptions = []
-          descriptions << Description.new(type: DescriptionType::ABSTRACT, value: abstract) if abstract
-          descriptions
+          @descriptions ||= begin
+            descriptions = []
+            descriptions << Description.new(type: DescriptionType::ABSTRACT, value: abstract) if abstract
+            descriptions
+          end
         end
 
         def abstract
@@ -140,9 +144,34 @@ module Dash2
         end
 
         def rights
-          rights_text = dataset.rights_text
-          return Rights::CC_BY_3 if 'creative commons license' == rights_text
-          Rights::CC_ZERO
+          @rights ||= begin
+            rights_text = dataset.rights_text
+            return Rights::CC_BY_3 if 'creative commons license' == rights_text
+            Rights::CC_ZERO
+          end
+        end
+
+        def url_alt_ident
+          return unless @url_alt_ident || ((dist = dataset.distribution) && (online = dist.online) && (url = online.url))
+          @url_alt_ident ||= begin
+            AlternateIdentifier.new(type: 'URL', value: url)
+          end
+        end
+
+        def location
+          return unless @location || (geo_coverage = dataset.geo_coverage)
+          @location ||= begin
+            loc = GeoLocation.new(place: geo_coverage.geographic_description)
+            if (coords = geo_coverage.bounding_coordinates)
+              loc.box = GeoLocationBox.new(
+                south_latitude: coords.south_bounding_coordinate.to_f,
+                west_longitude: coords.west_bounding_coordinate.to_f,
+                north_latitude: coords.north_bounding_coordinate.to_f,
+                east_longitude: coords.east_bounding_coordinate.to_f
+              )
+            end
+            loc
+          end
         end
       end
     end

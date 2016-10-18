@@ -264,6 +264,10 @@ module Eml
         coverage && (temporal = coverage.temporal_coverage) && temporal.range_end
       end
 
+      def geo_coverage
+        coverage && coverage.geographic_coverage
+      end
+
       def abstract_text
         abstract && abstract.full_text
       end
