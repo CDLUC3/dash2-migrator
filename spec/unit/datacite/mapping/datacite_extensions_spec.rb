@@ -60,7 +60,7 @@ module Datacite
         end
 
         it 'injects Providence Creek locations' do
-          datacite_xml = File.read('/Users/dmoles/Work/dash2-migrator/spec/data/datacite/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
+          datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/ucm-ark+=b6071=z7wc73-mrt-datacite.xml')
           resource = Resource.parse_mrt_datacite(datacite_xml)
           locs = resource.geo_locations
           expect(locs.size).to eq(1)
