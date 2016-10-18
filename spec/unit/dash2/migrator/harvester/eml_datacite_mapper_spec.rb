@@ -182,6 +182,26 @@ module Dash2
             end
           end
         end
+
+        it 'creates funding references' do
+          aggregate_failures 'all files' do
+            id_to_dataset.each do |id_value, dataset|
+              next unless (funding = dataset.funding)
+
+              resource = id_to_resource[id_value]
+              fundrefs = resource.funding_references
+
+              expect(fundrefs).not_to be_nil
+              next unless fundrefs
+
+              expect(fundrefs.size).to eq(1)
+              next unless fundrefs.size == 1
+
+              fundref = fundrefs[0]
+              expect(fundref.name).to eq(funding)
+            end
+          end
+        end
       end
     end
   end

@@ -39,7 +39,8 @@ module Dash2
             subjects: dataset.keyword_set.map { |kw| Subject.new(value: kw) },
             rights_list: [rights],
             alternate_identifiers: url_alt_ident ? [url_alt_ident] : [],
-            geo_locations: location ? [location] : []
+            geo_locations: location ? [location] : [],
+            funding_references: fundref ? [fundref] : []
           )
         end
 
@@ -171,6 +172,13 @@ module Dash2
               )
             end
             loc
+          end
+        end
+
+        def fundref
+          return unless @funding || (funding = dataset.funding)
+          @fundref ||= begin
+            FundingReference.new(name: funding)
           end
         end
       end

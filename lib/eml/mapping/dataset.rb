@@ -275,6 +275,10 @@ module Eml
       def rights_text
         intellectual_rights && intellectual_rights.full_text
       end
+
+      def funding
+        project && (funding = project.funding) && funding.full_text
+      end
     end
 
     class Metadata
