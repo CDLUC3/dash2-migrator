@@ -57,6 +57,7 @@ module Datacite
       end
 
       def self.parse_special(mrt_datacite_xml)
+        raise "Expected Datacite XML string, but was #{mrt_datacite_xml || 'nil'}" unless mrt_datacite_xml && mrt_datacite_xml.respond_to?(:force_encoding)
         datacite_xml = mrt_datacite_xml.force_encoding('utf-8')
         SPECIAL_CASES.each { |regex, replacement| datacite_xml.gsub!(regex, replacement) }
         parse_xml(datacite_xml)

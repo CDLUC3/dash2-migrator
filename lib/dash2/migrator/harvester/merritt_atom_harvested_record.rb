@@ -31,7 +31,7 @@ module Dash2
           @wrapper ||= begin
             builder = StashWrapperBuilder.new(
               entry: entry,
-              datacite_resource: datacite_resource
+              datacite_resource: build_datacite_resource
             )
             builder.build
           end
@@ -73,14 +73,25 @@ module Dash2
           @mrt_datacite_xml ||= content_for('producer/mrt-datacite.xml')
         end
 
-        def datacite_resource
-          @datacite_resource ||= begin
-            identifier_value = doi ? doi : ark
-            resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, identifier_value)
-            date_available = resource.dates.find { |d| d.type == Datacite::Mapping::DateType::AVAILABLE }
-            resource.dates << Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published) unless date_available
-            resource
-          end
+        def identifier_value
+          @identifier_value ||= doi ? doi : ark
+        end
+
+        def build_datacite_resource
+          return parse_mrt_datacite if mrt_datacite_xml
+          return parse_mrt_eml if mrt_eml
+          raise "No Datacite or EML XML found in entry #{identifier_value}"
+        end
+
+        def parse_mrt_eml
+          EmlDataciteMapper.to_datacite(mrt_eml, identifier_value)
+        end
+
+        def parse_mrt_datacite
+          resource = Datacite::Mapping::Resource.parse_mrt_datacite(mrt_datacite_xml, identifier_value)
+          date_available = resource.dates.find { |d| d.type == Datacite::Mapping::DateType::AVAILABLE }
+          resource.dates << Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: date_published) unless date_available
+          resource
         end
 
         def mrt_mom

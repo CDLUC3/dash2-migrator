@@ -27,6 +27,12 @@ module Dash2
           @ident_value = ident_value
         end
 
+        def self.to_datacite(eml_xml, id_value)
+          dataset = Eml::Mapping::Eml.parse_filtered(eml_xml).dataset
+          mapper = EmlDataciteMapper.new(dataset: dataset, ident_value: id_value)
+          mapper.to_datacite
+        end
+
         def to_datacite # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           @datacite_resource ||= Resource.new(
             identifier: identifier,

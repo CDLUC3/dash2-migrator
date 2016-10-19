@@ -8,11 +8,12 @@ module Dash2
         attr_reader :config
         attr_reader :record
         attr_reader :mrt_mom_uri
+        attr_reader :mrt_mom_txt
         attr_reader :feed_uri
         attr_reader :entry
 
         def wrapper
-          @wrapper ||= record.as_wrapper
+          record.as_wrapper
         end
 
         before(:all) do
@@ -25,7 +26,8 @@ module Dash2
           @config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
 
           @mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
-          stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/mrt-mom.txt'))
+          @mrt_mom_txt = File.read('spec/data/harvester/mrt-mom.txt')
+          stub_request(:get, mrt_mom_uri).to_return(body: mrt_mom_txt)
 
           @feed_uri = config.feed_uri
           entry_xml = File.read('spec/data/harvester/entry-r36p4t.xml')
@@ -66,6 +68,15 @@ module Dash2
             stub_request(:get, datacite_uri).to_return(status: 404)
             expect { record.as_wrapper }.to raise_error(RestClient::NotFound)
           end
+
+          it "fails if there's neither datacite nor EML" do
+            allow(record).to receive(:mrt_eml).and_return(nil)
+            allow(record).to receive(:mrt_datacite_xml).and_return(nil)
+            allow(record).to receive(:mrt_mom).and_return(mrt_mom_txt)
+            expect { record.as_wrapper }.to raise_error { |e|
+              expect(e.message).to include(record.identifier_value)
+            }
+          end
         end
 
         describe 'DOI handling' do
@@ -90,33 +101,6 @@ module Dash2
             sw_ident = wrapper.identifier
             expect(sw_ident.value).to eq(dcs_ident.value)
           end
-        end
-
-        describe 'EML handling' do
-          attr_reader :mrt_eml_uri
-          attr_reader :eml_path
-          attr_reader :eml_xml
-
-          before(:each) do
-            @eml_path = 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q1bk1994-mrt-eml.xml'
-            @eml_xml = File.read(eml_path).freeze
-
-            entry_xml = File.read('spec/data/harvester/eml/entry-q1f769jn.xml')
-            @entry = RSS::Parser.parse(entry_xml, false).items[0]
-            @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
-
-            @mrt_eml_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark:%2F90135%2Fq1f769jn/2/producer%2Fmrt-eml.xml"
-            stub_request(:get, mrt_eml_uri).to_return(body: eml_xml)
-          end
-
-          it 'returns the EML XML' do
-            expect(record.mrt_eml).to eq(eml_xml)
-          end
-        end
-
-        describe '#datacite_resource' do
-          it 'parses mrt-datacite.xml'
-          it 'converts mrt-eml.xml'
         end
 
         describe '#stash_wrapper' do
@@ -264,7 +248,7 @@ module Dash2
               datacite_xml = File.read('spec/data/harvester/mrt-datacite.xml')
               @dcs_resource = Datacite::Mapping::Resource.parse_mrt_datacite(datacite_xml, '10.15146/R3RG6G')
               dcs_resource.dates << Datacite::Mapping::Date.new(type: Datacite::Mapping::DateType::AVAILABLE, value: Date.today)
-              allow(record).to receive(:datacite_resource).and_return(@dcs_resource)
+              allow(record).to receive(:build_datacite_resource).and_return(@dcs_resource)
               record.instance_variable_set(:@wrapper, nil)
             end
 
@@ -297,7 +281,46 @@ module Dash2
               expect(license.uri).to eq(custom_uri)
             end
           end
+        end
 
+        describe 'EML handling' do
+          attr_reader :mrt_eml_uri
+          attr_reader :eml_path
+          attr_reader :eml_xml
+          attr_reader :id_value
+
+          before(:each) do
+            @eml_path = 'spec/data/eml/dash1-eml-xml/dataone-ark+=90135=q1bk1994-mrt-eml.xml'
+            @eml_xml = File.read(eml_path)
+
+            entry_xml = File.read('spec/data/harvester/eml/entry-q1f769jn.xml')
+            @entry = RSS::Parser.parse(entry_xml, false).items[0]
+            @record = MerrittAtomHarvestedRecord.new('example', feed_uri, entry)
+
+            @mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark:%2F90135%2Fq1f769jn/2/system%2Fmrt-mom.txt"
+            stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/eml/mrt-mom.txt'))
+
+            @id_value = 'ark:/90135/q1f769jn'
+
+            @mrt_eml_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark:%2F90135%2Fq1f769jn/2/producer%2Fmrt-eml.xml"
+            stub_request(:get, mrt_eml_uri).to_return(body: eml_xml)
+          end
+
+          it 'returns the EML XML' do
+            expect(record.mrt_eml).to eq(eml_xml)
+          end
+
+          it 'creates a wrapper' do
+            expect(wrapper).to be_a(Stash::Wrapper::StashWrapper)
+          end
+
+          it 'converts EML to datacite' do
+            resource = wrapper.datacite_resource
+            expect(resource).to be_a(Datacite::Mapping::Resource)
+
+            mapped_resource = EmlDataciteMapper.to_datacite(eml_xml, id_value)
+            expect(resource.save_to_xml).to be_xml(mapped_resource.save_to_xml)
+          end
         end
       end
 
