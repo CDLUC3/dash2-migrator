@@ -13,12 +13,12 @@ module Stash
 
       def stash_descriptive
         return [] unless datacite_resource
-        [ datacite_resource.save_to_xml ]
+        [datacite_resource.save_to_xml]
       end
 
       def stash_descriptive=(value)
         raise ArgumentError, "Not an array: #{value}" unless value.nil? || (value.respond_to?(:empty?) && value.respond_to?(:[]))
-        @datacite_resource == nil unless value && !value.empty?
+        @datacite_resource.nil? unless value && !value.empty?
         @datacite_resource = Datacite::Mapping::Resource.parse_xml(value[0])
       end
 

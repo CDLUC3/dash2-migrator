@@ -12,7 +12,7 @@ module Stash
       when Nokogiri::XML::Document
         xml.root
       when String
-        to_nokogiri(Nokogiri::XML(xml))
+        to_nokogiri(Nokogiri::XML(xml, &:noblanks))
       when REXML::Element
         to_nokogiri(xml.to_s)
       else

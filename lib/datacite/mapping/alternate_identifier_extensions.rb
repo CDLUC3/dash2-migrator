@@ -7,7 +7,7 @@ module Datacite
 
       def value=(v)
         new_value = v && v.strip
-        fail ArgumentError, 'Alternate identifier must have a non-nil value' unless new_value
+        raise ArgumentError, 'Alternate identifier must have a non-nil value' unless new_value
         @value = new_value
       end
     end
