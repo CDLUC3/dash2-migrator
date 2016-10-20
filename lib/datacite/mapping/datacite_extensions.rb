@@ -1,4 +1,5 @@
 require 'datacite/mapping'
+require 'datacite/mapping/alternate_identifier_extensions'
 require 'datacite/mapping/description_extensions'
 require 'datacite/mapping/funding_reference_extensions'
 require 'datacite/mapping/identifier_extensions'

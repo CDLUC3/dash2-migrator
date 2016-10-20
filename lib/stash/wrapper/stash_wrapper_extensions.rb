@@ -4,13 +4,22 @@ require 'datacite/mapping'
 module Stash
   module Wrapper
     class StashWrapper
-      def datacite_resource
-        @datacite_resource ||= Datacite::Mapping::Resource.parse_xml(stash_descriptive[0])
-      end
+      attr_reader :datacite_resource
 
       def datacite_resource=(resource)
-        stash_descriptive[0] = resource.save_to_xml
-        @datacite_resource = nil
+        raise ArgumentError, "Not a resource: #{resource}" unless resource.nil? || resource.is_a?(Datacite::Mapping::Resource) # || resource.to_s =~ /InstanceDouble\(#{Datacite::Mapping::Resource}\)/
+        @datacite_resource = resource
+      end
+
+      def stash_descriptive
+        return [] unless datacite_resource
+        [ datacite_resource.save_to_xml ]
+      end
+
+      def stash_descriptive=(value)
+        raise ArgumentError, "Not an array: #{value}" unless value.nil? || (value.respond_to?(:empty?) && value.respond_to?(:[]))
+        @datacite_resource == nil unless value && !value.empty?
+        @datacite_resource = Datacite::Mapping::Resource.parse_xml(value[0])
       end
 
       def stash_files
