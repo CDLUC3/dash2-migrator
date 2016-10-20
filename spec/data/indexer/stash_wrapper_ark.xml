@@ -1,0 +1,74 @@
+<st:stash_wrapper xsi:schemaLocation='http://dash.cdlib.org/stash_wrapper/ http://dash.cdlib.org/stash_wrapper/stash_wrapper.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:st='http://dash.cdlib.org/stash_wrapper/'>
+  <st:identifier type='ARK'>ark:/90135/q1f769jn</st:identifier>
+  <st:stash_administrative>
+    <st:version>
+      <st:version_number>1</st:version_number>
+      <st:date>2014-06-24Z</st:date>
+    </st:version>
+    <st:license>
+      <st:name>CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</st:name>
+      <st:uri>https://creativecommons.org/publicdomain/zero/1.0/</st:uri>
+    </st:license>
+    <st:embargo>
+      <st:type>none</st:type>
+      <st:period>none</st:period>
+      <st:start>2014-01-22Z</st:start>
+      <st:end>2014-01-22Z</st:end>
+    </st:embargo>
+    <st:inventory num_files='2'>
+      <st:file>
+        <st:pathname>File-metadata.csv</st:pathname>
+        <st:size unit='B'>9833</st:size>
+        <st:mime_type>text/csv</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>Federal_Libraries.csv</st:pathname>
+        <st:size unit='B'>11897</st:size>
+        <st:mime_type>text/csv</st:mime_type>
+      </st:file>
+    </st:inventory>
+  </st:stash_administrative>
+  <st:stash_descriptive>
+    <resource xsi:schemaLocation='http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://datacite.org/schema/kernel-4'>
+      <identifier identifierType='ARK'>ark:/90135/q1f769jn</identifier>
+      <creators>
+        <creator>
+          <creatorName>Aguilar, Fernando</creatorName>
+          <givenName>Fernando</givenName>
+          <familyName>Aguilar</familyName>
+          <nameIdentifier nameIdentifierScheme='email'>mailto:aguilarf@ifca.unican.es</nameIdentifier>
+          <affiliation>IFCA</affiliation>
+        </creator>
+      </creators>
+      <titles>
+        <title>Press, Temperature and Humidity October 2013</title>
+      </titles>
+      <publisher>IFCA</publisher>
+      <publicationYear>2014</publicationYear>
+      <subjects>
+        <subject>Press Temperature Humidity Cuerda del Pozo reservoir</subject>
+      </subjects>
+      <dates>
+        <date dateType='Available'>2014-01-22</date>
+        <date dateType='Collected'>2013-10-01T00:00:00-07:00/2013-10-31T00:00:00-07:00</date>
+      </dates>
+      <rightsList>
+        <rights rightsURI='https://creativecommons.org/publicdomain/zero/1.0/'>CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</rights>
+      </rightsList>
+      <descriptions>
+        <description descriptionType='Abstract'>PTU Cuerda del Pozo. October 2013</description>
+      </descriptions>
+      <geoLocations>
+        <geoLocation>
+          <geoLocationBox>
+            <westBoundLongitude>-2.81</westBoundLongitude>
+            <eastBoundLongitude>-2.7</eastBoundLongitude>
+            <southBoundLatitude>41.82</southBoundLatitude>
+            <northBoundLatitude>41.9</northBoundLatitude>
+          </geoLocationBox>
+          <geoLocationPlace>Cuerda del Pozo, Soria, Spain</geoLocationPlace>
+        </geoLocation>
+      </geoLocations>
+    </resource>
+  </st:stash_descriptive>
+</st:stash_wrapper>

@@ -320,6 +320,8 @@ module Dash2
 
             mapped_resource = EmlDataciteMapper.to_datacite(eml_xml, id_value)
             expect(resource.save_to_xml).to be_xml(mapped_resource.save_to_xml)
+
+            puts wrapper.write_xml
           end
         end
       end

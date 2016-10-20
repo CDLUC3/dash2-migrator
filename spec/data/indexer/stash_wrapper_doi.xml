@@ -1,0 +1,147 @@
+<st:stash_wrapper xsi:schemaLocation='http://dash.cdlib.org/stash_wrapper/ http://dash.cdlib.org/stash_wrapper/stash_wrapper.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:st='http://dash.cdlib.org/stash_wrapper/'>
+  <st:identifier type='DOI'>10.15146/R3RG6G</st:identifier>
+  <st:stash_administrative>
+    <st:version>
+      <st:version_number>1</st:version_number>
+      <st:date>2015-08-17Z</st:date>
+    </st:version>
+    <st:license>
+      <st:name>CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</st:name>
+      <st:uri>https://creativecommons.org/publicdomain/zero/1.0/</st:uri>
+    </st:license>
+    <st:embargo>
+      <st:type>none</st:type>
+      <st:period>none</st:period>
+      <st:start>2016-10-20Z</st:start>
+      <st:end>2016-10-20Z</st:end>
+    </st:embargo>
+    <st:inventory num_files='13'>
+      <st:file>
+        <st:pathname>survey_Q11-23_sensors_platforms.R</st:pathname>
+        <st:size unit='B'>26414</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q25-32_data_metadata_management.R</st:pathname>
+        <st:size unit='B'>9794</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q10_research_sites.R</st:pathname>
+        <st:size unit='B'>1180</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>clean_survey_data_no_ids.csv</st:pathname>
+        <st:size unit='B'>320890</st:size>
+        <st:mime_type>text/csv</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q3-9_respondent_info.R</st:pathname>
+        <st:size unit='B'>13784</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>Laney_IRBProposal.docx</st:pathname>
+        <st:size unit='B'>1097848</st:size>
+        <st:mime_type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_data_prep.R</st:pathname>
+        <st:size unit='B'>4359</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>research_coords.csv</st:pathname>
+        <st:size unit='B'>5827</st:size>
+        <st:mime_type>text/csv</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>Laney_300394_Exempt_Determination_Letter.pdf</st:pathname>
+        <st:size unit='B'>42686</st:size>
+        <st:mime_type>application/pdf</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q33-37_networking.R</st:pathname>
+        <st:size unit='B'>22658</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>SensorSurvey_Printout.pdf</st:pathname>
+        <st:size unit='B'>1728537</st:size>
+        <st:mime_type>application/pdf</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q24_limitsToExpansion.R</st:pathname>
+        <st:size unit='B'>11012</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+      <st:file>
+        <st:pathname>survey_Q38-42_publications.R</st:pathname>
+        <st:size unit='B'>1690</st:size>
+        <st:mime_type>text/plain</st:mime_type>
+      </st:file>
+    </st:inventory>
+  </st:stash_administrative>
+  <st:stash_descriptive>
+    <resource xsi:schemaLocation='http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://datacite.org/schema/kernel-4'>
+      <identifier identifierType='DOI'>10.15146/R3RG6G</identifier>
+      <creators>
+        <creator>
+          <creatorName>Chen, Hao</creatorName>
+        </creator>
+      </creators>
+      <titles>
+        <title>A Zebrafish Model for Studies on Esophageal Epithelial Biology</title>
+      </titles>
+      <publisher>DataONE</publisher>
+      <publicationYear>2016</publicationYear>
+      <subjects>
+        <subject>Zebrafish</subject>
+      </subjects>
+      <contributors>
+        <contributor contributorType='DataManager'>
+          <contributorName>Wilson, James</contributorName>
+        </contributor>
+      </contributors>
+      <dates>
+        <date dateType='Available'>2016-10-20</date>
+      </dates>
+      <resourceType resourceTypeGeneral='Dataset'>Dataset</resourceType>
+      <relatedIdentifiers>
+        <relatedIdentifier relationType='IsCitedBy' relatedIdentifierType='DOI'>10.1371/journal.pone.0143878</relatedIdentifier>
+        <relatedIdentifier relationType='IsDocumentedBy' relatedIdentifierType='URL'>http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0143878</relatedIdentifier>
+      </relatedIdentifiers>
+      <sizes>
+        <size>3824823</size>
+      </sizes>
+      <rightsList>
+        <rights rightsURI='https://creativecommons.org/publicdomain/zero/1.0/'>CC0 1.0 Universal (CC0 1.0) Public Domain Dedication</rights>
+      </rightsList>
+      <descriptions>
+        <description descriptionType='Abstract'>
+          Mammalian esophagus exhibits a remarkable change in epithelial
+          structure during the transition from embryo to adult. However, the
+          molecular mechanisms of esophageal epithelial development are not well
+          understood. Zebrafish (Danio rerio), a common model organism for
+          vertebrate development and gene function, has not previously been
+          characterized as a model system for esophageal epithelial development.
+          In this study, we characterized a piece of non-keratinized stratified
+          squamous epithelium similar to human esophageal epithelium in the
+          upper digestive tract of developing zebrafish. Under the microscope,
+          this piece was detectable at 5dpf and became stratified at 7dpf.
+          Expression of esophageal epithelial marker genes (Krt5, P63, Sox2 and
+          Pax9) was detected by immunohistochemistry and in situ hybridization.
+          Knockdown of P63, a gene known to be critical for esophageal
+          epithelium, disrupted the development of this epithelium. With this
+          model system, we found that Pax9 knockdown resulted in loss or
+          disorganization of the squamous epithelium, as well as down-regulation
+          of the differentiation markers Krt4 and Krt5. In summary, we
+          characterized a region of stratified squamous epithelium in the
+          zebrafish upper digestive tract which can be used for functional
+          studies of candidate genes involved in esophageal epithelial biology.
+        </description>
+      </descriptions>
+    </resource>
+  </st:stash_descriptive>
+</st:stash_wrapper>
