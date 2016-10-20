@@ -102,9 +102,11 @@ module Dash2
             ident
           end)
 
+          dcs4_xml = @dcs_resource.write_xml
+          dcs4_wrapper = wrapper_xml.sub(%r{<resource.*</resource>}m, dcs4_xml)
           @expected_metadata = {
-            'mrt-datacite.xml' => @dcs_resource.write_xml,
-            'stash-wrapper.xml' => wrapper_xml,
+            'mrt-datacite.xml' => dcs4_xml,
+            'stash-wrapper.xml' => dcs4_wrapper,
             'mrt-oaidc.xml' => File.read('spec/data/generated-oaidc.xml'),
             'mrt-dataone-manifest.txt' => File.read('spec/data/generated-dataone-manifest.txt')
           }
@@ -122,8 +124,8 @@ module Dash2
           expect(zipfile.size).to eq(expected_metadata.size)
           expected_metadata.each do |path, content|
             if path.end_with?('xml')
-              actual = zip_entry(path).gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
-              expected = content.gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
+              actual = zip_entry(path) # .gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
+              expected = content # .gsub(/xml:lang=["']en["']/, '').gsub(/\s+/, ' ')
               expect(actual).to be_xml(expected)
             else
               actual = zip_entry(path).strip
