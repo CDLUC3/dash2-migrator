@@ -58,30 +58,23 @@ module Dash2
           )
         end
 
-        def repo_landing_page(ark)
-          "http://repo.example.org/landing/#{ERB::Util.url_encode(ark)}"
-        end
-
-        def repo_download_page(ark)
-          "http://repo.example.org/download/#{ERB::Util.url_encode(ark)}"
-        end
+        # def repo_landing_page(ark)
+        #   "http://repo.example.org/landing/#{ERB::Util.url_encode(ark)}"
+        # end
+        #
+        # def repo_download_page(ark)
+        #   "http://repo.example.org/download/#{ERB::Util.url_encode(ark)}"
+        # end
 
         describe 'ARK-only wrapper' do
           attr_reader :ezid_resource
           
           before(:each) do
             @repo_ark = 'ark:/90135/q1f769jn'
-            merritt_landing_uri = repo_landing_page(repo_ark)
-            expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
-              expect(ident).to eq(minted_doi)
-              expect(target).to eq(merritt_landing_uri)
-              @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
-            end
 
             @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_ark_xml)
 
             importer.import(
-              merritt_landing_uri: merritt_landing_uri,
               stash_wrapper: stash_wrapper,
               user_uid: user_uid
             )
@@ -91,26 +84,9 @@ module Dash2
             expect(StashEngine::Resource.exists?).to be_falsey
           end
 
-          it 'adds a "same as" rel. ident to the datacite XML' do
-            rel_idents = ezid_resource.related_identifiers
-            expect(rel_idents.size).to eq(1)
-            rel_ident = rel_idents[0]
-            expect(rel_ident.value).to eq(repo_ark)
-            expect(rel_ident.identifier_type).to eq(Datacite::Mapping::RelatedIdentifierType::ARK)
-            expect(rel_ident.relation_type).to eq(Datacite::Mapping::RelationType::IS_IDENTICAL_TO)
-          end
-
           it 'mints a new DOI' do
             expect(ezid_client).to have_received(:mint_id)
           end
-
-          it 'injects the new DOI into the datacite XML' do
-            ident = ezid_resource.identifier
-            expect(ident.identifier_type).to eq('DOI')
-            expect("doi:#{ident.value}").to eq(minted_doi)
-          end
-
-          it 'posts the updated Datacite metadata to Merritt'
         end
 
         # describe 'wrapper with DOI' do
