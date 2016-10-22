@@ -8,7 +8,6 @@ module Dash2
         attr_reader :user
         attr_reader :user_uid
 
-        attr_reader :repo_ark
         attr_reader :sw_ark_xml
         attr_reader :sw_doi_xml
         attr_reader :stash_wrapper
@@ -17,13 +16,18 @@ module Dash2
 
         attr_reader :ezid_client
         attr_reader :minted_doi
-        
+        attr_reader :ezid_resource
+
         attr_reader :sword_client
 
         attr_reader :importer
 
         def user_id
           user.id
+        end
+
+        def dash_landing_uri(doi)
+          tenant.landing_url("/stash/dataset/#{doi}")
         end
 
         before(:all) do
@@ -49,7 +53,7 @@ module Dash2
 
           @sword_client = instance_double(Stash::Sword::Client)
 
-          @tenant = instance_double(StashEngine::Tenant)
+          @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/example.yml')['test'])
 
           @importer = Importer.new(
             tenant: tenant,
@@ -67,17 +71,10 @@ module Dash2
         # end
 
         describe 'ARK-only wrapper' do
-          attr_reader :ezid_resource
-          
+
           before(:each) do
-            @repo_ark = 'ark:/90135/q1f769jn'
-
             @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_ark_xml)
-
-            importer.import(
-              stash_wrapper: stash_wrapper,
-              user_uid: user_uid
-            )
+            importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
           end
 
           it 'doesn\'t create a new resource' do
@@ -89,14 +86,72 @@ module Dash2
           end
         end
 
+        describe 'wrapper with DOI' do
+          attr_reader :wrapper_doi_value
+          attr_reader :new_resource
+
+          def new_resource_id
+            new_resource.id
+          end
+
+          before(:each) do
+            @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_doi_xml)
+            @wrapper_doi_value = '10.15146/R3RG6G'
+          end
+
+          describe 'initial test migration' do
+            before(:each) do
+              expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
+                expect(ident).to eq(minted_doi)
+                expect(target).to eq(dash_landing_uri(minted_doi))
+                @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
+              end
+
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+              expect(new_resource).to be_a(StashEngine::Resource)
+              expect(StashEngine::Resource.count).to eq(1)
+            end
+
+            it 'mints a new DOI' do
+              expect(ezid_client).to have_received(:mint_id)
+              ident_value = (ident = new_resource.identifier) && ident.identifier
+              expect(ident_value).not_to be_nil
+              expect("doi:#{ident_value}").to eq(minted_doi)
+            end
+
+            it 'adds a "migrated from" alternate identifier to the resource' do
+              alt_ident = StashDatacite::AlternateIdentifier.find(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
+              expect(alt_ident).not_to be_nil
+              expect(alt_ident.alternate_identifier).to eq("doi:#{wrapper_doi_value}")
+            end
+
+            describe 'EZID update' do
+              it 'injects the newly minted DOI into the Datacite XML' do
+                ident_value = (ident = ezid_resource.identifier) && ident.value
+                expect(ident_value).to eq(minted_doi)
+              end
+              it 'adds a "migrated from" alternate identifier to the Datacite XML' do
+                alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
+                expect(alt_ident).not_to be_nil
+                expect(alt_ident.value).to eq(minted_doi)
+              end
+            end
+          end
+
+          # describe 'initial production migration' do
+          #   before(:each) do
+          #     allow(Migrator).to receive(:production?).and_return(true)
+          #     importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+          #   end
+          #
+          #   it 'creates a new resource' do
+          #     expect(StashEngine::Resource.count).to eq(1)
+          #   end
+          # end
+
+        end
+
         # describe 'wrapper with DOI' do
-        #   attr_reader :wrapper_doi_value
-        #   attr_reader :existing_resource
-        #
-        #   before(:each) do
-        #     @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_doi_xml)
-        #     @wrapper_doi_value = '10.15146/R3RG6G'
-        #   end
         #   describe 'existing resource w/same DOI' do
         #
         #     before(:each) do
