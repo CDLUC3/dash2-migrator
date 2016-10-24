@@ -1,6 +1,6 @@
 require 'logger'
-
 require 'stash_engine'
+require 'dash2/migrator/importer/sword_packager'
 
 module StashEngine
   class Resource < ActiveRecord::Base
@@ -30,6 +30,7 @@ module Dash2
       class Importer
 
         MIGRATED_FROM = 'migrated from'.freeze
+        SWORD_PATTERN = %r{(https?)://([^/]+)/mrtsword/collection/([^/]+)}
 
         attr_reader :tenant
         attr_reader :ezid_client
@@ -54,6 +55,25 @@ module Dash2
 
         def log
           Stash::Harvester.log
+        end
+
+        def edit_uri_base
+          @edit_uri_base ||= begin
+            if (match_data = SWORD_PATTERN.match(sword_client.collection_uri))
+              protocol = match_data[1]
+              server = match_data[2]
+              collection = match_data[3]
+              "#{protocol}://#{server}/mrtsword/edit/#{collection}/"
+            end
+          end
+        end
+
+        def edit_uri_for(doi)
+          "#{edit_uri_base}#{ERB::Util.url_encode(doi)}"
+        end
+
+        def sword_packager
+          SwordPackager.new(sword_client: sword_client, create_placeholder_files: !Migrator.production?)
         end
 
         def mint_doi_for(stash_wrapper:)
@@ -94,7 +114,7 @@ module Dash2
           landing_url = tenant.landing_url("/stash/dataset/#{new_doi}")
           ezid_client.update_metadata(new_doi, dcs3_xml, landing_url)
 
-          se_resource.save
+          sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
           se_resource
         end
 

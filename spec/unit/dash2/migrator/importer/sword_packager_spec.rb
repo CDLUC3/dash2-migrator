@@ -16,7 +16,7 @@ module Dash2
 
           it 'accepts a Stash::Sword::Client' do
             client = Stash::Sword::Client.new(
-              collection_uri: 'http://uc3-mrtsword-dev.cdlib.org:39001/mrtsword/collection/demo_open_context',
+              collection_uri: 'http://sword-aws-dev.cdlib.org:39001/mrtsword/collection/demo_open_context',
               username: 'dataone_dash_submitter',
               password: 'w2NnJ8qj'
             )

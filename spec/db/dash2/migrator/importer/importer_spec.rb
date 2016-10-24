@@ -31,6 +31,15 @@ module Dash2
           tenant.landing_url("/stash/dataset/#{doi}")
         end
 
+        def merritt_download_uri(doi)
+          ark = doi.sub('doi:', 'ark:/').sub(%r{10\.[^/]+}, '99999').downcase
+          "http://merritt-dev.cdlib.org/d/#{ERB::Util.url_encode(ark)}"
+        end
+
+        def sword_update_uri(doi)
+          "http://sword-aws-dev.cdlib.org:39001/mrtsword/edit/dash_cdl/#{ERB::Util.url_encode(doi)}"
+        end
+
         def minted_doi_value
           minted_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
         end
@@ -49,6 +58,22 @@ module Dash2
           allow(@ezid_client).to receive(:mint_id) { @minted_doi = (time = Time.now) && "doi:10.5072/FK#{time.to_i}.#{time.nsec}" }
 
           @sword_client = instance_double(Stash::Sword::Client)
+          allow(sword_client).to receive(:collection_uri).and_return('http://sword-aws-dev.cdlib.org:39001/mrtsword/collection/dash_cdl')
+          allow(sword_client).to receive(:create) do |params|
+            doi = params[:doi]
+
+            edit_iri = Stash::Sword::Link.new
+            edit_iri.rel = 'edit'
+            edit_iri.href = sword_update_uri(doi)
+
+            em_iri = Stash::Sword::Link.new
+            em_iri.rel = 'edit-media'
+            em_iri.href = merritt_download_uri(doi)
+
+            receipt = Stash::Sword::DepositReceipt.new
+            receipt.links = [edit_iri, em_iri]
+            receipt
+          end
 
           @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/example.yml')['test'])
 
@@ -68,13 +93,13 @@ module Dash2
           )
         end
 
-        # def repo_landing_page(ark)
-        #   "http://repo.example.org/landing/#{ERB::Util.url_encode(ark)}"
-        # end
-        #
-        # def repo_download_page(ark)
-        #   "http://repo.example.org/download/#{ERB::Util.url_encode(ark)}"
-        # end
+        describe '#edit_uri_for' do
+          it 'constructs a Merritt edit URI' do
+            doi = 'doi:10.5072/FK2DF6R618'
+            expected_uri = 'http://sword-aws-dev.cdlib.org:39001/mrtsword/edit/dash_cdl/doi%3A10.5072%2FFK2DF6R618'
+            expect(importer.edit_uri_for(doi)).to eq(expected_uri)
+          end
+        end
 
         describe 'ARK-only wrapper' do
 
@@ -127,7 +152,7 @@ module Dash2
               expect(ezid_client).to have_received(:mint_id)
               ident_value = (ident = new_resource.identifier) && ident.identifier
               expect(ident_value).not_to be_nil
-              expect("doi:#{ident_value}").to eq(minted_doi)
+              expect(ident_value).to eq(minted_doi_value)
             end
 
             it 'adds a "migrated from" alternate identifier to the resource' do
@@ -147,18 +172,51 @@ module Dash2
                 expect(alt_ident.value).to eq(wrapper_doi)
               end
             end
+
+            it 'submits a SWORD create' do
+              expect(sword_client).to have_received(:create).with(hash_including(doi: minted_doi))
+              expect(new_resource.download_uri).to eq(merritt_download_uri(minted_doi))
+              expect(new_resource.update_uri).to eq(sword_update_uri(minted_doi))
+            end
           end
 
-          # describe 'initial production migration' do
-          #   before(:each) do
-          #     allow(Migrator).to receive(:production?).and_return(true)
-          #     importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
-          #   end
-          #
-          #   it 'creates a new resource' do
-          #     expect(StashEngine::Resource.count).to eq(1)
-          #   end
-          # end
+          describe 'initial production migration' do
+            before(:each) do
+              allow(Migrator).to receive(:production?).and_return(true)
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+              expect(new_resource).to be_a(StashEngine::Resource)
+              expect(StashEngine::Resource.count).to eq(1)
+            end
+
+            it "doesn't mint a new DOI" do
+              expect(ezid_client).not_to have_receive(:mint_id)
+              ident_value = (ident = new_resource.identifier) && ident.identifier
+              expect(ident_value).not_to be_nil
+              expect(ident_value).to eq(wrapper_doi_value)
+            end
+
+            it "doesn't add a 'migrated from' alternate identifier to the resource" do
+              alt_ident = StashDatacite::AlternateIdentifier.find_by(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
+              expect(alt_ident).to be_nil
+            end
+
+            describe 'EZID update' do
+              it 'preserves the wrapper DOI' do
+                ident_value = (ident = ezid_resource.identifier) && ident.value
+                expect(ident_value).to eq(wrapper_doi_value)
+              end
+              it 'doesn\'t add a "migrated from" alternate identifier' do
+                alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
+                expect(alt_ident).to be_nil
+              end
+            end
+
+            it 'sets the SWORD update URI' do
+              update_uri = new_resource.update_uri
+              expect(update_uri).to eq(sword_update_uri(wrapper_doi))
+            end
+
+          end
 
         end
 

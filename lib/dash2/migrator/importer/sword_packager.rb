@@ -28,7 +28,7 @@ module Dash2
 
         # TODO: replace SwordCreator/SwordUpdater with SubmissionTask or similar
         # @return [String] the path to the submitted zipfile
-        def submit(stash_wrapper:, dcs_resource:, se_resource:, tenant:)
+        def submit(stash_wrapper:, dcs_resource:, se_resource:, tenant:) # TODO: stop passing dcs_resource
           package_builder = make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant)
           zipfile = package_builder.make_package
           SwordSubmitTask.new(se_resource: se_resource, zipfile: zipfile, sword_client: sword_client).submit!
@@ -36,7 +36,7 @@ module Dash2
 
         private
 
-        def make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant)
+        def make_package_builder(dcs_resource, se_resource, stash_wrapper, tenant) # TODO: stop passing dcs_resource
           ZipPackageBuilder.new(
             stash_wrapper: stash_wrapper,
             dcs_resource: dcs_resource,
