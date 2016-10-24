@@ -57,6 +57,7 @@ module StashDatacite
     end
 
     def populate_se_resource! # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      set_sd_identifier(dcs_resource.identifier)
       stash_files.each { |stash_file| add_stash_file(stash_file) }
       dcs_resource.creators.each { |dcs_creator| add_sd_creator(dcs_creator) }
       dcs_resource.titles.each { |dcs_title| add_sd_title(dcs_title) }
@@ -78,6 +79,14 @@ module StashDatacite
       dcs_resource.funding_references.each { |dcs_funding_reference| add_funding(dcs_funding_reference) }
       se_resource.save!
       se_resource
+    end
+
+    def set_sd_identifier(dcs_identifier)
+      return unless dcs_identifier
+      se_resource.identifier_id = StashEngine::Identifier.create(
+        identifier: dcs_identifier.value,
+        identifier_type: dcs_identifier.identifier_type
+      ).id
     end
 
     def add_stash_file(stash_file)

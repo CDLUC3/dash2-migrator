@@ -44,6 +44,13 @@ module StashDatacite
       expect(se_resource).to be_a(StashEngine::Resource)
     end
 
+    it 'sets the identifier' do
+      se_ident = se_resource.identifier
+      expect(se_ident).not_to be_nil
+      expect(se_ident.identifier_type).to eq('DOI')
+      expect(se_ident.identifier).to eq('10.15146/R3RG6G')
+    end
+
     it 'extracts the files' do
       expected_time = wrapper.version_date.to_time
       se_file_uploads = se_resource.file_uploads
