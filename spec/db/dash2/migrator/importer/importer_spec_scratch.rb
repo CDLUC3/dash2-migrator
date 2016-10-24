@@ -149,8 +149,8 @@ module Dash2
             allow(alt_ident).to receive(:resource_id).and_return(previously_migrated_resource_id)
             allow(StashDatacite::AlternateIdentifier)
               .to receive(:find_by)
-                    .with(alternate_identifier: previously_migrated_from)
-                    .and_return(alt_ident)
+              .with(alternate_identifier: previously_migrated_from)
+              .and_return(alt_ident)
           end
 
           it 'copies "migrated from" alt. ident to new resource'
