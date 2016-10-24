@@ -1,9 +1,35 @@
 require 'logger'
 
+require 'stash_engine'
+
+module StashEngine
+  class Resource < ActiveRecord::Base
+
+    def first_alternate_identifier(type:)
+      alternate_identifiers
+        .where(alternate_identifier_type: type)
+        .first
+    end
+
+    def first_identical_resource
+      identical_resources.first
+    end
+
+    def identical_resources
+      StashEngine::Identifier
+        .where(identifier: se_ident.identifier)
+        .where.not(id: se_ident.id)
+        .flat_map(&:resources)
+    end
+  end
+end
+
 module Dash2
   module Migrator
     module Importer
       class Importer
+
+        MIGRATED_FROM = 'migrated from'.freeze
 
         attr_reader :tenant
         attr_reader :ezid_client
@@ -34,11 +60,59 @@ module Dash2
           raise ArgumentError, "Wrong identifier type; expected ARK, was #{}" unless stash_wrapper.identifier.type == Stash::Wrapper::IdentifierType::ARK
           ark = stash_wrapper.identifier.value
           new_doi = ezid_client.mint_id
-          warn "Minted new DOI: #{new_doi} for ARK: #{ark}"
+          log.warn "Minted new DOI: #{new_doi} for ARK: #{ark}"
         end
 
         def import_to_stash(stash_wrapper:, user_uid:)
-          raise NoMethodError, "Not implemented yet"
+          se_resource = build_se_resource(stash_wrapper, user_uid)
+          se_ident = se_resource.identifier
+
+          old_doi_value = se_ident.identifier
+          old_doi = "doi:#{old_doi_value}"
+
+          new_doi = ezid_client.mint_id
+          new_doi_value = new_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
+          log.warn "Minted new DOI: #{new_doi} for #{se_ident.identifier_type}: #{old_doi_value}"
+
+          se_ident.identifier = new_doi_value
+          se_ident.save
+          alt_ident = StashDatacite::AlternateIdentifier.create(
+            resource_id: se_resource.id,
+            alternate_identifier_type: MIGRATED_FROM,
+            alternate_identifier: old_doi
+          )
+          log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{old_doi} for resource #{se_resource.id}"
+
+          dcs_resource = stash_wrapper.datacite_resource
+          dcs_resource.identifier.value = new_doi_value
+          dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
+            type: MIGRATED_FROM,
+            value: old_doi
+          )
+
+          dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
+          landing_url = tenant.landing_url("/stash/dataset/#{new_doi}")
+          ezid_client.update_metadata(new_doi, dcs3_xml, landing_url)
+
+          se_resource.save
+          se_resource
+        end
+
+        def build_se_resource(stash_wrapper, user_uid)
+          dcs_resource = stash_wrapper.datacite_resource
+          builder = StashDatacite::ResourceBuilder.new(
+            user_id: user_id_for(user_uid),
+            dcs_resource: dcs_resource,
+            stash_files: stash_wrapper.stash_files,
+            upload_date: stash_wrapper.version_date
+          )
+          builder.build
+        end
+
+        def user_id_for(user_uid)
+          user = StashEngine::User.find_by(uid: user_uid)
+          raise "No user found for #{user_uid}" unless user
+          user.id
         end
       end
     end

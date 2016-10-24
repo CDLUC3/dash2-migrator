@@ -3,6 +3,7 @@ require 'db_spec_helper'
 module Dash2
   module Migrator
     module Importer
+
       describe Importer do
 
         attr_reader :user
@@ -30,16 +31,12 @@ module Dash2
           tenant.landing_url("/stash/dataset/#{doi}")
         end
 
+        def minted_doi_value
+          minted_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
+        end
+
         before(:all) do
           @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
-          @user = StashEngine::User.create(
-            uid: user_uid,
-            first_name: 'Lisa',
-            last_name: 'Muckenhaupt',
-            email: 'lmuckenhaupt@ucop.edu',
-            provider: 'developer',
-            tenant_id: 'ucop'
-          )
 
           @sw_ark_xml = File.read('spec/data/indexer/stash_wrapper_ark.xml').freeze
           @sw_doi_xml = File.read('spec/data/indexer/stash_wrapper_doi.xml').freeze
@@ -59,6 +56,15 @@ module Dash2
             tenant: tenant,
             ezid_client: ezid_client,
             sword_client: sword_client
+          )
+
+          @user = StashEngine::User.create(
+            uid: user_uid,
+            first_name: 'Lisa',
+            last_name: 'Muckenhaupt',
+            email: 'lmuckenhaupt@ucop.edu',
+            provider: 'developer',
+            tenant_id: 'ucop'
           )
         end
 
@@ -94,6 +100,10 @@ module Dash2
             new_resource.id
           end
 
+          def wrapper_doi
+            "doi:#{wrapper_doi_value}"
+          end
+
           before(:each) do
             @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_doi_xml)
             @wrapper_doi_value = '10.15146/R3RG6G'
@@ -101,6 +111,7 @@ module Dash2
 
           describe 'initial test migration' do
             before(:each) do
+              expect(Migrator.production?).to eq(false)
               expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
                 expect(ident).to eq(minted_doi)
                 expect(target).to eq(dash_landing_uri(minted_doi))
@@ -120,20 +131,20 @@ module Dash2
             end
 
             it 'adds a "migrated from" alternate identifier to the resource' do
-              alt_ident = StashDatacite::AlternateIdentifier.find(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
+              alt_ident = StashDatacite::AlternateIdentifier.find_by(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
               expect(alt_ident).not_to be_nil
-              expect(alt_ident.alternate_identifier).to eq("doi:#{wrapper_doi_value}")
+              expect(alt_ident.alternate_identifier).to eq(wrapper_doi)
             end
 
             describe 'EZID update' do
               it 'injects the newly minted DOI into the Datacite XML' do
                 ident_value = (ident = ezid_resource.identifier) && ident.value
-                expect(ident_value).to eq(minted_doi)
+                expect(ident_value).to eq(minted_doi_value)
               end
               it 'adds a "migrated from" alternate identifier to the Datacite XML' do
                 alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
                 expect(alt_ident).not_to be_nil
-                expect(alt_ident.value).to eq(minted_doi)
+                expect(alt_ident.value).to eq(wrapper_doi)
               end
             end
           end
