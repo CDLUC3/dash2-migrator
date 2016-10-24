@@ -5,6 +5,14 @@ require 'dash2/migrator/importer/sword_packager'
 module StashEngine
   class Resource < ActiveRecord::Base
 
+    def identifier_type
+      identifier && identifier.identifier_type
+    end
+
+    def identifier_value
+      identifier && identifier.identifier
+    end
+
     def first_alternate_identifier(type:)
       alternate_identifiers
         .where(alternate_identifier_type: type)
@@ -16,6 +24,7 @@ module StashEngine
     end
 
     def identical_resources
+      se_ident = identifier
       StashEngine::Identifier
         .where(identifier: se_ident.identifier)
         .where.not(id: se_ident.id)
@@ -85,23 +94,49 @@ module Dash2
         def import_to_stash(stash_wrapper:, user_uid:)
           se_resource = build_se_resource(stash_wrapper, user_uid)
 
-          if Migrator.production?
-            se_ident = se_resource.identifier
-            wrapper_doi_value = se_ident.identifier
-            wrapper_doi = "doi:#{wrapper_doi_value}"
+          if (existing_alt_ident = alt_ident_for(se_resource))
+            existing_resource = StashEngine::Resource.find(existing_alt_ident.resource_id)
+            final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
+          elsif (existing_resource = se_resource.first_identical_resource)
+            final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
+          elsif Migrator.production?
+            wrapper_doi = "doi:#{se_resource.identifier_value}"
             se_resource.update_uri = edit_uri_for(wrapper_doi)
+            # TODO: download URI?
             final_doi = wrapper_doi
           else
             final_doi = migrate_test_record(stash_wrapper, se_resource)
           end
 
+          dcs_resource = update_ezid(final_doi, stash_wrapper)
+
+          sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+          se_resource
+        end
+
+        def update_ezid(final_doi, stash_wrapper)
           dcs_resource = stash_wrapper.datacite_resource
           dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
           landing_url = tenant.landing_url("/stash/dataset/#{final_doi}")
           ezid_client.update_metadata(final_doi, dcs3_xml, landing_url)
+          dcs_resource
+        end
 
-          sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
-          se_resource
+        def replace_existing_resource(se_resource, stash_wrapper, existing_resource)
+          new_doi_value = existing_resource.identifier_value
+          wrapper_doi_value = se_resource.identifier_value
+          log.info "Previously migrated record with DOI: #{new_doi_value} for #{se_resource.identifier_type}: #{wrapper_doi_value}"
+
+          update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
+          update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
+
+          se_resource.user_id = existing_resource.user_id
+          se_resource.download_uri = existing_resource.download_uri
+          se_resource.update_uri = existing_resource.update_uri
+
+          existing_resource.destroy
+
+          "doi:#{new_doi_value}"
         end
 
         def build_se_resource(stash_wrapper, user_uid)
@@ -121,6 +156,13 @@ module Dash2
           user.id
         end
 
+        def alt_ident_for(se_resource)
+          se_ident = se_resource.identifier
+          wrapper_doi_value = se_ident.identifier
+          wrapper_doi = "doi:#{wrapper_doi_value}"
+          StashDatacite::AlternateIdentifier.find_by(alternate_identifier: wrapper_doi, alternate_identifier_type: MIGRATED_FROM)
+        end
+
         def migrate_test_record(stash_wrapper, se_resource)
           se_ident = se_resource.identifier
           wrapper_doi_value = se_ident.identifier
@@ -137,6 +179,8 @@ module Dash2
 
         def update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
           se_ident = se_resource.identifier
+          return if se_ident.identifier == new_doi_value
+
           se_ident.identifier = new_doi_value
           se_ident.save
           se_resource_id = se_resource.id
@@ -151,6 +195,8 @@ module Dash2
         def update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
           dcs_resource = stash_wrapper.datacite_resource
           dcs_ident = dcs_resource.identifier
+          return if dcs_ident.value == new_doi_value
+
           dcs_ident.value = new_doi_value
           dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
             type: MIGRATED_FROM,

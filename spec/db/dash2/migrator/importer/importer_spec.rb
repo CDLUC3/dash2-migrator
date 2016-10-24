@@ -234,9 +234,9 @@ module Dash2
               end
             end
 
-            it 'sets the SWORD update URI' do
-              update_uri = new_resource.update_uri
-              expect(update_uri).to eq(sword_update_uri(wrapper_doi))
+            it 'sets the SWORD update and download URIs' do
+              expect(new_resource.update_uri).to eq(sword_update_uri(wrapper_doi))
+              expect(new_resource.download_uri).to eq(merritt_download_uri(minted_doi))
             end
 
             it 'submits a SWORD update' do
@@ -324,6 +324,12 @@ module Dash2
 
             it 'copies the user ID' do
               expect(new_resource.user_id).to eq(different_user_id)
+            end
+
+            it 'deletes the old resource' do
+              expect(StashEngine::Resource.exists?(existing_resource_id)).to be(false)
+              expect(StashEngine::Resource.count).to eq(1)
+              expect(StashDatacite::AlternateIdentifier.find_by(resource_id: existing_resource_id)).to be_nil
             end
 
             describe 'EZID update' do
