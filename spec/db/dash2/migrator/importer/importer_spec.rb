@@ -40,8 +40,16 @@ module Dash2
           "http://sword-aws-dev.cdlib.org:39001/mrtsword/edit/dash_cdl/#{ERB::Util.url_encode(doi)}"
         end
 
+        def new_fake_doi
+          (time = Time.now) && "doi:10.5072/FK#{time.to_i}.#{time.nsec}"
+        end
+
+        def value_of(doi)
+          doi.match(Datacite::Mapping::DOI_PATTERN)[0]
+        end
+
         def minted_doi_value
-          minted_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
+          value_of(minted_doi)
         end
 
         before(:all) do
@@ -55,7 +63,7 @@ module Dash2
           allow_any_instance_of(Dash2::Migrator::Harvester::MerrittAtomHarvestedRecord).to receive(:user_uid) { user_uid }
 
           @ezid_client = instance_double(StashEzid::Client)
-          allow(@ezid_client).to receive(:mint_id) { @minted_doi = (time = Time.now) && "doi:10.5072/FK#{time.to_i}.#{time.nsec}" }
+          allow(@ezid_client).to receive(:mint_id) { @minted_doi = new_fake_doi }
 
           @sword_client = instance_double(Stash::Sword::Client)
           allow(sword_client).to receive(:collection_uri).and_return('http://sword-aws-dev.cdlib.org:39001/mrtsword/collection/dash_cdl')
@@ -149,6 +157,10 @@ module Dash2
               expect(StashEngine::Resource.count).to eq(1)
             end
 
+            it 'sets the user ID' do
+              expect(new_resource.user_id).to eq(user_id)
+            end
+
             it 'mints a new DOI' do
               expect(ezid_client).to have_received(:mint_id)
               ident_value = (ident = new_resource.identifier) && ident.identifier
@@ -195,6 +207,10 @@ module Dash2
               expect(StashEngine::Resource.count).to eq(1)
             end
 
+            it 'sets the user ID' do
+              expect(new_resource.user_id).to eq(user_id)
+            end
+
             it "doesn't mint a new DOI" do
               expect(ezid_client).not_to have_received(:mint_id)
               ident_value = (ident = new_resource.identifier) && ident.identifier
@@ -229,6 +245,99 @@ module Dash2
 
           end
 
+          describe 'test re-migration' do
+
+            attr_reader :existing_resource_id
+            attr_reader :existing_fake_doi
+
+            attr_reader :different_user
+
+            def different_user_id
+              different_user.id
+            end
+
+            def existing_fake_doi_value
+              value_of(existing_fake_doi)
+            end
+
+            before(:each) do
+              expect(Migrator.production?).to eq(false)
+              @existing_fake_doi = new_fake_doi
+
+              @different_user = StashEngine::User.create(
+                uid: 'simon-ucop@ucop.edu',
+                first_name: 'Simon',
+                last_name: 'Bertucci',
+                email: 'simon@ucop.edu',
+                provider: 'developer',
+                tenant_id: 'ucop'
+              )
+
+              existing_ident = StashEngine::Identifier.create(
+                identifier: existing_fake_doi_value,
+                identifier_type: 'DOI'
+              )
+              existing_resource = StashEngine::Resource.create(
+                user_id: different_user_id,
+                identifier_id: existing_ident.id,
+                update_uri: sword_update_uri(existing_fake_doi)
+              )
+              @existing_resource_id = existing_resource.id
+
+              StashDatacite::AlternateIdentifier.create(
+                resource_id: existing_resource_id,
+                alternate_identifier_type: 'migrated from',
+                alternate_identifier: wrapper_doi
+              )
+
+              expect(ezid_client).not_to receive(:mint_id)
+              expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
+                expect(ident).to eq(existing_fake_doi)
+                expect(target).to eq(dash_landing_uri(existing_fake_doi))
+                @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
+              end
+
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+            end
+
+            it 'creates a new resource' do
+              expect(new_resource).to be_a(StashEngine::Resource)
+              expect(new_resource_id).not_to eq(existing_resource_id)
+            end
+
+            it 'transfers the DOI from the existing resource' do
+              ident_value = (ident = new_resource.identifier) && ident.identifier
+              expect(ident_value).not_to be_nil
+              expect(ident_value).to eq(existing_fake_doi_value)
+            end
+
+            it 'copies the alternate identifier from the existing resource' do
+              alt_ident = StashDatacite::AlternateIdentifier.find_by(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
+              expect(alt_ident).not_to be_nil
+              expect(alt_ident.alternate_identifier).to eq(wrapper_doi)
+            end
+
+            it 'copies the SWORD update URI' do
+              update_uri = new_resource.update_uri
+              expect(update_uri).to eq(sword_update_uri(existing_fake_doi))
+            end
+
+            it 'copies the user ID' do
+              expect(new_resource.user_id).to eq(different_user_id)
+            end
+
+            describe 'EZID update' do
+              it 'injects the existing DOI into the Datacite XML' do
+                ident_value = (ident = ezid_resource.identifier) && ident.value
+                expect(ident_value).to eq(existing_fake_doi_value)
+              end
+              it 'adds a "migrated from" alternate identifier to the Datacite XML' do
+                alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
+                expect(alt_ident).not_to be_nil
+                expect(alt_ident.value).to eq(wrapper_doi)
+              end
+            end
+          end
         end
 
         # describe 'wrapper with DOI' do

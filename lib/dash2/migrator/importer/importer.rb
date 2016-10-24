@@ -130,20 +130,9 @@ module Dash2
           log.warn "Minted new DOI: #{new_doi_value} for #{se_ident.identifier_type}: #{wrapper_doi_value}"
 
           update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
-
           update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
 
           new_doi
-        end
-
-        def update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
-          dcs_resource = stash_wrapper.datacite_resource
-          dcs_ident = dcs_resource.identifier
-          dcs_ident.value = new_doi_value
-          dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
-            type: MIGRATED_FROM,
-            value: "doi:#{wrapper_doi_value}"
-          )
         end
 
         def update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
@@ -157,6 +146,16 @@ module Dash2
             alternate_identifier: "doi:#{wrapper_doi_value}"
           )
           log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{"doi:#{wrapper_doi_value}"} for resource #{se_resource_id}"
+        end
+
+        def update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
+          dcs_resource = stash_wrapper.datacite_resource
+          dcs_ident = dcs_resource.identifier
+          dcs_ident.value = new_doi_value
+          dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
+            type: MIGRATED_FROM,
+            value: "doi:#{wrapper_doi_value}"
+          )
         end
 
       end
