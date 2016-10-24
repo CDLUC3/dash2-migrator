@@ -87,32 +87,39 @@ module Dash2
           se_resource = build_se_resource(stash_wrapper, user_uid)
           se_ident = se_resource.identifier
 
-          old_doi_value = se_ident.identifier
-          old_doi = "doi:#{old_doi_value}"
-
-          new_doi = ezid_client.mint_id
-          new_doi_value = new_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
-          log.warn "Minted new DOI: #{new_doi} for #{se_ident.identifier_type}: #{old_doi_value}"
-
-          se_ident.identifier = new_doi_value
-          se_ident.save
-          alt_ident = StashDatacite::AlternateIdentifier.create(
-            resource_id: se_resource.id,
-            alternate_identifier_type: MIGRATED_FROM,
-            alternate_identifier: old_doi
-          )
-          log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{old_doi} for resource #{se_resource.id}"
-
+          wrapper_doi_value = se_ident.identifier
+          wrapper_doi = "doi:#{wrapper_doi_value}"
           dcs_resource = stash_wrapper.datacite_resource
-          dcs_resource.identifier.value = new_doi_value
-          dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
-            type: MIGRATED_FROM,
-            value: old_doi
-          )
+
+          if Migrator.production?
+            se_resource.update_uri = edit_uri_for(wrapper_doi)
+            final_doi = wrapper_doi
+          else
+            new_doi = ezid_client.mint_id
+            new_doi_value = new_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
+            log.warn "Minted new DOI: #{new_doi} for #{se_ident.identifier_type}: #{wrapper_doi_value}"
+
+            se_ident.identifier = new_doi_value
+            se_ident.save
+            alt_ident = StashDatacite::AlternateIdentifier.create(
+              resource_id: se_resource.id,
+              alternate_identifier_type: MIGRATED_FROM,
+              alternate_identifier: wrapper_doi
+            )
+            log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{wrapper_doi} for resource #{se_resource.id}"
+
+            dcs_resource.identifier.value = new_doi_value
+            dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
+              type: MIGRATED_FROM,
+              value: wrapper_doi
+            )
+
+            final_doi = new_doi
+          end
 
           dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
-          landing_url = tenant.landing_url("/stash/dataset/#{new_doi}")
-          ezid_client.update_metadata(new_doi, dcs3_xml, landing_url)
+          landing_url = tenant.landing_url("/stash/dataset/#{final_doi}")
+          ezid_client.update_metadata(final_doi, dcs3_xml, landing_url)
 
           sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
           se_resource

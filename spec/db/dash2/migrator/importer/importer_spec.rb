@@ -74,6 +74,7 @@ module Dash2
             receipt.links = [edit_iri, em_iri]
             receipt
           end
+          allow(sword_client).to receive(:update).and_return(200)
 
           @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/example.yml')['test'])
 
@@ -183,13 +184,19 @@ module Dash2
           describe 'initial production migration' do
             before(:each) do
               allow(Migrator).to receive(:production?).and_return(true)
+              expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
+                expect(ident).to eq(wrapper_doi)
+                expect(target).to eq(dash_landing_uri(wrapper_doi))
+                @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
+              end
+
               @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
               expect(new_resource).to be_a(StashEngine::Resource)
               expect(StashEngine::Resource.count).to eq(1)
             end
 
             it "doesn't mint a new DOI" do
-              expect(ezid_client).not_to have_receive(:mint_id)
+              expect(ezid_client).not_to have_received(:mint_id)
               ident_value = (ident = new_resource.identifier) && ident.identifier
               expect(ident_value).not_to be_nil
               expect(ident_value).to eq(wrapper_doi_value)
@@ -214,6 +221,10 @@ module Dash2
             it 'sets the SWORD update URI' do
               update_uri = new_resource.update_uri
               expect(update_uri).to eq(sword_update_uri(wrapper_doi))
+            end
+
+            it 'submits a SWORD update' do
+              expect(sword_client).to have_received(:update).with(hash_including(edit_iri: sword_update_uri(wrapper_doi)))
             end
 
           end
