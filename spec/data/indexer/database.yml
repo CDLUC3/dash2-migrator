@@ -13,9 +13,9 @@ development:
 
 test:
   <<: *default
+  database: dash
   host: localhost
-  database: dashtest
-  password: 4a21f020
+  password: dashdba3dev
 
 stage:
   <<: *default
