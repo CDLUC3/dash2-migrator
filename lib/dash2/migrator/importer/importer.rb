@@ -52,13 +52,10 @@ module Dash2
         end
 
         def import(stash_wrapper:, user_uid:)
-          case stash_wrapper.identifier.type
-          when Stash::Wrapper::IdentifierType::ARK
+          if stash_wrapper.identifier.type == Stash::Wrapper::IdentifierType::ARK && Migrator.production?
             mint_real_doi_for(stash_wrapper: stash_wrapper)
-          when Stash::Wrapper::IdentifierType::DOI
-            import_to_stash(stash_wrapper: stash_wrapper, user_uid: user_uid)
           else
-            raise ArgumentError, "Bad identifier type in stash wrapper: #{stash_wrapper.identifier.type || 'nil'}"
+            import_to_stash(stash_wrapper: stash_wrapper, user_uid: user_uid)
           end
         end
 
@@ -100,7 +97,7 @@ module Dash2
           elsif (existing_resource = se_resource.first_identical_resource)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           elsif Migrator.production?
-            wrapper_doi = "doi:#{se_resource.identifier_value}"
+            wrapper_doi = id_for(se_resource.identifier_value)
             se_resource.update_uri = edit_uri_for(wrapper_doi)
             # TODO: download URI?
             final_doi = wrapper_doi
@@ -124,11 +121,11 @@ module Dash2
 
         def replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           new_doi_value = existing_resource.identifier_value
-          wrapper_doi_value = se_resource.identifier_value
-          log.info "Previously migrated record with DOI: #{new_doi_value} for #{se_resource.identifier_type}: #{wrapper_doi_value}"
+          wrapper_id_value = se_resource.identifier_value
+          log.info "Previously migrated record with DOI: #{new_doi_value} for #{se_resource.identifier_type}: #{wrapper_id_value}"
 
-          update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
-          update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
+          update_se_identifiers(se_resource, wrapper_id_value, new_doi_value)
+          update_dcs_identifiers(stash_wrapper, wrapper_id_value, new_doi_value)
 
           se_resource.user_id = existing_resource.user_id
           se_resource.download_uri = existing_resource.download_uri
@@ -136,7 +133,7 @@ module Dash2
 
           existing_resource.destroy
 
-          "doi:#{new_doi_value}"
+          id_for(new_doi_value)
         end
 
         def build_se_resource(stash_wrapper, user_uid)
@@ -158,26 +155,26 @@ module Dash2
 
         def alt_ident_for(se_resource)
           se_ident = se_resource.identifier
-          wrapper_doi_value = se_ident.identifier
-          wrapper_doi = "doi:#{wrapper_doi_value}"
+          wrapper_id_value = se_ident.identifier
+          wrapper_doi = id_for(wrapper_id_value)
           StashDatacite::AlternateIdentifier.find_by(alternate_identifier: wrapper_doi, alternate_identifier_type: MIGRATED_FROM)
         end
 
         def migrate_test_record(stash_wrapper, se_resource)
           se_ident = se_resource.identifier
-          wrapper_doi_value = se_ident.identifier
+          wrapper_id_value = se_ident.identifier
 
           new_doi = ezid_client.mint_id
           new_doi_value = new_doi.match(Datacite::Mapping::DOI_PATTERN)[0]
-          log.warn "Minted new DOI: #{new_doi_value} for #{se_ident.identifier_type}: #{wrapper_doi_value}"
+          log.warn "Minted new DOI: #{new_doi_value} for #{se_ident.identifier_type}: #{wrapper_id_value}"
 
-          update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
-          update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
+          update_se_identifiers(se_resource, wrapper_id_value, new_doi_value)
+          update_dcs_identifiers(stash_wrapper, wrapper_id_value, new_doi_value)
 
           new_doi
         end
 
-        def update_se_identifiers(se_resource, wrapper_doi_value, new_doi_value)
+        def update_se_identifiers(se_resource, wrapper_id_value, new_doi_value)
           se_ident = se_resource.identifier
           return if se_ident.identifier == new_doi_value
 
@@ -187,12 +184,20 @@ module Dash2
           alt_ident = StashDatacite::AlternateIdentifier.create(
             resource_id: se_resource_id,
             alternate_identifier_type: MIGRATED_FROM,
-            alternate_identifier: "doi:#{wrapper_doi_value}"
+            alternate_identifier: id_for(wrapper_id_value)
           )
-          log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{"doi:#{wrapper_doi_value}"} for resource #{se_resource_id}"
+          log.info "Created alternate identifier #{alt_ident.id} with type '#{MIGRATED_FROM}' and value #{id_for(wrapper_id_value)} for resource #{se_resource_id}"
         end
 
-        def update_dcs_identifiers(stash_wrapper, wrapper_doi_value, new_doi_value)
+        def id_for(id_value)
+          if (match_data = Datacite::Mapping::DOI_PATTERN.match(id_value))
+            "doi:#{match_data[0]}"
+          else
+            id_value
+          end
+        end
+
+        def update_dcs_identifiers(stash_wrapper, wrapper_id_value, new_doi_value)
           dcs_resource = stash_wrapper.datacite_resource
           dcs_ident = dcs_resource.identifier
           return if dcs_ident.value == new_doi_value
@@ -200,7 +205,7 @@ module Dash2
           dcs_ident.value = new_doi_value
           dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
             type: MIGRATED_FROM,
-            value: "doi:#{wrapper_doi_value}"
+            value: id_for(wrapper_id_value)
           )
         end
 
