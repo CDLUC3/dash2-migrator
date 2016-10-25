@@ -62,6 +62,15 @@ module Dash2
           end
         end
 
+        it 'sets the resource type' do
+          aggregate_failures 'all files' do
+            id_to_dataset.keys.each do |id_value|
+              resource = id_to_resource[id_value]
+              expect(resource.resource_type).not_to be_nil
+            end
+          end
+        end
+
         it 'sets the identifier' do
           aggregate_failures 'all files' do
             id_to_dataset.keys.each do |id_value|

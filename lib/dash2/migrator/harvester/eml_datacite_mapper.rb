@@ -44,6 +44,7 @@ module Dash2
             descriptions: descriptions,
             subjects: dataset.keyword_set.map { |kw| Subject.new(value: kw) },
             rights_list: [rights],
+            resource_type: ResourceType.new(resource_type_general: ResourceTypeGeneral::DATASET),
             alternate_identifiers: url_alt_ident ? [url_alt_ident] : [],
             geo_locations: location ? [location] : [],
             funding_references: fundref ? [fundref] : []
