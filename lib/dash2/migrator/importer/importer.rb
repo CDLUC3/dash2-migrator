@@ -148,6 +148,7 @@ module Dash2
           se_resource.download_uri = existing_resource.download_uri
           se_resource.update_uri = existing_resource.update_uri
 
+          log.warn("Deleting existing resource #{existing_resource.id}, replaced by #{se_resource.id}")
           existing_resource.destroy
 
           id_for(new_doi_value)
