@@ -37,7 +37,7 @@ module Dash2
         end
 
         def do_index(hr)
-          index_record(hr.as_wrapper, hr.user_uid)
+          index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: hr.ark)
           Stash::Indexer::IndexResult.success(hr)
         end
 
@@ -74,11 +74,11 @@ module Dash2
           (backtrace = e.backtrace) && Migrator.log.error(backtrace.join("\n"))
         end
 
-        def index_record(stash_wrapper, user_uid)
+        def index_record(stash_wrapper:, user_uid:, ark:)
           ident_value = (sw_ident = stash_wrapper.identifier) && sw_ident.value
-          Migrator.log.info("Migrating #{ident_value} for #{user_uid}")
+          Migrator.log.info("Migrating #{ident_value || ark} for #{user_uid}")
           ActiveRecord::Base.transaction(requires_new: true) do
-            importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+            importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
           end
         end
 

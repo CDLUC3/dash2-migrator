@@ -12,6 +12,9 @@ module Dash2
         attr_reader :sw_ark_xml
         attr_reader :sw_doi_xml
         attr_reader :stash_wrapper
+        attr_reader :ark
+        attr_reader :doi_ark
+        attr_reader :ark_ark
 
         attr_reader :tenant
 
@@ -31,8 +34,7 @@ module Dash2
           tenant.landing_url("/stash/dataset/#{doi}")
         end
 
-        def merritt_download_uri(doi)
-          ark = doi.sub('doi:', 'ark:/').sub(%r{10\.[^/]+}, '99999').downcase
+        def merritt_download_uri(ark)
           "http://merritt-dev.cdlib.org/d/#{ERB::Util.url_encode(ark)}"
         end
 
@@ -56,7 +58,9 @@ module Dash2
           @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
 
           @sw_ark_xml = File.read('spec/data/indexer/stash_wrapper_ark.xml').freeze
+          @ark_ark = 'ark:/90135/q1f769jn'
           @sw_doi_xml = File.read('spec/data/indexer/stash_wrapper_doi.xml').freeze
+          @doi_ark = 'ark:/c5146/r3rg6g'
         end
 
         before(:each) do
@@ -76,7 +80,7 @@ module Dash2
 
             em_iri = Stash::Sword::Link.new
             em_iri.rel = 'edit-media'
-            em_iri.href = merritt_download_uri(doi)
+            em_iri.href = merritt_download_uri(ark)
 
             receipt = Stash::Sword::DepositReceipt.new
             receipt.links = [edit_iri, em_iri]
@@ -112,18 +116,86 @@ module Dash2
 
         describe 'ARK-only wrapper' do
 
+          attr_reader :new_resource
+
+          def new_resource_id
+            new_resource.id
+          end
+
           before(:each) do
             @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_ark_xml)
-            importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+            @ark = @ark_ark
           end
 
-          it 'doesn\'t create a new resource' do
-            expect(StashEngine::Resource.exists?).to be_falsey
+          describe 'production' do
+            before(:each) do
+              allow(Migrator).to receive(:production?).and_return(true)
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
+            end
+
+            it 'mints a new DOI' do
+              expect(ezid_client).to have_received(:mint_id)
+            end
+
+            it 'doesn\'t create a new resource' do
+              expect(new_resource).not_to be_a(StashEngine::Resource)
+              expect(StashEngine::Resource.exists?).to be_falsey
+            end
           end
 
-          it 'mints a new DOI' do
-            expect(ezid_client).to have_received(:mint_id)
+          describe 'test' do
+            # TODO: shared with "initial test migration"
+            before(:each) do
+              expect(Migrator.production?).to eq(false)
+              expect(@ezid_client).to receive(:update_metadata) do |ident, xml_str, target|
+                expect(ident).to eq(minted_doi)
+                expect(target).to eq(dash_landing_uri(minted_doi))
+                @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
+              end
+
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
+              expect(new_resource).to be_a(StashEngine::Resource)
+              expect(StashEngine::Resource.count).to eq(1)
+            end
+
+            it 'sets the user ID' do
+              expect(new_resource.user_id).to eq(user_id)
+            end
+
+            it 'mints a new DOI' do
+              expect(ezid_client).to have_received(:mint_id)
+              ident_value = (ident = new_resource.identifier) && ident.identifier
+              expect(ident_value).not_to be_nil
+              expect(ident_value).to eq(minted_doi_value)
+              expect(ident.identifier_type).to eq('DOI')
+            end
+
+            it 'adds a "migrated from" alternate identifier to the resource' do
+              alt_ident = StashDatacite::AlternateIdentifier.find_by(resource_id: new_resource_id, alternate_identifier_type: 'migrated from')
+              expect(alt_ident).not_to be_nil
+              expect(alt_ident.alternate_identifier).to eq(ark)
+            end
+
+            describe 'EZID update' do
+              it 'injects the newly minted DOI into the Datacite XML' do
+                ident_value = (ident = ezid_resource.identifier) && ident.value
+                expect(ident_value).to eq(minted_doi_value)
+                expect(ident.identifier_type).to eq('DOI')
+              end
+              it 'adds a "migrated from" alternate identifier to the Datacite XML' do
+                alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
+                expect(alt_ident).not_to be_nil
+                expect(alt_ident.value).to eq(ark)
+              end
+            end
+
+            it 'submits a SWORD create' do
+              expect(sword_client).to have_received(:create).with(hash_including(doi: minted_doi))
+              expect(new_resource.download_uri).to eq('http://merritt-dev.cdlib.org/d/ark%3A%2F90135%2Fq1f769jn')
+              expect(new_resource.update_uri).to eq(sword_update_uri(minted_doi))
+            end
           end
+
         end
 
         describe 'wrapper with DOI' do
@@ -141,6 +213,7 @@ module Dash2
           before(:each) do
             @stash_wrapper = Stash::Wrapper::StashWrapper.parse_xml(sw_doi_xml)
             @wrapper_doi_value = '10.15146/R3RG6G'
+            @ark = doi_ark
           end
 
           describe 'initial test migration' do
@@ -152,7 +225,7 @@ module Dash2
                 @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
               end
 
-              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
               expect(new_resource).to be_a(StashEngine::Resource)
               expect(StashEngine::Resource.count).to eq(1)
             end
@@ -166,6 +239,7 @@ module Dash2
               ident_value = (ident = new_resource.identifier) && ident.identifier
               expect(ident_value).not_to be_nil
               expect(ident_value).to eq(minted_doi_value)
+              expect(ident.identifier_type).to eq('DOI')
             end
 
             it 'adds a "migrated from" alternate identifier to the resource' do
@@ -178,6 +252,7 @@ module Dash2
               it 'injects the newly minted DOI into the Datacite XML' do
                 ident_value = (ident = ezid_resource.identifier) && ident.value
                 expect(ident_value).to eq(minted_doi_value)
+                expect(ident.identifier_type).to eq('DOI')
               end
               it 'adds a "migrated from" alternate identifier to the Datacite XML' do
                 alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
@@ -188,7 +263,7 @@ module Dash2
 
             it 'submits a SWORD create' do
               expect(sword_client).to have_received(:create).with(hash_including(doi: minted_doi))
-              expect(new_resource.download_uri).to eq(merritt_download_uri(minted_doi))
+              expect(new_resource.download_uri).to eq('http://merritt-dev.cdlib.org/d/ark%3A%2Fc5146%2Fr3rg6g')
               expect(new_resource.update_uri).to eq(sword_update_uri(minted_doi))
             end
           end
@@ -202,7 +277,7 @@ module Dash2
                 @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
               end
 
-              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
               expect(new_resource).to be_a(StashEngine::Resource)
               expect(StashEngine::Resource.count).to eq(1)
             end
@@ -216,6 +291,7 @@ module Dash2
               ident_value = (ident = new_resource.identifier) && ident.identifier
               expect(ident_value).not_to be_nil
               expect(ident_value).to eq(wrapper_doi_value)
+              expect(ident.identifier_type).to eq('DOI')
             end
 
             it "doesn't add a 'migrated from' alternate identifier to the resource" do
@@ -227,6 +303,7 @@ module Dash2
               it 'preserves the wrapper DOI' do
                 ident_value = (ident = ezid_resource.identifier) && ident.value
                 expect(ident_value).to eq(wrapper_doi_value)
+                expect(ident.identifier_type).to eq('DOI')
               end
               it 'doesn\'t add a "migrated from" alternate identifier' do
                 alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }
@@ -236,7 +313,7 @@ module Dash2
 
             it 'sets the SWORD update and download URIs' do
               expect(new_resource.update_uri).to eq(sword_update_uri(wrapper_doi))
-              expect(new_resource.download_uri).to eq(merritt_download_uri(minted_doi))
+              expect(new_resource.download_uri).to eq('https://merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr3rg6g')
             end
 
             it 'submits a SWORD update' do
@@ -297,7 +374,7 @@ module Dash2
                 @ezid_resource = Datacite::Mapping::Resource.parse_xml(xml_str)
               end
 
-              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid)
+              @new_resource = importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
             end
 
             it 'creates a new resource' do
@@ -309,6 +386,7 @@ module Dash2
               ident_value = (ident = new_resource.identifier) && ident.identifier
               expect(ident_value).not_to be_nil
               expect(ident_value).to eq(existing_fake_doi_value)
+              expect(ident.identifier_type).to eq('DOI')
             end
 
             it 'copies the alternate identifier from the existing resource' do
@@ -336,6 +414,7 @@ module Dash2
               it 'injects the existing DOI into the Datacite XML' do
                 ident_value = (ident = ezid_resource.identifier) && ident.value
                 expect(ident_value).to eq(existing_fake_doi_value)
+                expect(ident.identifier_type).to eq('DOI')
               end
               it 'adds a "migrated from" alternate identifier to the Datacite XML' do
                 alt_ident = ezid_resource.alternate_identifiers.find { |ident| ident.type = 'migrated from' }

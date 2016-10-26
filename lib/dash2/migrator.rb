@@ -9,6 +9,10 @@ module Dash2
       env_name && env_name.casecmp('production').zero?
     end
 
+    def self.stage?
+      env_name && env_name.casecmp('stage').zero?
+    end
+
     def self.env_name
       ENV['STASH_ENV']
     end

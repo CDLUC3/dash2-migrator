@@ -79,6 +79,8 @@ module Dash2
               allow(record).to receive(:mrt_eml).and_return(nil)
               allow(record).to receive(:as_wrapper).and_return(wrapper)
               allow(record).to receive(:user_uid).and_return(uid)
+              index = uid[4]
+              allow(record).to receive(:ark).and_return("ark:/#{index}/#{index}")
               record
             end
           end
@@ -88,7 +90,8 @@ module Dash2
             allow(ActiveRecord::Base).to(receive(:transaction)) { |_args, &block| block.call }
 
             wrappers.zip(uids).each do |wrapper, uid|
-              expect(importer).to receive(:import).with(stash_wrapper: wrapper, user_uid: uid)
+              index = uid[4]
+              expect(importer).to receive(:import).with(stash_wrapper: wrapper, user_uid: uid, ark: "ark:/#{index}/#{index}")
             end
             indexer.index(records)
           end

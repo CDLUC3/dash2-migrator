@@ -51,11 +51,11 @@ module Dash2
           @sword_client = sword_client
         end
 
-        def import(stash_wrapper:, user_uid:)
+        def import(stash_wrapper:, user_uid:, ark:)
           if stash_wrapper.identifier.type == Stash::Wrapper::IdentifierType::ARK && Migrator.production?
             mint_real_doi_for(stash_wrapper: stash_wrapper)
           else
-            import_to_stash(stash_wrapper: stash_wrapper, user_uid: user_uid)
+            import_to_stash(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
           end
         end
 
@@ -74,8 +74,24 @@ module Dash2
           end
         end
 
+        def download_uri_base
+          @download_uri_base ||= begin
+            if Migrator.production?
+              'https://merritt.cdlib.org'
+            elsif Migrator.stage?
+              'https://merritt-stage.cdlib.org'
+            else
+              'http://merritt-dev.cdlib.org/'
+            end
+          end
+        end
+
         def edit_uri_for(doi)
           "#{edit_uri_base}#{ERB::Util.url_encode(doi)}"
+        end
+
+        def download_uri_for(ark)
+          "#{download_uri_base}/d/#{ERB::Util.url_encode(ark)}"
         end
 
         def sword_packager
@@ -88,7 +104,8 @@ module Dash2
           log.warn "Minted new DOI: #{ezid_client.mint_id} for ARK: #{sw_ident.value}"
         end
 
-        def import_to_stash(stash_wrapper:, user_uid:)
+        def import_to_stash(stash_wrapper:, user_uid:, ark:)
+          raise ArgumentError, 'No ARK provided' unless ark
           se_resource = build_se_resource(stash_wrapper, user_uid)
 
           if (existing_alt_ident = alt_ident_for(se_resource))
@@ -97,10 +114,10 @@ module Dash2
           elsif (existing_resource = se_resource.first_identical_resource)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           elsif Migrator.production?
-            wrapper_doi = id_for(se_resource.identifier_value)
-            se_resource.update_uri = edit_uri_for(wrapper_doi)
-            # TODO: download URI?
-            final_doi = wrapper_doi
+            wrapper_id = id_for(se_resource.identifier_value)
+            se_resource.update_uri = edit_uri_for(wrapper_id)
+            se_resource.download_uri = download_uri_for(ark)
+            final_doi = wrapper_id
           else
             final_doi = migrate_test_record(stash_wrapper, se_resource)
           end
@@ -179,8 +196,12 @@ module Dash2
           return if se_ident.identifier == new_doi_value
 
           se_ident.identifier = new_doi_value
+          se_ident.identifier_type = 'DOI'
           se_ident.save
-          se_resource_id = se_resource.id
+          create_alt_ident(se_resource.id, wrapper_id_value)
+        end
+
+        def create_alt_ident(se_resource_id, wrapper_id_value)
           alt_ident = StashDatacite::AlternateIdentifier.create(
             resource_id: se_resource_id,
             alternate_identifier_type: MIGRATED_FROM,
