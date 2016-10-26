@@ -8,8 +8,6 @@ module Dash2
 
       class Indexer < Stash::Indexer::Indexer
 
-        DOIUpdater = Dash2::Migrator::Importer::DOIUpdater
-        SwordPackager = Dash2::Migrator::Importer::SwordPackager
         Importer = Dash2::Migrator::Importer::Importer
 
         attr_reader :db_config
@@ -39,7 +37,6 @@ module Dash2
         end
 
         def do_index(hr)
-          return Stash::Indexer::IndexResult.failure(hr, [ArgumentError.new("Can't migrate EML record #{hr.identifier}")]) if hr.mrt_eml
           index_record(hr.as_wrapper, hr.user_uid)
           Stash::Indexer::IndexResult.success(hr)
         end
@@ -62,20 +59,12 @@ module Dash2
           @tenant ||= StashEngine::Tenant.new(tenant_config)
         end
 
-        def doi_updater
-          @doi_updater ||= DOIUpdater.new(ezid_client: ezid_client, tenant: tenant, mint_dois: demo_mode?)
-        end
-
         def sword_client
           @sword_client ||= Stash::Sword::Client.new(tenant.sword_params)
         end
 
-        def sword_packager
-          @sword_packager ||= SwordPackager.new(sword_client: sword_client, create_placeholder_files: demo_mode?)
-        end
-
         def importer
-          @importer ||= Importer.new(doi_updater: doi_updater, sword_packager: sword_packager, tenant: tenant)
+          @importer ||= Importer.new(ezid_client: ezid_client, sword_client: sword_client, tenant: tenant)
         end
 
         private

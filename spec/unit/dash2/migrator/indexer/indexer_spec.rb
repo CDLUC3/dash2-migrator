@@ -57,26 +57,13 @@ module Dash2
             allow(ezid_client).to receive(:instance_variable_get).with(:@ezid_client).and_return(inner_ezid_client)
             allow(StashEzid::Client).to receive(:new).with(ezid_params).and_return(ezid_client)
 
-            doi_updater = instance_double(Importer::DOIUpdater)
-            allow(Importer::DOIUpdater).to receive(:new).with(
-              ezid_client: ezid_client,
-              tenant: tenant,
-              mint_dois: true
-            ).and_return(doi_updater)
-
             sword_client = instance_double(Stash::Sword::Client)
             allow(Stash::Sword::Client).to receive(:new).with(sword_params).and_return(sword_client)
 
-            sword_packager = instance_double(Importer::SwordPackager)
-            allow(Importer::SwordPackager).to receive(:new).with(
-              sword_client: sword_client,
-              create_placeholder_files: true
-            ).and_return(sword_packager)
-
             @importer = instance_double(Importer::Importer)
             allow(Importer::Importer).to receive(:new).with(
-              doi_updater: doi_updater,
-              sword_packager: sword_packager,
+              ezid_client: ezid_client,
+              sword_client: sword_client,
               tenant: tenant
             ).and_return(importer)
 
