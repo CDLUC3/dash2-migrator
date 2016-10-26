@@ -9,7 +9,8 @@ module Eml
       %r{<([A-Za-z]+)>[^<]*No standard is specified[^<]*</\1>},
       %r{<([A-Za-z]+)>noemail@noemail.com</\1>},
       %r{<([A-Za-z]+)>\s*</\1>},
-      %r{<([A-Za-z]+)/>}
+      %r{<([A-Za-z]+)/>},
+      %r{<([A-Za-z]+)>Missing required element</\1>},
     ].freeze
 
     def self.filter(xml_text)
@@ -94,6 +95,11 @@ module Eml
       non_blank_text_node :east_bounding_coordinate, 'eastBoundingCoordinate', default_value: nil
       non_blank_text_node :north_bounding_coordinate, 'northBoundingCoordinate', default_value: nil
       non_blank_text_node :south_bounding_coordinate, 'southBoundingCoordinate', default_value: nil
+
+      def empty?
+        south_bounding_coordinate == north_bounding_coordinate &&
+          west_bounding_coordinate == east_bounding_coordinate
+      end
     end
 
     class GeographicCoverage

@@ -175,6 +175,7 @@ module Dash2
         end
 
         def to_box(coords)
+          return if coords.empty?
           GeoLocationBox.new(
             south_latitude: coords.south_bounding_coordinate.to_f,
             west_longitude: coords.west_bounding_coordinate.to_f,

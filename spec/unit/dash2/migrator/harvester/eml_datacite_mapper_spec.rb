@@ -162,33 +162,43 @@ module Dash2
           end
         end
 
-        it 'sets geolocations' do
-          aggregate_failures 'all files' do
-            id_to_dataset.each do |id_value, dataset|
-              next unless (coverage = dataset.coverage) && (geo_coverage = coverage.geographic_coverage)
+        describe 'geolocations' do
+          it 'sets place names' do
+            aggregate_failures 'all files' do
+              id_to_dataset.each do |id_value, dataset|
+                next unless (coverage = dataset.coverage) && (geo_coverage = coverage.geographic_coverage)
+                next unless (place = geo_coverage.geographic_description)
+                resource = id_to_resource[id_value]
+                locs = resource.geo_locations
+                expect(locs.size).to eq(1), "Wrong number of geolocations for #{id_value}; expected 1, was #{locs.size}"
+                next unless locs.size == 1
+                expect(locs[0].place).to eq(place)
+              end
+            end
+          end
+          it 'sets bounding boxes' do
+            aggregate_failures 'all files' do
+              id_to_dataset.each do |id_value, dataset|
+                next unless (coverage = dataset.coverage) && (geo_coverage = coverage.geographic_coverage)
+                next unless (coords = geo_coverage.bounding_coordinates)
+                resource = id_to_resource[id_value]
+                locs = resource.geo_locations
+                if coords.empty?
+                  next if locs.empty?
+                  expect(locs[0].box).to be_nil, "Box created for empty coordinates in #{id_value}"
+                else
+                  expect(locs.size).to eq(1), "Wrong number of geolocations for #{id_value}; expected 1, was #{locs.size}"
+                  next unless locs.size == 1
 
-              resource = id_to_resource[id_value]
-              locs = resource.geo_locations
+                  expect(box = locs[0].box).not_to be_nil, "Missing geolocationbox for #{id_value}"
+                  next unless box
 
-              expect(locs).not_to be_nil, "No locations for #{id_value}"
-              next unless locs
-
-              expect(locs.size).to eq(1), "Wrong number of geolocations for #{id_value}; expected 1, was #{locs.size}"
-              next unless locs.size == 1
-
-              loc = locs[0]
-              expect(loc.place).to eq(geo_coverage.geographic_description)
-
-              coords = geo_coverage.bounding_coordinates
-              next unless coords
-
-              expect(box = loc.box).not_to be_nil, "Missing geolocationbox for #{id_value}"
-              next unless box
-
-              expect(box.south_latitude).to eq(coords.south_bounding_coordinate.to_f)
-              expect(box.west_longitude).to eq(coords.west_bounding_coordinate.to_f)
-              expect(box.north_latitude).to eq(coords.north_bounding_coordinate.to_f)
-              expect(box.east_longitude).to eq(coords.east_bounding_coordinate.to_f)
+                  expect(box.south_latitude).to eq(coords.south_bounding_coordinate.to_f)
+                  expect(box.west_longitude).to eq(coords.west_bounding_coordinate.to_f)
+                  expect(box.north_latitude).to eq(coords.north_bounding_coordinate.to_f)
+                  expect(box.east_longitude).to eq(coords.east_bounding_coordinate.to_f)
+                end
+              end
             end
           end
         end
