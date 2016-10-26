@@ -4,6 +4,8 @@ module Dash2
   module Migrator
     describe MigrationJob do
 
+      EXPECTED_RECORDS = 156
+
       attr_reader :user_uid
       attr_reader :last_doi
 
@@ -39,10 +41,22 @@ module Dash2
         allow(Stash::Sword::Client).to receive(:new) { @sword_client }
       end
 
-      it 'harvests and imports' do
-        migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
-        migrator.migrate!
-        expect(StashEngine::Resource.count).to eq(147)
+      describe 'harvest and import' do
+        before(:each) do
+          migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
+          migrator.migrate!
+        end
+
+        it 'harvests and imports' do
+          expect(StashEngine::Resource.count).to eq(EXPECTED_RECORDS)
+        end
+
+        it 'remigrates' do
+          expect(@sword_client).to receive(:update).exactly(EXPECTED_RECORDS).times.and_return(200)
+          migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
+          migrator.migrate!
+          expect(StashEngine::Resource.count).to eq(EXPECTED_RECORDS)
+        end
       end
 
     end
