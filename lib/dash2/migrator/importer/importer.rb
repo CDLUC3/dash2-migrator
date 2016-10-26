@@ -202,7 +202,7 @@ module Dash2
           dcs_ident = dcs_resource.identifier
           return if dcs_ident.value == new_doi_value
 
-          dcs_ident.value = new_doi_value
+          dcs_resource.identifier = Datacite::Mapping::Identifier.new(value: new_doi_value)
           dcs_resource.alternate_identifiers << Datacite::Mapping::AlternateIdentifier.new(
             type: MIGRATED_FROM,
             value: id_for(wrapper_id_value)
