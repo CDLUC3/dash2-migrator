@@ -61,3 +61,5 @@ end
 
 job = Dash2::Migrator::MigrationJob.from_file('config/migrate-all-to-ucop.yml')
 job.migrate!
+
+Dash2::Migrator::Importer::Importer.clean_up!
