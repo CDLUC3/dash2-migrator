@@ -166,8 +166,16 @@ module Dash2
         def location
           return unless @location || (geo_coverage = dataset.geo_coverage)
           @location ||= begin
-            loc = GeoLocation.new(place: geo_coverage.geographic_description)
-            if (coords = geo_coverage.bounding_coordinates)
+            desc = geo_coverage.geographic_description
+            loc = GeoLocation.new(place: desc)
+            if desc && desc.include?('Cuerda del Pozo')
+              loc.box = GeoLocationBox.new(
+                south_latitude: 41.82,
+                west_longitude: -2.81,
+                north_latitude: 41.9,
+                east_longitude: -2.70
+              )
+            elsif (coords = geo_coverage.bounding_coordinates)
               loc.box = to_box(coords)
             end
             loc

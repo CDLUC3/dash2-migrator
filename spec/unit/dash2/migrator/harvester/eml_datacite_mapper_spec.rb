@@ -193,10 +193,26 @@ module Dash2
                   expect(box = locs[0].box).not_to be_nil, "Missing geolocationbox for #{id_value}"
                   next unless box
 
-                  expect(box.south_latitude).to eq(coords.south_bounding_coordinate.to_f)
-                  expect(box.west_longitude).to eq(coords.west_bounding_coordinate.to_f)
-                  expect(box.north_latitude).to eq(coords.north_bounding_coordinate.to_f)
-                  expect(box.east_longitude).to eq(coords.east_bounding_coordinate.to_f)
+                  expected_coords = if (place = locs[0].place) && place.include?('Cuerda del Pozo')
+                                      {
+                                        south_latitude: 41.82,
+                                        west_longitude: -2.81,
+                                        north_latitude: 41.9,
+                                        east_longitude: -2.70
+                                      }
+                                    else
+                                      {
+                                        south_latitude: coords.send(:south_bounding_coordinate).to_f,
+                                        north_latitude: coords.send(:north_bounding_coordinate).to_f,
+                                        west_longitude: coords.send(:west_bounding_coordinate).to_f,
+                                        east_longitude: coords.send(:east_bounding_coordinate).to_f
+                                      }
+                                    end
+
+                  expected_coords.each do |coord, expected|
+                    actual = box.send(coord)
+                    expect(actual).to eq(expected), "incorrect #{coord} for #{id_value}: expected #{expected}, was #{actual}"
+                  end
                 end
               end
             end
