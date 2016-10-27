@@ -6,6 +6,10 @@ module Stash
     class StashWrapper
       attr_reader :datacite_resource
 
+      def id_value
+        identifier && identifier.value
+      end
+
       def datacite_resource=(resource)
         raise ArgumentError, "Not a resource: #{resource}" unless resource.nil? || resource.is_a?(Datacite::Mapping::Resource) # || resource.to_s =~ /InstanceDouble\(#{Datacite::Mapping::Resource}\)/
         @datacite_resource = resource

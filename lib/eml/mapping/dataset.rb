@@ -10,7 +10,7 @@ module Eml
       %r{<([A-Za-z]+)>noemail@noemail.com</\1>},
       %r{<([A-Za-z]+)>\s*</\1>},
       %r{<([A-Za-z]+)/>},
-      %r{<([A-Za-z]+)>Missing required element</\1>},
+      %r{<([A-Za-z]+)>Missing required element</\1>}
     ].freeze
 
     def self.filter(xml_text)

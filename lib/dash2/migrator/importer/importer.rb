@@ -63,6 +63,10 @@ module Dash2
           Stash::Harvester.log
         end
 
+        def self.log
+          Stash::Harvester.log
+        end
+
         def edit_uri_base
           @edit_uri_base ||= begin
             if (match_data = SWORD_PATTERN.match(sword_client.collection_uri))
@@ -106,19 +110,25 @@ module Dash2
 
         def import_to_stash(stash_wrapper:, user_uid:, ark:)
           raise ArgumentError, 'No ARK provided' unless ark
-          se_resource = build_se_resource(stash_wrapper, user_uid)
+          wrapper_id_value = stash_wrapper.id_value
 
-          if (existing_alt_ident = alt_ident_for(se_resource))
+          if (existing_alt_ident = alt_ident_for(wrapper_id_value))
+            raise "Can't remigrate in production" if Migrator.production?
             existing_resource = StashEngine::Resource.find(existing_alt_ident.resource_id)
+            se_resource = build_se_resource(stash_wrapper, user_uid)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
-          elsif (existing_resource = se_resource.first_identical_resource)
+          elsif (existing_resource = first_identical_resource(wrapper_id_value))
+            raise "Can't remigrate in production" if Migrator.production?
+            se_resource = build_se_resource(stash_wrapper, user_uid)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           elsif Migrator.production?
-            wrapper_id = id_for(se_resource.identifier_value)
+            wrapper_id = id_for(wrapper_id_value)
+            se_resource = build_se_resource(stash_wrapper, user_uid)
             se_resource.update_uri = edit_uri_for(wrapper_id)
             se_resource.download_uri = download_uri_for(ark)
             final_doi = wrapper_id
           else
+            se_resource = build_se_resource(stash_wrapper, user_uid)
             final_doi = migrate_test_record(stash_wrapper, se_resource)
           end
 
@@ -126,6 +136,16 @@ module Dash2
 
           sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
           se_resource
+        end
+
+        def first_identical_resource(id_value)
+          identical_resources(id_value).first
+        end
+
+        def identical_resources(id_value)
+          StashEngine::Identifier
+            .where(identifier: id_value)
+            .flat_map(&:resources)
         end
 
         def update_ezid(final_doi, stash_wrapper)
@@ -149,9 +169,14 @@ module Dash2
           se_resource.update_uri = existing_resource.update_uri
 
           log.warn("Deleting existing resource #{existing_resource.id}, replaced by #{se_resource.id}")
-          existing_resource.destroy
+          destroy(existing_resource)
 
           id_for(new_doi_value)
+        end
+
+        def destroy(existing_resource)
+          # TODO: identifiers, locations
+          existing_resource.destroy
         end
 
         def build_se_resource(stash_wrapper, user_uid)
@@ -171,9 +196,7 @@ module Dash2
           user.id
         end
 
-        def alt_ident_for(se_resource)
-          se_ident = se_resource.identifier
-          wrapper_id_value = se_ident.identifier
+        def alt_ident_for(wrapper_id_value)
           wrapper_doi = id_for(wrapper_id_value)
           StashDatacite::AlternateIdentifier.find_by(alternate_identifier: wrapper_doi, alternate_identifier_type: MIGRATED_FROM)
         end
@@ -229,6 +252,22 @@ module Dash2
             type: MIGRATED_FROM,
             value: id_for(wrapper_id_value)
           )
+        end
+
+        def self.clean_up!
+          valid_identifier_ids = StashEngine::Resource.pluck(:identifier_id)
+          orphan_identifiers = StashEngine::Identifier.where.not(id: valid_identifier_ids)
+          log.warn("Destroying #{orphan_identifiers.count} orphan identifiers")
+          orphan_identifiers.destroy_all
+
+          valid_resource_ids = StashEngine::Resource.ids
+          orphan_locations = StashDatacite::Geolocation.where.not(resource_id: valid_resource_ids)
+          log.warn("Destroying #{orphan_locations.count} orphan locations")
+          orphan_locations.destroy_all
+
+          orphan_states = StashEngine::ResourceState.where.not(resource_id: valid_resource_ids)
+          log.warn("Destroying #{orphan_states.count} orphan states")
+          orphan_states.destroy_all
         end
 
       end
