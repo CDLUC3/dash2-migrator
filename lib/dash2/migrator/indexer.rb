@@ -34,7 +34,6 @@ module Dash2
               yield Stash::Indexer::IndexResult.failure(hr, [e]) if block_given?
             end
           end
-          importer.cleanup
         end
 
         def do_index(hr)
