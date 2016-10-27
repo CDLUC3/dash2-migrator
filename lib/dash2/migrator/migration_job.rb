@@ -23,12 +23,15 @@ module Dash2
 
       def migrate!
         sources.each do |source|
-          app = create_app_instance(source[:tenant_path], source[:feed_uri])
+          app = create_app(source)
           app.start
         end
       end
 
-      def create_app_instance(tenant_path, feed_uri)
+      def create_app(source)
+        tenant_path = source[:tenant_path]
+        feed_uri = source[:feed_uri]
+
         index_tenant_path = index_tenant_override || tenant_path
         source_config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: feed_uri, env_name: env_name)
         index_config = IndexerIndexConfig.new(db_config_path: index_db_config_path, tenant_path: index_tenant_path)
