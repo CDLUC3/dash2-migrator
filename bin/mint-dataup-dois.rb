@@ -13,15 +13,25 @@ ENV['RAILS_ENV'] = ENV['STASH_ENV']
 lib_path = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
-require 'dash2/migrator'
+require 'stash_ezid/client'
 
-source_config = Dash2::Migrator::Harvester::MerrittAtomSourceConfig.new(
-  tenant_path: 'config/tenants/dataone.yml',
-  feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5222s39',
-  env_name: ENV['STASH_ENV']
-)
+ezid_config = {
+  shoulder: 'doi:10.5072/FK2',
+  account: 'apitest',
+  password: 'apitest',
+  id_scheme: 'doi',
+  owner: nil
+}
 
-harvest_task = source_config.create_harvest_task
-harvest_task.harvest_records.each do |hr|
-  puts hr.ark
+ezid_client = StashEzid::Client.new(ezid_config)
+inner_client = ezid_client.instance_variable_get(:@ezid_client)
+if inner_client && (logger = inner_client.logger)
+  logger.level = Logger::WARN
+end
+
+File.readlines('spec/data/all_dataup_arks.txt').each do |line|
+  ark = line.strip
+  next if ark == 'ark:/90135/q1f769jn' # oops
+  doi = ezid_client.mint_id
+  puts "#{ark}\t#{doi}"
 end
