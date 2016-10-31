@@ -17,3 +17,15 @@ module Datacite
     end
   end
 end
+
+module Datacite
+  module Mapping
+    class NameIdentifier
+      def value=(v)
+        new_value = v && v.strip
+        warn 'Identifier should have a non-nil value' unless new_value && !new_value.empty?
+        @value = new_value
+      end
+    end
+  end
+end

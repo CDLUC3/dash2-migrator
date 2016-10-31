@@ -287,8 +287,9 @@ module StashDatacite
     def sd_name_identifier_id_for(dcs_name_identifier)
       return nil unless dcs_name_identifier
       scheme_uri = dcs_name_identifier.scheme_uri
+      value = dcs_name_identifier.value
       sd_name_ident = StashDatacite::NameIdentifier.find_or_create_by(
-        name_identifier: dcs_name_identifier.value,
+        name_identifier: value,
         name_identifier_scheme: dcs_name_identifier.scheme,
         scheme_URI: (scheme_uri if scheme_uri)
       )

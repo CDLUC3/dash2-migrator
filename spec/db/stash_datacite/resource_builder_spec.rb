@@ -151,10 +151,14 @@ module StashDatacite
 
     it 'extracts the dates' do
       dates = se_resource.datacite_dates
-      expect(dates.size).to eq(1)
-      date = dates[0]
-      expect(date.date).to eq(Date.new(2015, 12, 2))
-      expect(date.date_type).to eq(Datacite::Mapping::DateType::AVAILABLE.value.downcase)
+      expect(dates.size).to eq(2)
+      date0 = dates[0]
+      expect(date0.date).to eq('2015-12-02')
+      expect(date0.date_type).to eq(Datacite::Mapping::DateType::AVAILABLE.value.downcase)
+
+      date1 = dates[1]
+      expect(date1.date).to eq('2009/2011')
+      expect(date1.date_type).to eq(Datacite::Mapping::DateType::COLLECTED.value.downcase)
     end
 
     it 'extracts the language' do
