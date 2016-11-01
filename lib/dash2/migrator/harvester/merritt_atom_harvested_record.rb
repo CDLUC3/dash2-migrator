@@ -92,13 +92,6 @@ module Dash2
         end
 
         def build_datacite_resource
-          # base = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}"
-          #
-          # mom_file = "spec/data/harvester/moms/#{base}-mrt-mom.txt"
-          # File.open(mom_file, 'wb') { |f| f.write(mrt_mom) }
-          #
-          # puts "#{tenant_id}\t#{ark}\t#{local_id || 'nil'}"
-
           return parse_mrt_datacite if mrt_datacite_xml
           return parse_mrt_eml if mrt_eml
           raise "No Datacite or EML XML found in entry #{identifier_value}"
