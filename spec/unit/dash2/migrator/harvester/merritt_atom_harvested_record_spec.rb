@@ -53,6 +53,12 @@ module Dash2
           end
         end
 
+        describe '#local_id' do
+          it 'extracts the local id' do
+            expect(record.local_id).to eq('oangdfazln')
+          end
+        end
+
         describe '#user_uid' do
           it 'gets the user info from Dash 1'
           it 'creates a user if needed'
@@ -324,6 +330,7 @@ module Dash2
             puts wrapper.write_xml
           end
         end
+
       end
 
     end

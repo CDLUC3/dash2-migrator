@@ -11,6 +11,7 @@ module Dash2
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
         DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
         ARK_PATTERN = %r{ark:/[a-z0-9]+/[a-z0-9]+}
+        LOCAL_ID_PATTERN = %r{localIdentifier:\s*([a-z]+);}
 
         attr_reader :tenant_id
         attr_reader :feed_uri
@@ -44,7 +45,7 @@ module Dash2
         def doi
           @doi ||= begin
             doi_match_data = mrt_mom.match(DOI_PATTERN)
-            warn 'no DOI found in mrt-mom.txt' unless doi_match_data
+            log.warn('no DOI found in mrt-mom.txt') unless doi_match_data
             doi_match_data[0].strip if doi_match_data
           end
         end
@@ -52,15 +53,23 @@ module Dash2
         def ark
           @ark ||= begin
             ark_match_data = mrt_mom.match(ARK_PATTERN)
-            warn 'no ARK found in mrt-mom.txt' unless ark_match_data
+            log.warn('no ARK found in mrt-mom.txt') unless ark_match_data
             ark_match_data[0].strip if ark_match_data
+          end
+        end
+
+        def local_id
+          @local_id ||= begin
+            local_id_match_data = mrt_mom.match(LOCAL_ID_PATTERN)
+            log.warn('no local ID found in mrt-mom.txt') unless local_id_match_data
+            local_id_match_data[1] if local_id_match_data
           end
         end
 
         def date_published
           @date_published ||= begin
             published = entry.published
-            warn 'no published date for entry' unless published
+            log.warn('no published date for entry') unless published
             published.content
           end
         end
@@ -78,6 +87,13 @@ module Dash2
         end
 
         def build_datacite_resource
+          # base = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}"
+          #
+          # mom_file = "spec/data/harvester/moms/#{base}-mrt-mom.txt"
+          # File.open(mom_file, 'wb') { |f| f.write(mrt_mom) }
+          #
+          # puts "#{tenant_id}\t#{ark}\t#{local_id || 'nil'}"
+
           return parse_mrt_datacite if mrt_datacite_xml
           return parse_mrt_eml if mrt_eml
           raise "No Datacite or EML XML found in entry #{identifier_value}"
