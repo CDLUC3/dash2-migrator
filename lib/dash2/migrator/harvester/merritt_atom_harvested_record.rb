@@ -86,6 +86,11 @@ module Dash2
           @identifier_value ||= doi ? doi : ark
         end
 
+        def title
+          datacite_resource = as_wrapper.datacite_resource
+          datacite_resource.default_title
+        end
+
         def build_datacite_resource
           # base = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}"
           #

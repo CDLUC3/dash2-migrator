@@ -287,6 +287,13 @@ module Dash2
               expect(license.uri).to eq(custom_uri)
             end
           end
+
+          describe '#title' do
+            it 'extracts the title' do
+              expect(record.title).to eq('A Zebrafish Model for Studies on Esophageal Epithelial Biology')
+            end
+          end
+
         end
 
         describe 'EML handling' do
