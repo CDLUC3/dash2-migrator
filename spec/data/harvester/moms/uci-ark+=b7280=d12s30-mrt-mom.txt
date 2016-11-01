@@ -1,0 +1,4 @@
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	cwgovthdaq; doi:10.7280/D12S30
+primaryIdentifier:	ark:/b7280/d12s30

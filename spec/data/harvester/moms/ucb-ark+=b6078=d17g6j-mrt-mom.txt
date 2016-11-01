@@ -1,0 +1,4 @@
+type:		MRT-curatorial
+role:		MRT-content
+primaryIdentifier:	ark:/b6078/d17g6j
+localIdentifier:	doi:10.6078/D17G6J

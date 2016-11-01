@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b7280/d15k5m
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	zsguulmlfw; doi:10.7280/D15K5M

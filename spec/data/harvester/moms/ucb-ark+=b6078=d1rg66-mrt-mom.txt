@@ -1,0 +1,4 @@
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	popuazybdv; doi:10.6078/D1RG66
+primaryIdentifier:	ark:/b6078/d1rg66

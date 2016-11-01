@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b5060/d8301x
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	sakienttlz; doi:10.5060/D8301X

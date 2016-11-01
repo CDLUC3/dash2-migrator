@@ -1,0 +1,4 @@
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	hienwfruia; doi:10.15146/R3RP4S
+primaryIdentifier:	ark:/c5146/r3rp4s

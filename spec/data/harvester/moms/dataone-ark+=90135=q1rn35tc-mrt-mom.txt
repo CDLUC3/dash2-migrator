@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/90135/q1rn35tc
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	doi:10.15146/R3JP4X

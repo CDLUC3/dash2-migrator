@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b5060/d8z59f
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	nqvljorpyw; doi:10.5060/D8Z59F

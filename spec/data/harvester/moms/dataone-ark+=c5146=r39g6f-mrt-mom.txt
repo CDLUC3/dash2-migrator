@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/c5146/r39g6f
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	nculfjdcnv; doi:10.15146/R39G6F

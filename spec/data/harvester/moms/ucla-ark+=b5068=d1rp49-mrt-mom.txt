@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b5068/d1rp49
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	doi:10.5068/D1RP49

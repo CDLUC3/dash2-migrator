@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b7272/q6pn93h6
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	plurtafdxo; doi:10.7272/Q6PN93H6

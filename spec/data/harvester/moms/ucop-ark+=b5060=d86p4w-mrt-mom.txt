@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b5060/d86p4w
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	ijguzznuxx; doi:10.5060/D86P4W

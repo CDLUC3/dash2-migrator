@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b7291/d17p46
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	kbsagntvtr; doi:10.7291/D17P46

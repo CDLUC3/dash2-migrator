@@ -1,0 +1,4 @@
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	veltbrpgvo; doi:10.15146/R32S37
+primaryIdentifier:	ark:/c5146/r32s37

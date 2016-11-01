@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b7280/d1pk58
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	zbcryvsmlx; doi:10.7280/D1PK58

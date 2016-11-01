@@ -1,0 +1,4 @@
+primaryIdentifier:	ark:/b7272/q65q4t1r
+type:		MRT-curatorial
+role:		MRT-content
+localIdentifier:	aikiqolqmj; doi:10.7272/Q65Q4T1R
