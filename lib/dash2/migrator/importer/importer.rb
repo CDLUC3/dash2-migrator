@@ -112,7 +112,7 @@ module Dash2
           raise ArgumentError, 'No ARK provided' unless ark
           wrapper_id_value = stash_wrapper.id_value
 
-          if (existing_alt_ident = alt_ident_for(wrapper_id_value))
+          if (existing_alt_ident = alt_ident_for(wrapper_id_value, ark))
             raise "Can't remigrate in production" if Migrator.production?
             existing_resource = StashEngine::Resource.find(existing_alt_ident.resource_id)
             se_resource = build_se_resource(stash_wrapper, user_uid)
@@ -150,10 +150,15 @@ module Dash2
 
         def update_ezid(final_doi, stash_wrapper)
           dcs_resource = stash_wrapper.datacite_resource
-          dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
-          landing_url = tenant.landing_url("/stash/dataset/#{final_doi}")
-          ezid_client.update_metadata(final_doi, dcs3_xml, landing_url)
-          dcs_resource
+          begin
+            dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
+            landing_url = tenant.landing_url("/stash/dataset/#{final_doi}")
+            ezid_client.update_metadata(final_doi, dcs3_xml, landing_url)
+            dcs_resource
+          rescue => e
+            log.warn "Error updating #{final_doi} (expired fake DOI?): #{e}"
+            dcs_resource
+          end
         end
 
         def replace_existing_resource(se_resource, stash_wrapper, existing_resource)
@@ -196,9 +201,13 @@ module Dash2
           user.id
         end
 
-        def alt_ident_for(wrapper_id_value)
-          wrapper_doi = id_for(wrapper_id_value)
-          StashDatacite::AlternateIdentifier.find_by(alternate_identifier: wrapper_doi, alternate_identifier_type: MIGRATED_FROM)
+        def alt_ident_for(wrapper_id_value, ark)
+          wrapper_id = id_for(wrapper_id_value)
+          alt_ident = StashDatacite::AlternateIdentifier.find_by(alternate_identifier: wrapper_id, alternate_identifier_type: MIGRATED_FROM)
+          return alt_ident if alt_ident || (ark == wrapper_id)
+          # Fall back to ARK in case we're looking at a DataUP record
+          # we migrated in test before we minted DOIs for it
+          StashDatacite::AlternateIdentifier.find_by(alternate_identifier: ark, alternate_identifier_type: MIGRATED_FROM)
         end
 
         def migrate_test_record(stash_wrapper, se_resource)
