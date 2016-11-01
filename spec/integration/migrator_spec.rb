@@ -2,9 +2,16 @@ require 'db_spec_helper'
 
 module Dash2
   module Migrator
+
+    module Datacite::Mapping::ReadOnlyNodes
+      def self.warn(warning)
+        Stash::Harvester::log.warn(warning)
+      end
+    end
+
     describe MigrationJob do
 
-      EXPECTED_RECORDS = 156
+      EXPECTED_RECORDS = 247
 
       attr_reader :user_uid
       attr_reader :last_doi
@@ -43,7 +50,7 @@ module Dash2
 
       describe 'harvest and import' do
         before(:each) do
-          migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
+          migrator = MigrationJob.from_file('config/migrate-all-to-ucop.yml')
           migrator.migrate!
         end
 
@@ -53,7 +60,7 @@ module Dash2
 
         it 'remigrates' do
           expect(@sword_client).to receive(:update).exactly(EXPECTED_RECORDS).times.and_return(200)
-          migrator = MigrationJob.from_file('spec/data/migrator-full.yml')
+          migrator = MigrationJob.from_file('config/migrate-all-to-ucop.yml')
           migrator.migrate!
           expect(StashEngine::Resource.count).to eq(EXPECTED_RECORDS)
         end
