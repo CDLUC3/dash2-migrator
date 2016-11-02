@@ -13,10 +13,8 @@ record_id	title	title_count	local_id	user_id	campus	first_name	last_name	email	u
 122	The Evolution of Function within the Nudix Superfamily	14	xpjxxihhux	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
 123	The Evolution of Function within the Nudix Superfamily 	14	vgstqlktls	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
 124	The Evolution of Function within the Nudix Superfamily	14	vynamyzkng	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
-43	Adam's Test Dataset	2	aklckwxmia	49	ucb			adstone@berkeley.edu	adstone@berkeley.edu	shibboleth	NULL
 141	xxx research data	2	hhevtkbunj	161	dataone	Yun	Can	canyun002@gmail.com	108180949815354753717	google_oauth2	ya29.BgJP00MbsF3RRCDTSzt-UqhcIIRGMzaoYBgan2wKk2EhHGGqN5lDu3RdZ-w3yTdjNuhn1hc
 142	xxx research data	2	bkyhiwevwv	161	dataone	Yun	Can	canyun002@gmail.com	108180949815354753717	google_oauth2	ya29.BgJP00MbsF3RRCDTSzt-UqhcIIRGMzaoYBgan2wKk2EhHGGqN5lDu3RdZ-w3yTdjNuhn1hc
-157	Adam's Test Dataset	2	sdcdriqvtc	75	lbnl	Adam	Stone	ADStone@lbl.gov	ADStone@lbl.gov	shibboleth	NULL
 161	Crystal Cove Marine Conservation Area Citizen Science Monitoring	2	agncrvfuin	28	uci	Matthew J.	McKinley	mjmckinl@uci.edu	mjmckinl@uci.edu	shibboleth	NULL
 254	Crystal Cove Marine Conservation Area Citizen Science Monitoring	2	yghhmxlztb	130	uci	Laura Jean	Smart	lsmart@uci.edu	lsmart@uci.edu	shibboleth	NULL
 2	My First Dataset	1	uuhokrvkjk	2	ucop	Marisa	Strong	Marisa.Strong@ucop.edu	Marisa.Strong-ucop.edu@ucop.edu	shibboleth	NULL
