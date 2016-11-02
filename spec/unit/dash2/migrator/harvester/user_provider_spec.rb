@@ -47,22 +47,23 @@ module Dash2
           end
         end
 
-        describe '#dash1_user_id_for' do
-          it 'maps the user IDs' do
+        describe '#dash1_user_for' do
+          it 'maps the users' do
             found = {}
             missing = []
             records.each do |r|
-              dash1_user_id = user_provider.dash1_user_id_for(local_id: r.local_id, title: r.title)
-              if dash1_user_id
-                found[r.ark] = dash1_user_id
+              dash1_user = user_provider.dash1_user_for(local_id: r.local_id, title: r.title)
+              if dash1_user
+                found[r.ark] = dash1_user
               else
                 missing << r
               end
             end
-            expect(found.size).to eq(130)
             expect(missing.size).to eq(117)
+            expect(found.size).to eq(130)
           end
         end
+
       end
     end
   end

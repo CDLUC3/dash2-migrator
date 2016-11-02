@@ -23,6 +23,37 @@ module Dash2
           end
         end
 
+        def dash1_user_for(local_id:, title:)
+          dash1_user_id = dash1_user_id_for(local_id: local_id, title: title)
+          return nil unless dash1_user_id
+
+          users_by_id[dash1_user_id]
+        end
+
+        def self.parse_tsv(path)
+          records = []
+          File.open(path) do |f|
+            header_line = f.gets
+            headers = header_line.strip.split("\t").map(&:to_sym)
+            f.each do |line|
+              cells = line.split("\t").map { |v| normalize_cell(v) }
+              record_hash = Hash[headers.zip(cells)]
+              records << OpenStruct.new(record_hash)
+            end
+          end
+          records
+        end
+
+        def self.normalize_cell(v)
+          return nil unless v
+          value = v.strip
+          return nil if value == 'nil'
+          return nil if value == ''
+          value
+        end
+
+        private
+
         def record_title(user_ids_by_title, record)
           user_id = record.user_id
           title = record.title
@@ -37,13 +68,6 @@ module Dash2
           return unless existing_user_id
           return unless existing_user_id == user_id
           raise "Duplicate local_id '#{record.local_id}' for user IDs #{user_id}, #{existing_user_id}"
-        end
-
-        def dash1_user_for(local_id:, title:)
-          dash1_user_id = dash1_user_id_for(local_id: local_id, title: title)
-          return nil unless dash1_user_id
-
-          users_by_id[dash1_user_id]
         end
 
         def dash1_user_id_for(local_id:, title:)
@@ -81,27 +105,6 @@ module Dash2
           )
         end
 
-        def self.parse_tsv(path)
-          records = []
-          File.open(path) do |f|
-            header_line = f.gets
-            headers = header_line.strip.split("\t").map(&:to_sym)
-            f.each do |line|
-              cells = line.split("\t").map { |v| normalize_cell(v) }
-              record_hash = Hash[headers.zip(cells)]
-              records << OpenStruct.new(record_hash)
-            end
-          end
-          records
-        end
-
-        def self.normalize_cell(v)
-          return nil unless v
-          value = v.strip
-          return nil if value == 'nil'
-          return nil if value == ''
-          value
-        end
       end
     end
   end
