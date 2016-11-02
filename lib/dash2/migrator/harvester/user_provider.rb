@@ -34,7 +34,8 @@ module Dash2
           user_id = record.user_id
           existing_user_id = user_ids_by_local_id[record.local_id]
           user_ids_by_local_id[record.local_id] = user_id unless existing_user_id
-          return unless existing_user_id.nil? || existing_user_id == user_id
+          return unless existing_user_id
+          return unless existing_user_id == user_id
           raise "Duplicate local_id '#{record.local_id}' for user IDs #{user_id}, #{existing_user_id}"
         end
 
@@ -83,7 +84,8 @@ module Dash2
         def self.parse_tsv(path)
           records = []
           File.open(path) do |f|
-            headers = f.gets.strip.split("\t").map(&:to_sym)
+            header_line = f.gets
+            headers = header_line.strip.split("\t").map(&:to_sym)
             f.each do |line|
               cells = line.split("\t").map { |v| normalize_cell(v) }
               record_hash = Hash[headers.zip(cells)]
