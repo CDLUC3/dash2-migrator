@@ -37,7 +37,20 @@ module Dash2
         end
 
         def do_index(hr)
-          index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: hr.ark)
+          # ark = hr.ark
+          # tenant_id = hr.tenant_id
+          # local_id = hr.local_id
+          # title = hr.title
+          #
+          # title.gsub!(/\A[[:space:]]+/, '')
+          # title.gsub!(/[[:space:]]+\z/, '')
+          # title.gsub!(/[[:space:]]+/, ' ')
+          #
+          # info = "#{tenant_id}\t#{ark}\t#{local_id || 'nil'}\t\"#{title}\""
+          # File.open('/tmp/titles.txt', 'a') { |f| f.puts(info) }
+          #
+          # puts info
+          index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: ark)
           Stash::Indexer::IndexResult.success(hr)
         end
 
