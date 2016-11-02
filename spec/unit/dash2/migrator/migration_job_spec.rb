@@ -76,18 +76,24 @@ module Dash2
 
       describe '#migrate' do
         it 'migrates each source' do
+          user_provider = instance_double(Dash2::Migrator::Harvester::UserProvider)
+          users_path = File.absolute_path('config/dash1_records_users.txt')
+          allow(Dash2::Migrator::Harvester::UserProvider).to receive(:new).with(users_path).and_return(user_provider)
+
           EXPECTED_SOURCES.each do |source|
             source_config = instance_double(Harvester::MerrittAtomSourceConfig)
             expect(Harvester::MerrittAtomSourceConfig).to receive(:new).with(
               tenant_path: source[:tenant_path],
               feed_uri: source[:feed_uri],
+              user_provider: user_provider,
               env_name: 'test'
             ).and_return(source_config)
 
             index_config = instance_double(Indexer::IndexConfig)
             expect(Indexer::IndexConfig).to receive(:new).with(
               db_config_path: EXPECTED_DB_PATH,
-              tenant_path: EXPECTED_TENANT_OVERRIDE
+              tenant_path: EXPECTED_TENANT_OVERRIDE,
+              user_provider: user_provider
             ).and_return(index_config)
 
             migrator_config = instance_double(MigratorConfig)

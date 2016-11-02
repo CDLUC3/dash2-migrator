@@ -6,12 +6,14 @@ module Dash2
     module Harvester
       class UserProvider
 
+        attr_reader :users_path
         attr_reader :users_by_id
         attr_reader :user_ids_by_local_id
         attr_reader :user_ids_by_title
 
-        def initialize(dash1_records_users_path)
-          dash1_records_users = UserProvider.parse_tsv(dash1_records_users_path)
+        def initialize(users_path)
+          @users_path = users_path
+          dash1_records_users = UserProvider.parse_tsv(users_path)
           @users_by_id = {}
           @user_ids_by_title = {}
           @user_ids_by_local_id = {}

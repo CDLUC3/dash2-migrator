@@ -54,17 +54,6 @@ module Dash2
           expect(job.indexer).to be_a(Dash2::Migrator::Indexer::Indexer)
         end
       end
-
-      describe '#from_files' do
-        it 'loads source and index configs separately' do
-          config = MigratorConfig.from_files(source: 'spec/data/source-example.yml', index: 'spec/data/index-example.yml')
-          app = Stash::HarvesterApp::Application.with_config(config)
-          job = app.send(:create_job)
-          expect(job).to be_a(Stash::HarvestAndIndexJob)
-          expect(job.harvest_task).to be_a(Dash2::Migrator::Harvester::MerrittAtomHarvestTask)
-          expect(job.indexer).to be_a(Dash2::Migrator::Indexer::Indexer)
-        end
-      end
     end
   end
 end

@@ -15,10 +15,12 @@ module Dash2
             @base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
             @tenant_path = File.absolute_path('config/tenants/example.yml')
             @env_name = 'test'
+            user_provider = UserProvider.new('config/dash1_records_users.txt')
             @config = MerrittAtomSourceConfig.new(
               tenant_path: tenant_path,
               feed_uri: base_feed_uri,
-              env_name: env_name
+              env_name: env_name,
+              user_provider: user_provider
             )
           end
 

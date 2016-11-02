@@ -16,8 +16,9 @@ module Dash2
 
         before(:each) do
           base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
+          user_provider = UserProvider.new('config/dash1_records_users.txt')
           @tenant_path = File.absolute_path('config/tenants/example.yml')
-          @config = MerrittAtomSourceConfig.new(tenant_path: @tenant_path, feed_uri: base_feed_uri, env_name: 'test')
+          @config = MerrittAtomSourceConfig.new(user_provider: user_provider, tenant_path: @tenant_path, feed_uri: base_feed_uri, env_name: 'test')
           @task = config.create_harvest_task
 
           @feed_uri = base_feed_uri.sub('https://', "https://#{config.username}:#{config.password}@")

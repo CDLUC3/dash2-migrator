@@ -8,11 +8,13 @@ module Dash2
         attr_reader :db_yml
         attr_reader :tenant_yml
         attr_reader :config
+        attr_reader :user_provider
 
         before(:each) do
           @db_yml = 'spec/data/indexer/database.yml'
           @tenant_yml = 'config/tenants/example.yml'
-          @config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml)
+          @user_provider = Dash2::Migrator::Harvester::UserProvider.new('config/dash1_records_users.txt')
+          @config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml, user_provider: user_provider)
         end
 
         describe '#description' do
@@ -25,7 +27,7 @@ module Dash2
           end
           it 'identifies the production environment' do
             allow(Migrator).to receive(:production?).and_return(true)
-            config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml)
+            config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml, user_provider: user_provider)
             expect(config.description).to include('production')
           end
         end
@@ -76,7 +78,7 @@ module Dash2
             old_stash_env = ENV['STASH_ENV']
             begin
               ENV['STASH_ENV'] = 'stage'
-              @config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml)
+              @config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml, user_provider: user_provider)
               tenant_config = config.tenant_config
               expect(tenant_config[:full_domain]).to eq('example-stg.example.org')
             ensure

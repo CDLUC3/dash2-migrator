@@ -23,7 +23,8 @@ module Dash2
         before(:each) do
           base_feed_uri = 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
           tenant_path = File.absolute_path('config/tenants/example.yml')
-          @config = MerrittAtomSourceConfig.new(tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
+          user_provider = UserProvider.new('config/dash1_records_users.txt')
+          @config = MerrittAtomSourceConfig.new(user_provider: user_provider, tenant_path: tenant_path, feed_uri: base_feed_uri, env_name: 'test')
 
           @mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/system%2Fmrt-mom.txt"
           @mrt_mom_txt = File.read('spec/data/harvester/mrt-mom.txt')

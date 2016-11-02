@@ -9,10 +9,12 @@ module Dash2
         adapter 'Dash2'
 
         attr_reader :tenant_path
+        attr_reader :user_provider
 
-        def initialize(db_config_path:, tenant_path:)
+        def initialize(db_config_path:, tenant_path:, user_provider:)
           super(url: URI.join('file:///', File.absolute_path(db_config_path)))
           @tenant_path = File.absolute_path(tenant_path)
+          @user_provider = user_provider
         end
 
         def description

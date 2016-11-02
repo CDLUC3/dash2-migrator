@@ -7,11 +7,13 @@ module Dash2
         protocol 'Merritt Atom'
 
         attr_reader :tenant_path
+        attr_reader :user_provider
 
-        def initialize(tenant_path:, feed_uri:, env_name: nil)
+        def initialize(tenant_path:, feed_uri:, user_provider:, env_name: nil)
           super(source_url: feed_uri)
           @env_name = env_name
           @tenant_path = File.absolute_path(tenant_path)
+          @user_provider = user_provider
         end
 
         def description

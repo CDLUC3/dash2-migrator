@@ -10,7 +10,8 @@ module Dash2
         before(:each) do
           db_yml = 'spec/data/indexer/database.yml'
           tenant_yml = 'config/tenants/example.yml'
-          config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml)
+          user_provider = Dash2::Migrator::Harvester::UserProvider.new('config/dash1_records_users.txt')
+          config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml, user_provider: user_provider)
           @indexer = config.create_indexer
         end
 

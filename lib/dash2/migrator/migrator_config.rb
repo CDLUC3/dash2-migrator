@@ -37,16 +37,15 @@ module Dash2
       end
 
       def self.from_env(env)
+        users_path = env.args_for(:users_path)
+        user_provider = Dash2::Migrator::Harvester::UserProvider.new(users_path)
+        [:source, :index].each do |conf|
+          args = env.args_for(conf)
+          args[:user_provider] = user_provider
+        end
+
         source_config = Stash::Harvester::SourceConfig.for_environment(env, :source)
         index_config = Stash::Indexer::IndexConfig.for_environment(env, :index)
-        MigratorConfig.new(source_config: source_config, index_config: index_config)
-      end
-
-      def self.from_files(source:, index:)
-        source_env = Environment.load_file(source)
-        index_env = Environment.load_file(index)
-        source_config = Stash::Harvester::SourceConfig.for_environment(source_env, :source)
-        index_config = Stash::Indexer::IndexConfig.for_environment(index_env, :index)
         MigratorConfig.new(source_config: source_config, index_config: index_config)
       end
     end
