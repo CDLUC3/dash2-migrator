@@ -50,7 +50,7 @@ module Dash2
           # File.open('/tmp/titles.txt', 'a') { |f| f.puts(info) }
           #
           # puts info
-          index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: ark)
+          index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: hr.ark)
           Stash::Indexer::IndexResult.success(hr)
         end
 
