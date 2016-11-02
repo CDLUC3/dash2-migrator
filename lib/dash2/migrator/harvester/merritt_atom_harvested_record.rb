@@ -11,7 +11,7 @@ module Dash2
       class MerrittAtomHarvestedRecord < Stash::Harvester::HarvestedRecord
         DOI_PATTERN = %r{10\.[^/\s]+/[^;\s]+$}
         ARK_PATTERN = %r{ark:/[a-z0-9]+/[a-z0-9]+}
-        LOCAL_ID_PATTERN = %r{localIdentifier:\s*([a-z]+);}
+        LOCAL_ID_PATTERN = /localIdentifier:\s*([a-z]+);/
 
         attr_reader :tenant_id
         attr_reader :feed_uri

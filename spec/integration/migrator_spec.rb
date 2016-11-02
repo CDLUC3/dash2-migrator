@@ -5,7 +5,7 @@ module Dash2
 
     module Datacite::Mapping::ReadOnlyNodes
       def self.warn(warning)
-        Stash::Harvester::log.warn(warning)
+        Stash::Harvester.log.warn(warning)
       end
     end
 
