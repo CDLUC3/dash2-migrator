@@ -6,12 +6,14 @@ module Dash2
       describe UserProvider do
 
         attr_reader :records
+        attr_reader :records_by_ark
         attr_reader :user_provider
 
-        ARKS_LOCALIDS_TITLES = 'spec/data/harvester/arks_localids_titles.txt'
+        ARKS_LOCALIDS_TITLES = 'spec/data/harvester/arks_localids_titles.txt'.freeze
 
         before(:each) do
-          @records = UserProvider.parse_tsv(ARKS_LOCALIDS_TITLES)
+          @records = UserProvider.parse_tsv(ARKS_LOCALIDS_TITLES).freeze
+          @records_by_ark = records.map { |r| [r.ark, r] }.to_h.freeze
           @user_provider = UserProvider.new('config/dash1_records_users.txt')
         end
 
@@ -42,9 +44,23 @@ module Dash2
           it 'extracts the users' do
             users_by_id = user_provider.users_by_id
             expect(users_by_id.size).to eq(106)
-            users_by_id.each do |id, user|
-              puts "#{id}\t#{user.tenant_id}\t#{user.first_name}\t#{user.last_name}\t#{user.email}"
+          end
+        end
+
+        describe '#dash1_user_id_for' do
+          it 'maps the user IDs' do
+            found = {}
+            missing = []
+            records.each do |r|
+              dash1_user_id = user_provider.dash1_user_id_for(local_id: r.local_id, title: r.title)
+              if dash1_user_id
+                found[r.ark] = dash1_user_id
+              else
+                missing << r
+              end
             end
+            expect(found.size).to eq(130)
+            expect(missing.size).to eq(117)
           end
         end
       end
