@@ -41,7 +41,7 @@ module Dash2
         describe '#users_by_id' do
           it 'extracts the users' do
             users_by_id = user_provider.users_by_id
-            expect(users_by_id.size).to eq(115)
+            expect(users_by_id.size).to eq(108)
             users_by_id.each do |id, user|
               puts "#{id}\t#{user.tenant_id}\t#{user.first_name}\t#{user.last_name}\t#{user.email}"
             end

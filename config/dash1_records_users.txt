@@ -13,17 +13,6 @@ record_id	title	title_count	local_id	user_id	campus	first_name	last_name	email	u
 122	The Evolution of Function within the Nudix Superfamily	14	xpjxxihhux	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
 123	The Evolution of Function within the Nudix Superfamily 	14	vgstqlktls	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
 124	The Evolution of Function within the Nudix Superfamily	14	vynamyzkng	135	ucb			annseajm@gmail.com	annsea@berkeley.edu	shibboleth	NULL
-8	Test	11	eoaceidgdj	14	ucop	Joel	Hagedorn	Joel.Hagedorn@ucop.edu	Joel.Hagedorn-ucop.edu@ucop.edu	shibboleth	NULL
-45	Test	11	rzjreuswni	47	ucop	Scott	Fisher	Scott.Fisher@ucop.edu	Scott.Fisher-ucop.edu@ucop.edu	shibboleth	NULL
-65	test	11	qabtlvomtg	96	ucm			bilan@ucmerced.edu	bilan@ucmerced.edu	shibboleth	NULL
-68	test	11	hhtdpyfxxs	31	ucop	Shirin	Faenza	Shirin.Faenza@ucop.edu	Shirin.Faenza-ucop.edu@ucop.edu	shibboleth	NULL
-108	Test	11	xuodcigdjd	25	uci			ucopcdl@uci.edu	UCOPCDL@uci.edu	shibboleth	NULL
-132	Test	11	jervvtnwxv	167	dataone	Tom	Morrell	tom127106@gmail.com	103769999516993470666	google_oauth2	ya29.3QE3Sz56Ud6YmVdmNwkouj4hBjPJaHnbrHOEwmZ8RaBp-8SubceCb9QtPcmmGJlafVlJ
-133	Test	11	peqlaszaau	168	ucb			wittenberg@berkeley.edu	wittenberg@berkeley.edu	shibboleth	NULL
-136	Test	11	liznqftpuv	175	dataone	David	Beitey	david@davidjb.com	106527454335411502430	google_oauth2	ya29.-QHoqv5buLfILJw8RzA75Okai2zbjvApUvrvqV44rWqVSSzMXUxrfoXSDaDjGtegYy9w
-140	Test	11	caxmjnpbpv	28	uci	Matthew J.	McKinley	mjmckinl@uci.edu	mjmckinl@uci.edu	shibboleth	NULL
-153	test	11	femkupxlxo	46	dataone	David	LeBauer	dlebauer@gmail.com	109816365614365674936	google_oauth2	ya29.IgKNkpo4M49aJuuPY35af4iIs-OXEZXuZJAZvaJ5EgwySZnr9tgchWkISKgLX1gmIPUm
-204	Test	11	ehaqnuqkvx	275	dataone	Satyendra	Sharma	satyendra.sharmma@gmail.com	104404449238698523401	google_oauth2	ya29.Ci8fA4zh2eBLpdESQkNeL-aQQtE9qH0dhqB_rX16eZkRviOBCLegpoLxFqCfvCht6A
 43	Adam's Test Dataset	2	aklckwxmia	49	ucb			adstone@berkeley.edu	adstone@berkeley.edu	shibboleth	NULL
 141	xxx research data	2	hhevtkbunj	161	dataone	Yun	Can	canyun002@gmail.com	108180949815354753717	google_oauth2	ya29.BgJP00MbsF3RRCDTSzt-UqhcIIRGMzaoYBgan2wKk2EhHGGqN5lDu3RdZ-w3yTdjNuhn1hc
 142	xxx research data	2	bkyhiwevwv	161	dataone	Yun	Can	canyun002@gmail.com	108180949815354753717	google_oauth2	ya29.BgJP00MbsF3RRCDTSzt-UqhcIIRGMzaoYBgan2wKk2EhHGGqN5lDu3RdZ-w3yTdjNuhn1hc
