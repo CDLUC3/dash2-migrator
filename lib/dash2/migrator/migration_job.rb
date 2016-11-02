@@ -12,13 +12,15 @@ module Dash2
       attr_reader :index_db_config_path
       attr_reader :index_tenant_override
       attr_reader :env_name
+      attr_reader :users_path
 
-      def initialize(sources:, index_db_config_path:, index_tenant_override: nil, env_name: Dash2::Migrator.env_name)
+      def initialize(sources:, index_db_config_path:, index_tenant_override: nil, users_path:, env_name: Dash2::Migrator.env_name)
         Migrator.log.info("Initializing migrator with DB #{index_db_config_path} in environment #{env_name}")
         @sources = sources
         @index_db_config_path = index_db_config_path
         @index_tenant_override = index_tenant_override
         @env_name = env_name
+        @users_path = users_path
       end
 
       def migrate!
@@ -42,10 +44,12 @@ module Dash2
       def self.from_file(config_path)
         config = deep_symbolize_keys(YAML.load_file(config_path))
         index_config = config[:index]
+        users_path = config[:users_path]
         MigrationJob.new(
           sources: config[:sources],
           index_db_config_path: index_config[:db_config_path],
-          index_tenant_override: index_config[:tenant_override]
+          index_tenant_override: index_config[:tenant_override],
+          users_path: users_path
         )
       end
 

@@ -35,3 +35,4 @@ sources:
 index:
   db_config_path: config/database.yml
   tenant_override: config/tenants/ucop.yml
+users_path: config/dash1_records_users.txt

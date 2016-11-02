@@ -68,6 +68,10 @@ module Dash2
         it 'reads the environment' do
           expect(job.env_name).to eq('test')
         end
+
+        it 'reads the users path' do
+          expect(job.users_path).to eq('config/dash1_records_users.txt')
+        end
       end
 
       describe '#migrate' do

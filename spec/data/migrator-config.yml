@@ -1,4 +1,5 @@
 defaults: &defaults
+  users_path: config/dash1_records_users.txt
   source:
     protocol: 'Merritt Atom'
     tenant_path: config/tenants/example.yml
