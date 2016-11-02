@@ -17,11 +17,12 @@ module Dash2
         attr_reader :feed_uri
         attr_reader :entry
 
-        def initialize(tenant_id, feed_uri, entry)
+        def initialize(user_provider, tenant_id, feed_uri, entry)
           super(identifier: entry.id.content, timestamp: MerrittAtomHarvestedRecord.extract_timestamp(entry))
           @tenant_id = tenant_id
           @feed_uri = Stash::Util.to_uri(feed_uri)
           @entry = entry
+          @user_provider = user_provider
         end
 
         def log
