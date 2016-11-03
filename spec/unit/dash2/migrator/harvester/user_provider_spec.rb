@@ -43,7 +43,7 @@ module Dash2
         describe '#users_by_id' do
           it 'extracts the users' do
             users_by_id = user_provider.users_by_id
-            expect(users_by_id.size).to eq(106)
+            expect(users_by_id.size).to eq(110)
           end
         end
 
@@ -58,7 +58,7 @@ module Dash2
               end
               expect(found.size).to eq(247)
               unique_users = found.values.uniq
-              expect(unique_users.size).to eq(73)
+              expect(unique_users.size).to eq(72)
             end
           end
         end
