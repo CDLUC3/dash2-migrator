@@ -1,5 +1,6 @@
 require 'csv'
 require 'ostruct'
+require 'stash_engine'
 
 module Dash2
   module Migrator
@@ -23,6 +24,13 @@ module Dash2
             record_local_id(user_ids_by_local_id, record)
             record_title(user_ids_by_title, record)
           end
+        end
+
+        def stash_user_id_for(local_id:, title:)
+          dash1_user = dash1_user_for(local_id: local_id, title: title)
+          return nil unless dash1_user
+
+          ensure_stash_user_id(dash1_user)
         end
 
         def dash1_user_for(local_id:, title:)
@@ -55,6 +63,26 @@ module Dash2
         end
 
         private
+
+        def stash_user_id_cache
+          @stash_user_id_cache ||= {}
+        end
+
+        def ensure_stash_user_id(dash1_user)
+          stash_user_id = stash_user_id_cache[dash1_user.uid]
+          return stash_user_id if stash_user_id
+
+          stash_user = StashEngine::User.create(
+            uid: dash1_user.uid,
+            first_name: dash1_user.first_name,
+            last_name: dash1_user.last_name,
+            email: dash1_user.email,
+            provider: dash1_user.provider,
+            tenant_id: dash1_user.tenant_id,
+            oauth_token: dash1_user.oauth_token
+          )
+          stash_user_id_cache[dash1_user.uid] = stash_user.id
+        end
 
         def record_title(user_ids_by_title, record)
           user_id = record.user_id

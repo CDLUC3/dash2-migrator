@@ -61,6 +61,8 @@ module Dash2
             end
             expect(missing.size).to eq(117)
             expect(found.size).to eq(130)
+            unique_users = found.values.uniq
+            expect(unique_users.size).to eq(68)
           end
         end
 
