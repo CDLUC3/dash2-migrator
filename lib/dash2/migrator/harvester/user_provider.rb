@@ -74,29 +74,42 @@ module Dash2
 
         private
 
+        def log
+          Stash::Harvester.log
+        end
+
         def stash_user_id_cache
           @stash_user_id_cache ||= {}
         end
 
         def ensure_stash_user_id(dash1_user)
-          stash_user_id_cache[dash1_user.uid] ||= begin
-            ids = StashEngine::User.where(uid: dash1_user.uid).pluck(:id)
+          uid = dash1_user.uid
+          stash_user_id_cache[uid] ||= begin
+            ids = StashEngine::User.where(uid: uid).pluck(:id)
             if ids.size == 1
+              log.info("Found existing Stash user #{ids[0]} for uid #{uid}")
               ids[0]
             elsif ids.empty?
-              StashEngine::User.create(
-                              uid: dash1_user.uid,
-                              first_name: dash1_user.first_name,
-                              last_name: dash1_user.last_name,
-                              email: dash1_user.email,
-                              provider: dash1_user.provider,
-                              tenant_id: dash1_user.tenant_id,
-                              oauth_token: dash1_user.oauth_token
-                            ).id
+              create_stash_user(dash1_user).id
             else
               raise IndexError, "Duplicate user IDs #{ids} for uid #{uid}"
             end
           end
+        end
+
+        def create_stash_user(dash1_user)
+          stash_user = StashEngine::User.create(
+            uid: dash1_user.uid,
+            first_name: dash1_user.first_name,
+            last_name: dash1_user.last_name,
+            email: dash1_user.email,
+            provider: dash1_user.provider,
+            tenant_id: dash1_user.tenant_id,
+            oauth_token: dash1_user.oauth_token
+          )
+          fields = dash1_user.to_h.map { |k, v| "#{k}: #{v || 'nil'}" }.join(", ")
+          log.info("Created Stash user #{stash_user.id} for Dash 1 user: #{fields}")
+          stash_user
         end
 
         def record_title(user_ids_by_title, record)
@@ -144,10 +157,10 @@ module Dash2
         def extract_user(r)
           OpenStruct.new(
             id: r.user_id.to_i,
+            uid: r.uid,
             first_name: r.first_name,
             last_name: r.last_name,
             email: r.email,
-            uid: r.uid,
             provider: r.provider,
             oauth_token: r.oauth_token,
             tenant_id: r.campus
