@@ -288,25 +288,25 @@ record_id	title	title_count	local_id	user_id	campus	first_name	last_name	email	u
 1093	IceMorph morphological analysis data files	1		1001	ucla	Timothy	Tangherlini	tango@humnet.ucla.edu	tango@humnet.ucla.edu	shibboleth	NULL
 1094	Live cell interferometry cell division tracking data files	1		1002	ucla	Thomas	Zangle	tzangle@ucla.edu	tzangle@ucla.edu	shibboleth	NULL
 1095	Providence Creek soil moisture and temperature, snow depth and air temperature	1		137	ucm	Emily	Lin	elin@ucmerced.edu	elin@ucmerced.edu	shibboleth	NULL
-1096	Provider counseling and provision of female condom in South Africa and Zimbabwe	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1097	NEXUS Chest CT	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1098	Media coverage of nonsmoker only hiring policies	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1099	NODDI-PLOS-ONE-Chang et al 2015	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1100	Predicting Cognitive Decline	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1101	SIVD (Subcortical Ischemic Vascular Dementia)	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1102	Associations between vascular risk factors, carotid atherosclerosis and cortical volume and thickness in older adults	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1103	Frontotemporal Lobar Degeneration (FTLD)	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1104	Posttraumatic Stress Disorder (PTSD)	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1105	Gulf War Illness	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1106	Voxel-wise co-analysis of macro- and microstructural brain alteration in Mild Cognitive Impairment and Alzheimer's disease using anatomical and diffusion MRI	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1107	Changes in brain anatomy during the course of PTSD	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1108	Pooled metagenomic sequence from human stool	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1109	Tobacco-free retailers project	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1110	C. elegans RNA Sequence for viral discovery	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1111	Program to Reduce Incontinence through Diet and Exercise (PRIDE)	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1112	Re-analysis of microarray data from rapamycin resistant DLBCL cell lines	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1113	Patterns of age-related water diffusion changes in human brain by concordance and discordance analysis.	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1114	White matter damage in frontotemporal dementia and Alzheimer's disease measured by diffusion MRI	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1115	CSF Biomarker and PIB-PET Derived Beta-Amyloid Signature Predicts Metabolic, Grey Matter and Cognitive Changes in Non-Demented Subjects	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1116	Progression of white matter degeneration in amyotrophic lateral sclerosis: A diffusion tensor imaging study	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
-1117	Protocol for the Training and Calibration of Dental Examiners	1		149	ucsf	Megan	Laurance	Megan.Laurance@ucsf.edu	420965@ucsf.edu	shibboleth	NULL
+1096	Provider counseling and provision of female condom in South Africa and Zimbabwe	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1097	NEXUS Chest CT	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1098	Media coverage of nonsmoker only hiring policies	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1099	NODDI-PLOS-ONE-Chang et al 2015	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1100	Predicting Cognitive Decline	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1101	SIVD (Subcortical Ischemic Vascular Dementia)	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1102	Associations between vascular risk factors, carotid atherosclerosis and cortical volume and thickness in older adults	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1103	Frontotemporal Lobar Degeneration (FTLD)	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1104	Posttraumatic Stress Disorder (PTSD)	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1105	Gulf War Illness	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1106	Voxel-wise co-analysis of macro- and microstructural brain alteration in Mild Cognitive Impairment and Alzheimer's disease using anatomical and diffusion MRI	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1107	Changes in brain anatomy during the course of PTSD	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1108	Pooled metagenomic sequence from human stool	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1109	Tobacco-free retailers project	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1110	C. elegans RNA Sequence for viral discovery	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1111	Program to Reduce Incontinence through Diet and Exercise (PRIDE)	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1112	Re-analysis of microarray data from rapamycin resistant DLBCL cell lines	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1113	Patterns of age-related water diffusion changes in human brain by concordance and discordance analysis.	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1114	White matter damage in frontotemporal dementia and Alzheimer's disease measured by diffusion MRI	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1115	CSF Biomarker and PIB-PET Derived Beta-Amyloid Signature Predicts Metabolic, Grey Matter and Cognitive Changes in Non-Demented Subjects	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1116	Progression of white matter degeneration in amyotrophic lateral sclerosis: A diffusion tensor imaging study	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
+1117	Protocol for the Training and Calibration of Dental Examiners	1		172	ucsf	Ariel	Deardorff	Ariel.Deardorff@ucsf.edu	201937@ucsf.edu	shibboleth	NULL
