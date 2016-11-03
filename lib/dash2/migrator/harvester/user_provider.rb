@@ -26,15 +26,15 @@ module Dash2
           end
         end
 
-        def stash_user_id_for(local_id:, title:)
-          dash1_user = dash1_user_for(local_id: local_id, title: title)
+        def stash_user_id_for(record)
+          dash1_user = dash1_user_for(record)
           return nil unless dash1_user
 
           ensure_stash_user_id(dash1_user)
         end
 
-        def dash1_user_for(local_id:, title:)
-          dash1_user_id = dash1_user_id_for(local_id: local_id, title: title)
+        def dash1_user_for(record)
+          dash1_user_id = dash1_user_id_for(record)
           return nil unless dash1_user_id
 
           users_by_id[dash1_user_id]
@@ -58,7 +58,10 @@ module Dash2
           return nil unless v
           value = v.strip
           return nil if value == 'nil'
+          return nil if value.downcase == 'null'
           return nil if value == ''
+          int_value = value.to_i
+          return int_value if int_value.to_s == value && int_value < 2000
           value
         end
 
@@ -88,22 +91,26 @@ module Dash2
           user_id = record.user_id
           title = record.title
           user_ids_by_title[title] ||= []
-          user_ids_by_title[title] << user_id
+          user_ids_by_title[title] << user_id unless user_ids_by_title[title].include?(user_id)
         end
 
         def record_local_id(user_ids_by_local_id, record)
+          local_id = record.local_id
+          return unless local_id
           user_id = record.user_id
-          existing_user_id = user_ids_by_local_id[record.local_id]
-          user_ids_by_local_id[record.local_id] = user_id unless existing_user_id
+          existing_user_id = user_ids_by_local_id[local_id]
+          user_ids_by_local_id[local_id] = user_id unless existing_user_id
           return unless existing_user_id
-          return unless existing_user_id == user_id
-          raise "Duplicate local_id '#{record.local_id}' for user IDs #{user_id}, #{existing_user_id}"
+          return if existing_user_id == user_id
+          raise "Duplicate local_id '#{local_id}' for user IDs #{user_id || 'nil'}, #{existing_user_id}"
         end
 
-        def dash1_user_id_for(local_id:, title:)
+        def dash1_user_id_for(record)
+          local_id = record.local_id
           by_local_id = user_ids_by_local_id[local_id]
           return by_local_id if by_local_id
 
+          title = record.title
           by_title = user_ids_by_title[title]
           return by_title[0] if by_title && by_title.size == 1
 
@@ -121,6 +128,16 @@ module Dash2
             campus: r.campus
           )
         end
+
+        # ark:/b7272/q6 -> Megan Laurance Megan.Laurance@ucsf.edu 420965@ucsf.edu
+        # ark:/b6071/z7wc73: Emily Lin <elin@ucmerced.edu> elin@ucmerced.edu
+        # ark:/b5068/d1wc7k: Timothy Tangherlini  <tango@humnet.ucla.edu >
+        # ark:/b5068/d1rp49: Thomas Zangle <tzangle@ucla.edu>
+        # ark:/b6078/d17g6j: Nicholas Swanson-Hysell <swanson-hysell@berkeley.edu> swanson-hysell@berkeley.edu
+        # ark:/b6078/d1c88g: Nicholas Swanson-Hysell <swanson-hysell@berkeley.edu> swanson-hysell@berkeley.edu
+
+        # id	external_id	created_at	updated_at	email	institution_id	first_name	last_name	uid	provider	oauth_token
+        # 137	elin@ucmerced.edu	2015-06-29 22:00:35	2015-06-29 22:00:35	elin@ucmerced.edu	7			elin@ucmerced.edu	shibboleth	NULL
 
         def extract_user(r)
           OpenStruct.new(
