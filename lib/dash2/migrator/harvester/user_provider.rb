@@ -129,16 +129,6 @@ module Dash2
           )
         end
 
-        # ark:/b7272/q6 -> Megan Laurance Megan.Laurance@ucsf.edu 420965@ucsf.edu
-        # ark:/b6071/z7wc73: Emily Lin <elin@ucmerced.edu> elin@ucmerced.edu
-        # ark:/b5068/d1wc7k: Timothy Tangherlini  <tango@humnet.ucla.edu >
-        # ark:/b5068/d1rp49: Thomas Zangle <tzangle@ucla.edu>
-        # ark:/b6078/d17g6j: Nicholas Swanson-Hysell <swanson-hysell@berkeley.edu> swanson-hysell@berkeley.edu
-        # ark:/b6078/d1c88g: Nicholas Swanson-Hysell <swanson-hysell@berkeley.edu> swanson-hysell@berkeley.edu
-
-        # id	external_id	created_at	updated_at	email	institution_id	first_name	last_name	uid	provider	oauth_token
-        # 137	elin@ucmerced.edu	2015-06-29 22:00:35	2015-06-29 22:00:35	elin@ucmerced.edu	7			elin@ucmerced.edu	shibboleth	NULL
-
         def extract_user(r)
           OpenStruct.new(
             id: r.user_id.to_i,
