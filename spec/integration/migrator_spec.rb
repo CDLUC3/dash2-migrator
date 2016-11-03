@@ -16,21 +16,7 @@ module Dash2
       attr_reader :user_uid
       attr_reader :last_doi
 
-      before(:all) do
-        @user_uid = 'lmuckenhaupt-ucop@ucop.edu'
-      end
-
       before(:each) do
-        @user = StashEngine::User.create(
-          uid: user_uid,
-          first_name: 'Lisa',
-          last_name: 'Muckenhaupt',
-          email: 'lmuckenhaupt@ucop.edu',
-          provider: 'developer',
-          tenant_id: 'ucop'
-        )
-        allow_any_instance_of(Dash2::Migrator::Harvester::MerrittAtomHarvestedRecord).to receive(:user_uid) { user_uid }
-
         @ezid_client = instance_double(StashEzid::Client)
         allow(@ezid_client).to receive(:mint_id) do
           time = Time.now
@@ -49,8 +35,11 @@ module Dash2
       end
 
       describe 'harvest and import' do
+        attr_reader :config_file
+
         before(:each) do
-          migrator = MigrationJob.from_file('config/migrate-all-to-ucop.yml')
+          @config_file = 'config/migrate-all.yml'
+          migrator = MigrationJob.from_file(config_file)
           migrator.migrate!
         end
 
@@ -60,7 +49,7 @@ module Dash2
 
         it 'remigrates' do
           expect(@sword_client).to receive(:update).exactly(EXPECTED_RECORDS).times.and_return(200)
-          migrator = MigrationJob.from_file('config/migrate-all-to-ucop.yml')
+          migrator = MigrationJob.from_file(config_file)
           migrator.migrate!
           expect(StashEngine::Resource.count).to eq(EXPECTED_RECORDS)
         end

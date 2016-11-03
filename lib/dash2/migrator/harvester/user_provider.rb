@@ -27,8 +27,10 @@ module Dash2
           end
         end
 
-        def uid_for(record)
-
+        def ensure_uid!(record)
+          dash1_user = dash1_user_for(record)
+          ensure_stash_user_id(dash1_user)
+          dash1_user.uid
         end
 
         def stash_user_id_for(record)

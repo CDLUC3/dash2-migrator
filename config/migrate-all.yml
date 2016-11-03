@@ -1,0 +1,37 @@
+sources:
+# DataUP
+  - tenant_path: config/tenants/dataone.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5222s39'
+# Regular DataONE
+  - tenant_path: config/tenants/dataone.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5709fmd'
+# Berkeley
+  - tenant_path: config/tenants/ucb.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5q82t8x'
+# Irvine
+  - tenant_path: config/tenants/uci.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5fr19qh'
+# UCLA
+  - tenant_path: config/tenants/ucla.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5tm8r6v'
+# UCM
+  - tenant_path: config/tenants/ucm.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5sv2b3c'
+# UCR
+  - tenant_path: config/tenants/ucr.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5jt2v2m'
+# UCSC
+  - tenant_path: config/tenants/ucsc.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5t16hvv'
+# UCSF #1
+  - tenant_path: config/tenants/ucsf.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m52j8gvj'
+# UCSF #2
+  - tenant_path: config/tenants/ucsf.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5ng4nz1'
+# UCOP
+  - tenant_path: config/tenants/ucop.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5v13jxb'
+index:
+  db_config_path: config/database.yml
+users_path: config/dash1_records_users.txt

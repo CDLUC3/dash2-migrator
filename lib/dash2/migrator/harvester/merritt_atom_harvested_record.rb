@@ -16,6 +16,7 @@ module Dash2
         attr_reader :tenant_id
         attr_reader :feed_uri
         attr_reader :entry
+        attr_reader :user_provider
 
         def initialize(user_provider, tenant_id, feed_uri, entry)
           super(identifier: entry.id.content, timestamp: MerrittAtomHarvestedRecord.extract_timestamp(entry))
@@ -40,7 +41,7 @@ module Dash2
         end
 
         def user_uid
-          raise NoMethodError, 'user_uid not implemented yet'
+          user_provider.ensure_uid!(self)
         end
 
         def doi
