@@ -24,6 +24,25 @@ module Dash2
             end
             expect(StashEngine::User.count).to eq(72)
           end
+
+          it 'doesn\'t replace existing users' do
+            uid = '101663810912298466931'
+            id = StashEngine::User.create(
+                          uid: uid,
+                          first_name: 'Dash',
+                          last_name: 'Admin',
+                          email: 'cdluc3@gmail.com',
+                          provider: 'google_oauth2',
+                          tenant_id: 'dataone',
+                          oauth_token: '12345'
+                        ).id
+            dataup_records = records.select { |r| r.ark.start_with?('ark:/90135/') }
+            expect(dataup_records.size).to eq(90) # just to be sure
+            dataup_records.each do |record|
+              stash_user_id = user_provider.stash_user_id_for(record)
+              expect(stash_user_id).to eq(id)
+            end
+          end
         end
       end
     end

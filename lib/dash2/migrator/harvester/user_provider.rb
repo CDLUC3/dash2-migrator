@@ -20,10 +20,15 @@ module Dash2
           @user_ids_by_local_id = {}
           dash1_records_users.each do |record|
             user_id = record.user_id
+            raise ArgumentError, "No user ID for record: #{record}" unless user_id
             users_by_id[user_id] = extract_user(record) unless users_by_id[user_id]
             record_local_id(user_ids_by_local_id, record)
             record_title(user_ids_by_title, record)
           end
+        end
+
+        def uid_for(record)
+
         end
 
         def stash_user_id_for(record)
@@ -72,19 +77,24 @@ module Dash2
         end
 
         def ensure_stash_user_id(dash1_user)
-          stash_user_id = stash_user_id_cache[dash1_user.uid]
-          return stash_user_id if stash_user_id
-
-          stash_user = StashEngine::User.create(
-            uid: dash1_user.uid,
-            first_name: dash1_user.first_name,
-            last_name: dash1_user.last_name,
-            email: dash1_user.email,
-            provider: dash1_user.provider,
-            tenant_id: dash1_user.tenant_id,
-            oauth_token: dash1_user.oauth_token
-          )
-          stash_user_id_cache[dash1_user.uid] = stash_user.id
+          stash_user_id_cache[dash1_user.uid] ||= begin
+            ids = StashEngine::User.where(uid: dash1_user.uid).pluck(:id)
+            if ids.size == 1
+              ids[0]
+            elsif ids.empty?
+              StashEngine::User.create(
+                              uid: dash1_user.uid,
+                              first_name: dash1_user.first_name,
+                              last_name: dash1_user.last_name,
+                              email: dash1_user.email,
+                              provider: dash1_user.provider,
+                              tenant_id: dash1_user.tenant_id,
+                              oauth_token: dash1_user.oauth_token
+                            ).id
+            else
+              raise IndexError, "Duplicate user IDs #{ids} for uid #{uid}"
+            end
+          end
         end
 
         def record_title(user_ids_by_title, record)
