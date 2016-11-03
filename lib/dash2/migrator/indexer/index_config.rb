@@ -47,7 +47,7 @@ module Dash2
         end
 
         def create_indexer(*_args)
-          Indexer.new(db_config: db_config, tenant_config: tenant_config)
+          Indexer.new(db_config: db_config, tenant_config: tenant_config, user_provider: user_provider)
         end
 
         private

@@ -6,11 +6,12 @@ module Dash2
       describe Indexer do
 
         attr_reader :indexer
+        attr_reader :user_provider
 
         before(:each) do
           db_yml = 'spec/data/indexer/database.yml'
           tenant_yml = 'config/tenants/example.yml'
-          user_provider = Dash2::Migrator::Harvester::UserProvider.new('config/dash1_records_users.txt')
+          @user_provider = Dash2::Migrator::Harvester::UserProvider.new('config/dash1_records_users.txt')
           config = IndexConfig.new(db_config_path: db_yml, tenant_path: tenant_yml, user_provider: user_provider)
           @indexer = config.create_indexer
         end
@@ -34,6 +35,8 @@ module Dash2
           attr_reader :records
 
           before(:each) do
+
+            @uids = Array.new(3) { |i| "user#{i}@example.edu" }
 
             sword_params = {
               collection_uri: 'http://sword-dev.example.org:39001/mrtsword/collection/test',
@@ -65,7 +68,8 @@ module Dash2
             allow(Importer::Importer).to receive(:new).with(
               ezid_client: ezid_client,
               sword_client: sword_client,
-              tenant: tenant
+              tenant: tenant,
+              user_provider: user_provider
             ).and_return(importer)
 
             @wrappers = Array.new(3) do |i|
@@ -74,7 +78,7 @@ module Dash2
               allow(wrapper).to receive(:identifier).and_return(sw_ident)
               wrapper
             end
-            @uids = Array.new(3) { |i| "user#{i}@example.edu" }
+
             @records = wrappers.zip(uids).map do |wrapper, uid|
               record = instance_double(Harvester::MerrittAtomHarvestedRecord)
               allow(record).to receive(:mrt_eml).and_return(nil)

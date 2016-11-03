@@ -12,11 +12,13 @@ module Dash2
 
         attr_reader :db_config
         attr_reader :tenant_config
+        attr_reader :user_provider
 
-        def initialize(db_config:, tenant_config:)
+        def initialize(db_config:, tenant_config:, user_provider:)
           super(metadata_mapper: nil)
           @db_config = db_config
           @tenant_config = tenant_config
+          @user_provider = user_provider
         end
 
         def demo_mode?
@@ -37,19 +39,6 @@ module Dash2
         end
 
         def do_index(hr)
-          # ark = hr.ark
-          # tenant_id = hr.tenant_id
-          # local_id = hr.local_id
-          # title = hr.title
-          #
-          # title.gsub!(/\A[[:space:]]+/, '')
-          # title.gsub!(/[[:space:]]+\z/, '')
-          # title.gsub!(/[[:space:]]+/, ' ')
-          #
-          # info = "#{tenant_id}\t#{ark}\t#{local_id || 'nil'}\t\"#{title}\""
-          # File.open('/tmp/titles.txt', 'a') { |f| f.puts(info) }
-          #
-          # puts info
           index_record(stash_wrapper: hr.as_wrapper, user_uid: hr.user_uid, ark: hr.ark)
           Stash::Indexer::IndexResult.success(hr)
         end
@@ -77,7 +66,7 @@ module Dash2
         end
 
         def importer
-          @importer ||= Importer.new(ezid_client: ezid_client, sword_client: sword_client, tenant: tenant)
+          @importer ||= Importer.new(ezid_client: ezid_client, sword_client: sword_client, tenant: tenant, user_provider: user_provider)
         end
 
         private

@@ -44,11 +44,13 @@ module Dash2
         attr_reader :tenant
         attr_reader :ezid_client
         attr_reader :sword_client
+        attr_reader :user_provider
 
-        def initialize(tenant:, ezid_client:, sword_client:)
+        def initialize(tenant:, ezid_client:, sword_client:, user_provider:)
           @tenant = tenant
           @ezid_client = ezid_client
           @sword_client = sword_client
+          @user_provider = user_provider
         end
 
         def import(stash_wrapper:, user_uid:, ark:)
