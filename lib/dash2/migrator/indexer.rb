@@ -78,7 +78,7 @@ module Dash2
 
         def index_record(stash_wrapper:, user_uid:, ark:)
           ident_value = (sw_ident = stash_wrapper.identifier) && sw_ident.value
-          Migrator.log.info("Migrating #{ident_value || ark} for #{user_uid}")
+          Migrator.log.info("Migrating #{ident_value || ark} for user with uid #{user_uid}")
           ActiveRecord::Base.transaction(requires_new: true) do
             importer.import(stash_wrapper: stash_wrapper, user_uid: user_uid, ark: ark)
           end
