@@ -46,6 +46,7 @@ uci-ark+=b7280=d1ks3n-mrt-datacite.xml
 uci-ark+=b7280=d1kw29-mrt-datacite.xml
 uci-ark+=b7280=d1ms3z-mrt-datacite.xml
 uci-ark+=b7280=d1mw2m-mrt-datacite.xml
+uci-ark+=b7280=d1nk5z-mrt-datacite.xml
 uci-ark+=b7280=d1np4m-mrt-datacite.xml
 uci-ark+=b7280=d1pk58-mrt-datacite.xml
 uci-ark+=b7280=d1pp4x-mrt-datacite.xml
@@ -67,6 +68,7 @@ uci-ark+=b7280=d1z594-mrt-datacite.xml
 ucla-ark+=b5068=d1cc7x-mrt-datacite.xml
 ucla-ark+=b5068=d1h59v-mrt-datacite.xml
 ucla-ark+=b5068=d1rp49-mrt-datacite.xml
+ucm-ark+=b6071=m3wc7k-mrt-datacite.xml
 ucm-ark+=b6071=z7wc73-mrt-datacite.xml
 ucop-ark+=b5060=d8301x-mrt-datacite.xml
 ucop-ark+=b5060=d86p4w-mrt-datacite.xml
@@ -76,6 +78,7 @@ ucop-ark+=b5060=d8h59d-mrt-datacite.xml
 ucop-ark+=b5060=d8kw2m-mrt-datacite.xml
 ucop-ark+=b5060=d8rp4v-mrt-datacite.xml
 ucop-ark+=b5060=d8z59f-mrt-datacite.xml
+ucr-ark+=b6086=d1h59v-mrt-datacite.xml
 ucsc-ark+=b7291=d11592-mrt-datacite.xml
 ucsc-ark+=b7291=d17p46-mrt-datacite.xml
 ucsc-ark+=b7291=d1h59d-mrt-datacite.xml

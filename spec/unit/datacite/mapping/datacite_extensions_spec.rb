@@ -317,7 +317,7 @@ module Datacite
               expect(rights.uri).not_to be_nil, "Expected #{f} to have a rights URI, but it didn't"
               expect(rights.value).not_to be_nil, "Expected #{f} to have a rights value, but it didn't"
 
-              expect(expected.key?(f)).to be_truthy, "No expected value for #{f}"
+              expect(expected.key?(f)).to be_truthy, "No expected value for #{f}; actual was #{rights.value}"
               next unless expected[f] # TODO: Remove once we disaggregate failures
               expected_uri = expected[f].uri
               expected_value = expected[f].value
