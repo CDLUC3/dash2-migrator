@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Faria, Leandro</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>Pacientes que Aderiram ao uso de Aplicativo para preenchimento de Questionários</title>
+  </titles>
+  <publisher>DataONE</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>Aplicativo</subject>
+    <subject>Questionário</subject>
+    <subject>Prostatectomia Robótica</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="DataManager">
+      <contributorName>Faria, Leandro</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers/>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <sizes>
+    <size>3597</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Public Domain Dedication (CC0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">Meu conjunto de dados é uma amostra de 100 pacientes que foram submetidos a prostatectomia robótica, e quais responderam a questionários pós operatório via Aplicativo</description>
+    <description descriptionType="Methods">Os dados foram extraídos do banco de dados SQL Server e exportados para a planilha excel. Possui um ID para o Paciente, Nome e se o paciente respondeu ou não ao questionário pelo Aplicativo</description>
+  </descriptions>
+</resource>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Caetano, Eduardo</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>PCS 5031 - teste</title>
+  </titles>
+  <publisher>DataONE</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>cahoeiro de itapemirim</subject>
+    <subject>crise hídrica</subject>
+    <subject>redes sociais</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="DataManager">
+      <contributorName>Caetano, Eduardo</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers/>
+  <resourceType resourceTypeGeneral="Text">Text</resourceType>
+  <sizes>
+    <size>412629</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Public Domain Dedication (CC0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">Dados proveniente de páginas e grupos públicos do Facebook, Twitter, Youtube, instagram e por assinaturas RSS durante o mês de Setembro 2016</description>
+    <description descriptionType="Methods">Capturado via aplicação de mineração de dados de redes sociais Seekr</description>
+  </descriptions>
+</resource>

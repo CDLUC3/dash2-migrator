@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Hamann, Frederick</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>Supplemental BOSS Emission Line Catalog</title>
+  </titles>
+  <publisher>UC Riverside</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>astronomy</subject>
+    <subject>quasars</subject>
+    <subject>galaxies</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="DataManager">
+      <contributorName>Hamann;Hamann, Frederick</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers/>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <sizes>
+    <size>290366484</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC-BY 4.0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">This archive contains the emission-line catalog described in Appendix A of the paper by Hamann et al., 2016, MNRAS, in press. "Extremely Red Quasars in BOSS"
+
+Paper Abstract:
+Red quasars are candidate young objects in an early transition stage of massive galaxy evolution. Our team recently discovered a population of extremely red quasars (ERQs) in the Baryon Oscillation Spectroscopic Survey (BOSS) that has a suite of peculiar emission-line properties including large rest equivalent widths (REWs), unusual "wingless" line profiles, large NV/Lya, NV/CIV, SiIV/CIV and other flux ratios, and very broad and blueshifted [OIII] 5007. Here we present a new catalog of CIV and NV emission-line data for 216,188 BOSS quasars to characterize the ERQ line properties further. We show that they depend sharply on UV-to-mid-IR color, secondarily on REW(CIV), and not at all on luminosity or the Baldwin Effect. We identify a “core” sample of 97 ERQs with nearly uniform peculiar properties selected via i-W3 &gt; 4.6 (AB) and REW(Civ) &gt; 100 A at redshifts 2.0-3.4. A broader search finds 235 more red quasars with similar unusual characteristics. The core ERQs have median luminosity logL(ergs/s) ~ 47.1, sky density 0.010 deg-2, surprisingly flat/blue UV spectra given their red UV-to-mid-IR colors, and common outflow signatures including BALs or BAL-like features and large CIV emission-line blueshifts. Their SEDs and line properties are inconsistent with normal quasars behind a dust reddening screen. We argue that the core ERQs are a unique obscured quasar population with extreme physical conditions related to powerful outflows across the line-forming regions. Patchy obscuration by small dusty clouds could produce the observed UV extinctions without substantial UV reddening.</description>
+  </descriptions>
+</resource>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Ardell, David H.</creatorName>
+    </creator>
+    <creator>
+      <creatorName>Hou, Ya-Ming</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>Reannotation of CCA-ends, initiator tRNAs, and other CAU-anticodon tRNAs of prokaryotic genomes in tRNAdb-CE 0.8 </title>
+  </titles>
+  <publisher>UC Merced</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>initiator tRNA</subject>
+    <subject>prokaryotic genomes</subject>
+    <subject>CCA ends</subject>
+    <subject>tRNAdb-CE</subject>
+    <subject>CAU anticodon</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="Funder">
+      <contributorName>National Science Foundation. Division of Behavioral and Cognitive Sciences</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers>
+    <relatedIdentifier relatedIdentifierType="DOI" relationType="Cites">GICS-D-16-01058R1</relatedIdentifier>
+  </relatedIdentifiers>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <sizes>
+    <size>20497008</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC-BY 4.0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">Background: While the CCA sequence at the mature 3′ end of tRNAs is conserved and critical for translational function, a genetic template for this sequence is not always contained in tRNA genes. In eukaryotes and archaea, the CCA ends of tRNAs are synthesized post-transcriptionally by CCA-adding enzymes. In bacteria, tRNA genes template CCA sporadically. 
+
+Results: In order to understand the variation in how prokaryotic tRNA genes template CCA, we re-annotated tRNA genes in tRNAdb-CE database version 0.8. Among 132,129 prokaryotic tRNA genes, initiator tRNA genes template CCA at the highest average frequency (74.1%) over all functional classes except selenocysteine and pyrrolysine tRNA genes (88.1% and 100% respectively). Across bacterial phyla and a wide range of genome sizes, many lineages exist in which predominantly initiator tRNA genes template CCA. Convergent and parallel retention of CCA templating in initiator tRNA genes evolved in independent histories of reductive genome evolution in Bacteria. Also, in a majority of cyanobacterial and actinobacterial genera, predominantly initiator tRNA genes template CCA. We also found that a surprising fraction of archaeal tRNA genes template CCA.
+
+Conclusions: We suggest that cotranscriptional synthesis of initiator tRNA CCA 3′ ends can complement inefficient processing of initiator tRNA precursors, “bootstrap” rapid initiation of protein synthesis from a non-growing state, or contribute to an increase in cellular growth rates by reducing overheads of mass and energy to maintain nonfunctional tRNA precursors. More generally, CCA templating in structurally non-conforming tRNA genes can afford cells robustness and greater plasticity to respond rapidly to environmental changes and stimuli.</description>
+    <description descriptionType="Methods">CCA-end reannotation was done by automated sequence comparison to annotated 5-prime end. Function of CAU-anticodon tRNAs was computed with TFAM (Ardell and Andersson 2006) using the Silva model (Silva et al. 2007). Reannotations may be applied to prokaryotic genome data through genome accession IDs provided in the sequence data identifiers. </description>
+    <description descriptionType="Other">1344279 </description>
+  </descriptions>
+</resource>

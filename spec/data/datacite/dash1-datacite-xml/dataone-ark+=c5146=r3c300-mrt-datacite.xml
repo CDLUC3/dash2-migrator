@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Miguel Souza, Danilo</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>Protocolo de Roteamento Adaptativo para Redes de Sensores Sem Fio </title>
+  </titles>
+  <publisher>DataONE</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>Redes de Sensores Sem fio, Protocolo de Roteamento</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="DataManager">
+      <contributorName>de Souza Miguel, Danilo</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers>
+    <relatedIdentifier relatedIdentifierType="DOI" relationType="Documents">DSMFBBMMG</relatedIdentifier>
+    <relatedIdentifier relatedIdentifierType="DOI" relationType="Documents">DSMFBBMMG</relatedIdentifier>
+  </relatedIdentifiers>
+  <resourceType resourceTypeGeneral="Software">Software</resourceType>
+  <sizes>
+    <size>25298</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Public Domain Dedication (CC0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">Proposta de protocolo de roteamento adaptativo com base em tabela hash, vislumbrando maior confiabilidade na transmissão de dados entre os nós que compõe uma rede de sensores sem fio.  </description>
+  </descriptions>
+</resource>

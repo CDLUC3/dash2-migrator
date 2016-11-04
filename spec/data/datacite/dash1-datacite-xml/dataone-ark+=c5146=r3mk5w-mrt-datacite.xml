@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <identifier identifierType="DOI"/>
+  <creators>
+    <creator>
+      <creatorName>Balasubramaniam, Krishna</creatorName>
+    </creator>
+    <creator>
+      <creatorName>Beisner, Brianne</creatorName>
+    </creator>
+    <creator>
+      <creatorName>Vandeleest, Jessica</creatorName>
+    </creator>
+    <creator>
+      <creatorName>Atwill, Rob</creatorName>
+    </creator>
+    <creator>
+      <creatorName>McCowan, Brenda</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>Data associated with Balasubramaniam, Beisner et al. (PeerJ, 2016): "Social buffering and contact transmission: Network connections have beneficial and detrimental effects on Shigella infection risk among captive rhesus macaques"  </title>
+  </titles>
+  <publisher>DataONE</publisher>
+  <publicationYear>2016</publicationYear>
+  <subjects>
+    <subject>Social networks</subject>
+    <subject>Infectious disease risk</subject>
+    <subject>Social buffering</subject>
+    <subject>contact-mediated transmission</subject>
+    <subject>nonhuman primate</subject>
+  </subjects>
+  <contributors>
+    <contributor contributorType="DataManager">
+      <contributorName>Balasubramaniam, Krishna</contributorName>
+    </contributor>
+  </contributors>
+  <relatedIdentifiers/>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <sizes>
+    <size>42750</size>
+  </sizes>
+  <rightsList>
+    <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Public Domain Dedication (CC0)</rights>
+  </rightsList>
+  <descriptions>
+    <description descriptionType="Abstract">In human and animal societies, social connections are among the most critical factors that may influence infectious disease risk. On the one hand, being well-connected within a social network may increase an individual's risk of infection via contact-mediated transmission. On the other hand, connections also strengthen ties of social support and thereby, may socially buffer individuals against infection risk. In two groups of captive rhesus macaques, our study reveals that animals that were socially buffered, i.e. had increased social network connections or “friendships” via their grooming and huddling relationships, were more resistant to infection from an enteric bacterial pathogen: Shigella. Yet in a third group, we reveal that increased huddling connections and aggressive interactions enhanced the likelihood of Shigella infection, presumably via contact-mediated transmission. Our findings emerging from an animal model biologically and behaviorally analogous to humans. They pave the way for a more systematic delineation of the circumstances or contexts (e.g. social group stability, living conditions, pathogen-specific characteristics) under which social connections may prove to be beneficial versus detrimental to infectious disease acquisition and general health.</description>
+    <description descriptionType="Methods">Behavioral observations to record social grooming, huddling, and aggressive interactions were conducted on three outdoor captive groups of rhesus macaques (N=299 subjects), each group was observed for 6 weeks. For each macaque, social network metrics of grooming and huddling degree, betweenness, and eigenvector centralities, and aggression in- and out-degree and strength, were all calculated using the STATNET and SNA packages in R. Dominance ranks and dominance certainties were calculated from aggressive interactions using the recently developed PERC package in R. From each individual, two freshly collected fecal swabs at the end of the behavioral observation periods were processed for the isolation and subsequent biochemical characterization of the bacterial pathogen Shigella flexneri, using previously standardized protocols. Each macaque was then deemed as either 'infected' or 'uninfected', based on the outcome of these biochemical assays. Data analyses testing the effects of social network metrics on the outcome of Shigella infection were carried out using an Information-Theoretical approach to construct generalized linear mixed-effects models with a logit function (the LME4 and MUMIN packages in R). Additional methodology is available in Balasubramaniam, Beisner et al. (2016).</description>
+    <description descriptionType="Other"></description>
+  </descriptions>
+</resource>
