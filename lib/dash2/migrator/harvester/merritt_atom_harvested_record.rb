@@ -55,8 +55,19 @@ module Dash2
         def ark
           @ark ||= begin
             ark_match_data = mrt_mom.match(ARK_PATTERN)
-            log.warn('no ARK found in mrt-mom.txt') unless ark_match_data
-            ark_match_data[0].strip if ark_match_data
+            raise ('no ARK found in mrt-mom.txt') unless ark_match_data
+            ark = ark_match_data[0].strip
+
+            # basename = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}-mrt-mom.txt"
+            # filename = "spec/data/harvester/moms/#{basename}"
+            # if File.exists?(filename)
+            #   warn("#{filename} already exists")
+            # else
+            #   warn("Writing new mrt-mom file #{basename}")
+            #   File.open("tmp/#{basename}", 'wb') { |f| f.write(mrt_mom) }
+            # end
+
+            ark
           end
         end
 
@@ -81,7 +92,20 @@ module Dash2
         end
 
         def mrt_datacite_xml
-          @mrt_datacite_xml ||= content_for('producer/mrt-datacite.xml')
+          @mrt_datacite_xml ||= begin
+            content = content_for('producer/mrt-datacite.xml')
+            # if content
+            #   basename = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}-mrt-datacite.xml"
+            #   filename = "spec/data/datacite/dash1-datacite-xml/#{basename}"
+            #   if File.exists?(filename)
+            #     warn("#{filename} already exists")
+            #   else
+            #     warn("Writing new datacite file #{basename}")
+            #     File.open("tmp/#{basename}", 'wb') { |f| f.write(content) }
+            #   end
+            # end
+            content
+          end
         end
 
         def identifier_value
