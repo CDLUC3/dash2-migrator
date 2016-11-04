@@ -11,7 +11,7 @@ module Dash2
 
     describe MigrationJob do
 
-      EXPECTED_RECORDS = 247
+      EXPECTED_RECORDS = 248
 
       attr_reader :user_uid
       attr_reader :last_doi
