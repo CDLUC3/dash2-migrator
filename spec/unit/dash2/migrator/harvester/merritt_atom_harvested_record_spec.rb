@@ -63,15 +63,6 @@ module Dash2
           end
         end
 
-        describe '#user_uid' do
-          it 'gets the user info from Dash 1'
-          it 'creates a user if needed'
-          it 'doesn\'t create duplicate users'
-          it 'throws NoMethodError for now till we get the above finished' do
-            expect { record.user_uid }.to raise_error(NoMethodError)
-          end
-        end
-
         describe 'error handling' do
           it 'forwards errors' do
             datacite_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fc5146%2Fr36p4t/2/producer%2Fmrt-datacite.xml"
