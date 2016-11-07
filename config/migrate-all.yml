@@ -18,7 +18,7 @@ sources:
   - tenant_path: config/tenants/ucm.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5b00k0h'
 # UCM SSCZO
-  - tenant_path: config/tenants/ucm.yml
+  - tenant_path: config/tenants/ucm_ssczo.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5sv2b3c'
 # UCR
   - tenant_path: config/tenants/ucr.yml
