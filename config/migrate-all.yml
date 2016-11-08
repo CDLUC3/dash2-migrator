@@ -1,4 +1,10 @@
 sources:
+# UCM SSCZO
+  - tenant_path: config/tenants/ucm_ssczo.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5sv2b3c'
+# UCM
+  - tenant_path: config/tenants/ucm.yml
+    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5b00k0h'
 # DataUP
   - tenant_path: config/tenants/dataone.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5222s39'
@@ -14,12 +20,6 @@ sources:
 # UCLA
   - tenant_path: config/tenants/ucla.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5tm8r6v'
-# UCM
-  - tenant_path: config/tenants/ucm.yml
-    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5b00k0h'
-# UCM SSCZO
-  - tenant_path: config/tenants/ucm_ssczo.yml
-    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5sv2b3c'
 # UCR
   - tenant_path: config/tenants/ucr.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5jt2v2m'
