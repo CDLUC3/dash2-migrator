@@ -62,7 +62,11 @@ module Dash2
         end
 
         def sword_client
-          @sword_client ||= Stash::Sword::Client.new(tenant.sword_params)
+          @sword_client ||= begin
+            params = tenant.sword_params.dup
+            params[:logger] = Migrator.log
+            Stash::Sword::Client.new(params)
+          end
         end
 
         def importer
