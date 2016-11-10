@@ -36,7 +36,7 @@ module Datacite
       end
 
       def fix_breaks!
-        descriptions.each { |d| d.value.gsub!("\n", '<br/>') }
+        descriptions.each { |d| d.value.gsub!("\n\n", '<br/>') }
       end
 
       def add_funding_reference(funder_contrib, funder_name, grant_number)

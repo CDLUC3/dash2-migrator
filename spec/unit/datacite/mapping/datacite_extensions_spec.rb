@@ -99,44 +99,26 @@ module Datacite
           it 'doesn\'t mess with incidental semicolons'
         end
 
-        # Leave as-is:
-        #
-        # spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r36p4t-mrt-datacite.xml:      <contributorName>U.S. Environmental Protection Agency; CYBER-ShARE Center of Excellence National Science Foundation (NSF) CREST grants; CI-Team Grant</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3pp45-mrt-datacite.xml:      <contributorName>European Research Council (ERC); UC Institute for the Study of Ecological and Evolutionary Climate Impacts (ISEECI); China Scholarship Council (CSC)</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/ucsf-ark+=b7272=q6ms3qnx-mrt-datacite.xml:      <contributorName>Funding for the preparation of this data was supported by the Bill &amp; Melinda Gates Foundation. The original data collection was supported by grants from the MacArthur Foundation, National Institutes of Health, and the Bill &amp; Melinda Gates Foundation. </contributorName>
+        it 'injects <br/> tags only for double-spaced paragraphs' do
+          datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1h593-mrt-datacite.xml')
+          expect(datacite_xml).not_to include('<br/>')
 
-        # Fix:
-        #
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1001p-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d11010-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d12s30-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d13s39-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d14s3m-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d15k5m-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d16k5x-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d17g6k-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d18g6w-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1988w-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1b886-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1c88h-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1d595-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1f30c-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1g011-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1h01b-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1j01n-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1js3b-mrt-datacite.xml:      <contributorName>Lim;Lim, Nathan</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1ks3n-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1ms3z-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1np4m-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1pk58-mrt-datacite.xml:      <contributorName>Saberi;Saberi, Kourosh</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1qg6x-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1rg67-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1s887-mrt-datacite.xml:      <contributorName>Bannan;Bannan, Caitlin Colleen</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1t88j-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1v88v-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1w885-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x30q-mrt-datacite.xml:      <contributorName>McKinley;McKinley, Matthew J.</contributorName>
-        # spec/data/datacite/dash1-datacite-xml/uci-ark+=b7280=d1x59t-mrt-datacite.xml:      <contributorName>Drew;Drew, Nancy</contributorName>
+          expected_breaks = datacite_xml.scan(%r{<description[^s].*?</description>}m).inject(0) do |sum, desc|
+            val = desc.match(%r{<description[^>]*>(.*)</description>}m)[1]
+            sum + val.scan("\n\n").count
+          end
+
+          resource = Resource.parse_mrt_datacite(datacite_xml)
+          resource.identifier ||= Identifier.from_doi('10.12345/67890')
+
+          dcs4_xml = resource.write_xml
+          dcs4_br_count = dcs4_xml.scan('<br/>').count
+          expect(dcs4_br_count).to eq(expected_breaks)
+
+          dcs3_xml = resource.write_xml(mapping: :datacite_3)
+          dcs3_br_count = dcs3_xml.scan('<br/>').count
+          expect(dcs3_br_count).to eq(expected_breaks)
+        end
 
         it 'creates a FundingReference from a description' do
           datacite_xml = File.read('spec/data/datacite/dash1-datacite-xml/dataone-ark+=c5146=r3059p-mrt-datacite.xml')
