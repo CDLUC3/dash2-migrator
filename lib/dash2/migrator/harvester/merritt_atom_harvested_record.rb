@@ -55,7 +55,7 @@ module Dash2
         def ark
           @ark ||= begin
             ark_match_data = mrt_mom.match(ARK_PATTERN)
-            raise ('no ARK found in mrt-mom.txt') unless ark_match_data
+            raise 'no ARK found in mrt-mom.txt' unless ark_match_data
             ark = ark_match_data[0].strip
 
             # basename = "#{tenant_id}-#{ark.sub(':', '+').gsub('/', '=')}-mrt-mom.txt"
