@@ -65,7 +65,7 @@ module Dash2
           return nil unless v
           value = v.strip
           return nil if value == 'nil'
-          return nil if value.downcase == 'null'
+          return nil if value.casecmp('null').zero?
           return nil if value == ''
           int_value = value.to_i
           return int_value if int_value.to_s == value && int_value < 2000
@@ -107,7 +107,7 @@ module Dash2
             tenant_id: dash1_user.tenant_id,
             oauth_token: dash1_user.oauth_token
           )
-          fields = dash1_user.to_h.map { |k, v| "#{k}: #{v || 'nil'}" }.join(", ")
+          fields = dash1_user.to_h.map { |k, v| "#{k}: #{v || 'nil'}" }.join(', ')
           log.info("Created Stash user #{stash_user.id} for Dash 1 user: #{fields}")
           stash_user
         end

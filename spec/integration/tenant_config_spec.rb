@@ -16,7 +16,7 @@ module Dash2
         @doi_to_tenant = {}
         @all_tenants = []
         Dir.glob('spec/data/harvester/moms/*mrt-mom.txt').sort.each do |f|
-          tenant = %r{^[a-z]+}.match(File.basename(f))[0]
+          tenant = /^[a-z]+/.match(File.basename(f))[0]
           all_tenants << tenant unless all_tenants.include?(tenant)
 
           mrt_mom = File.read(f)
