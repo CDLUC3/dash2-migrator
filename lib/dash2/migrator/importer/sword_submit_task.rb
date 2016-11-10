@@ -42,7 +42,7 @@ module Dash2
         end
 
         def create
-          Migrator.log.info("create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val})")
+          Migrator.log.info("posting create(doi: #{id_val}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) to #{sword_client.collection_uri}")
           receipt = submit_create
           se_resource.download_uri = receipt.em_iri
           se_resource.update_uri = receipt.edit_iri
@@ -58,7 +58,7 @@ module Dash2
         end
 
         def update(edit_iri)
-          Migrator.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val})")
+          Migrator.log.info("posting update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val})")
           status = submit_update(edit_iri)
           Migrator.log.info("update(edit_iri: #{edit_iri}, zipfile: #{zipfile}) for resource #{se_resource.id} (#{id_val}) completed with status #{status}")
         end

@@ -31,6 +31,7 @@ module Dash2
 
         @sword_client = instance_double(Stash::Sword::Client)
         allow(@sword_client).to receive(:create) { receipt }
+        allow(@sword_client).to receive(:collection_uri) { 'http://example.org/sword/my-collection' }
         allow(Stash::Sword::Client).to receive(:new) { @sword_client }
       end
 
