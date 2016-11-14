@@ -8,6 +8,7 @@ module Dash2
 
         attr_reader :user
         attr_reader :user_uid
+        attr_reader :user_provider
 
         attr_reader :sw_ark_xml
         attr_reader :sw_doi_xml
@@ -90,10 +91,14 @@ module Dash2
 
           @tenant = StashEngine::Tenant.new(YAML.load_file('config/tenants/example.yml')['test'])
 
+          @user_provider = instance_double(Dash2::Migrator::Harvester::UserProvider)
+          allow(user_provider).to receive(:ensure_uid!).and_return(user_uid)
+
           @importer = Importer.new(
             tenant: tenant,
             ezid_client: ezid_client,
-            sword_client: sword_client
+            sword_client: sword_client,
+            user_provider: user_provider
           )
 
           @user = StashEngine::User.create(
