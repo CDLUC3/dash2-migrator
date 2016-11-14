@@ -1,9 +1,9 @@
 sources:
-# UCSF #1
+# UCSF current (ucsf_lib_datashare)
   - tenant_path: config/tenants/ucsf.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m52j8gvj'
-# UCSF #2
-  - tenant_path: config/tenants/ucsf.yml
+# UCSF legacy (ucsf_datashare)
+  - tenant_path: config/tenants/ucsf_legacy.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m5ng4nz1'
 # UCM SSCZO
   - tenant_path: config/tenants/ucm_ssczo.yml
