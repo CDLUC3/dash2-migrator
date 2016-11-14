@@ -29,6 +29,7 @@ module Dash2
 
         def ensure_uid!(record)
           dash1_user = dash1_user_for(record)
+          raise ArgumentError, "No Dash1 user ID for local_id #{record.local_id || 'nil'}, title '#{record.title}'" unless dash1_user
           ensure_stash_user_id(dash1_user)
           dash1_user.uid
         end
