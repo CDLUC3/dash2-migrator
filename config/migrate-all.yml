@@ -1,7 +1,4 @@
 sources:
-# LBNL test
-  - tenant_path: config/tenants/lbnl.yml
-    feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m50s13nf'
 # UCSF current (ucsf_lib_datashare)
   - tenant_path: config/tenants/ucsf.yml
     feed_uri: 'https://merritt.cdlib.org/object/recent.atom?collection=ark:/13030/m52j8gvj'
