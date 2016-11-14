@@ -57,6 +57,7 @@ module Dash2
 
           before(:each) do
             @sword_client = instance_double(Stash::Sword::Client)
+            allow(sword_client).to receive(:collection_uri).and_return('http://example.org/sword')
 
             @doi_value = '10.123/456'
 
@@ -100,6 +101,7 @@ module Dash2
               allow(receipt).to receive(:em_iri) { em_iri }
               allow(receipt).to receive(:edit_iri) { edit_iri }
               expect(sword_client).to receive(:create).with(doi: "doi:#{doi_value}", zipfile: expected_zipfile) { receipt }
+              allow(sword_client).to receive(:collection_uri).and_return('http://example.org/sword')
 
               expect(se_resource).to receive(:download_uri=).with(em_iri)
               expect(se_resource).to receive(:update_uri=).with(edit_iri)

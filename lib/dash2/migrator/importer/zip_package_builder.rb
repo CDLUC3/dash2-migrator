@@ -68,7 +68,7 @@ module Dash2
 
         def write_mrt_datacite(folder)
           mrt_datacite_xml = "#{folder}/mrt-datacite.xml"
-          dcs_resource.write_to_file(mrt_datacite_xml, pretty: true)
+          dcs_resource.write_to_file(mrt_datacite_xml, pretty: true, options: { mapping: :datacite_3 })
           mrt_datacite_xml
         end
 

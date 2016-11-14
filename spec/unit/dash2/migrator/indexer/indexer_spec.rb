@@ -62,7 +62,7 @@ module Dash2
             allow(StashEzid::Client).to receive(:new).with(ezid_params).and_return(ezid_client)
 
             sword_client = instance_double(Stash::Sword::Client)
-            allow(Stash::Sword::Client).to receive(:new).with(sword_params).and_return(sword_client)
+            allow(Stash::Sword::Client).to receive(:new).with(hash_including(sword_params)).and_return(sword_client)
 
             @importer = instance_double(Importer::Importer)
             allow(Importer::Importer).to receive(:new).with(

@@ -102,10 +102,11 @@ module Dash2
             ident
           end)
 
+          dcs3_xml = @dcs_resource.write_xml(mapping: :datacite_3)
           dcs4_xml = @dcs_resource.write_xml
           dcs4_wrapper = wrapper_xml.sub(%r{<resource.*</resource>}m, dcs4_xml)
           @expected_metadata = {
-            'mrt-datacite.xml' => dcs4_xml,
+            'mrt-datacite.xml' => dcs3_xml,
             'stash-wrapper.xml' => dcs4_wrapper,
             'mrt-oaidc.xml' => File.read('spec/data/generated-oaidc.xml'),
             'mrt-dataone-manifest.txt' => File.read('spec/data/generated-dataone-manifest.txt')
