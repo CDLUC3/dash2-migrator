@@ -141,9 +141,9 @@ module Dash2
             final_doi = migrate_test_record(stash_wrapper, se_resource)
           end
 
-          dcs_resource = update_ezid(final_doi, stash_wrapper)
-
+          dcs_resource = stash_wrapper.datacite_resource
           sword_packager.submit(stash_wrapper: stash_wrapper, dcs_resource: dcs_resource, se_resource: se_resource, tenant: tenant)
+          update_ezid(final_doi, stash_wrapper)
           se_resource
         end
 
@@ -163,10 +163,8 @@ module Dash2
             dcs3_xml = dcs_resource.write_xml(mapping: :datacite_3)
             landing_url = tenant.landing_url("/stash/dataset/#{final_doi}")
             ezid_client.update_metadata(final_doi, dcs3_xml, landing_url)
-            dcs_resource
           rescue => e
             log.warn "Error updating #{final_doi} (expired fake DOI?): #{e}"
-            dcs_resource
           end
         end
 
