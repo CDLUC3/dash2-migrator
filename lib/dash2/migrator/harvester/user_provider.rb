@@ -29,7 +29,7 @@ module Dash2
 
         def ensure_uid!(record)
           dash1_user = dash1_user_for(record)
-          raise ArgumentError, "No Dash1 user ID for local_id #{record.local_id || 'nil'}, title '#{record.title}'" unless dash1_user
+          raise ArgumentError, "No Dash1 user ID for local_id #{record.local_id || 'nil'}, title '#{record.title}', tenant #{record.tenant_id}" unless dash1_user
           ensure_stash_user_id(dash1_user)
           dash1_user.uid
         end
@@ -143,7 +143,18 @@ module Dash2
           if by_title
             warn "multiple users for title '#{title}': #{by_title}"
           else
-            warn "no user for local_id #{local_id || 'nil'}, title '#{title}'"
+            warn "no user for local_id #{local_id || 'nil'}, title '#{title}', tenant_id #{record.tenant_id}"
+          end
+
+          if record.tenant_id == 'lbnl'
+            warn "returning test user cdluc3@gmail.com for #{local_id || 'nil'}, title '#{title}'"
+            users_by_id[9999] ||= begin
+              test_user = users_by_id[1003].dup
+              test_user.tenant_id = 'lbnl'
+              test_user.id = 9999
+              test_user
+            end
+            9999
           end
         end
 
