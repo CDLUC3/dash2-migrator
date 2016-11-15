@@ -71,7 +71,8 @@ module Dash2
 
         def edit_uri_base
           @edit_uri_base ||= begin
-            if (match_data = SWORD_PATTERN.match(sword_client.collection_uri))
+            collection_uri = sword_client.collection_uri.to_s
+            if (match_data = SWORD_PATTERN.match(collection_uri))
               protocol = match_data[1]
               server = match_data[2]
               collection = match_data[3]
@@ -115,12 +116,18 @@ module Dash2
           wrapper_id_value = stash_wrapper.id_value
 
           if (existing_alt_ident = alt_ident_for(wrapper_id_value, ark))
-            raise "Can't remigrate in production" if Migrator.production?
+            if Migrator.production?
+              warn "#{wrapper_id_value || 'nil'} / #{ark} already migrated as resource #{existing_alt_ident.resource_id}; skipping"
+              return
+            end
             existing_resource = StashEngine::Resource.find(existing_alt_ident.resource_id)
             se_resource = build_se_resource(stash_wrapper, user_uid)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           elsif (existing_resource = first_identical_resource(wrapper_id_value))
-            raise "Can't remigrate in production" if Migrator.production?
+            if Migrator.production?
+              warn "#{wrapper_id_value || 'nil'} / #{ark} already migrated as resource #{existing_resource.id}; skipping"
+              return
+            end
             se_resource = build_se_resource(stash_wrapper, user_uid)
             final_doi = replace_existing_resource(se_resource, stash_wrapper, existing_resource)
           elsif Migrator.production?
