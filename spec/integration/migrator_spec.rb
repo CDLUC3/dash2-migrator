@@ -30,9 +30,12 @@ module Dash2
         allow(receipt).to(receive(:edit_iri)) { "http://example.org/#{@last_doi}/edit" }
 
         @sword_client = instance_double(Stash::Sword::Client)
+        allow(@sword_client).to receive(:update).and_return(200)
         allow(@sword_client).to receive(:create) { receipt }
-        allow(@sword_client).to receive(:collection_uri) { 'http://example.org/sword/my-collection' }
+        allow(@sword_client).to receive(:collection_uri) { 'http://example.org/mrtsword/collection/my-collection' }
         allow(Stash::Sword::Client).to receive(:new) { @sword_client }
+
+        allow(Migrator).to receive(:production?).and_return(true)
       end
 
       describe 'harvest and import' do
