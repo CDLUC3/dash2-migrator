@@ -52,7 +52,7 @@ PATH
       omniauth-shibboleth (~> 1.2.1)
       rails (~> 4.2.4)
       redcarpet (~> 3.3)
-      stash-sword (~> 0.1, >= 0.1.2)
+      stash-sword (~> 0.1, >= 0.1.4)
 
 GEM
   remote: https://rubygems.org/
