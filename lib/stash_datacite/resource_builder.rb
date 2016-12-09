@@ -164,12 +164,21 @@ module StashDatacite
     def set_sd_resource_type(dcs_resource_type)
       return nil unless dcs_resource_type
       dcs_resource_type_general = dcs_resource_type.resource_type_general
+      dcs_resource_type_value = dcs_resource_type.value
       se_resource_type = dcs_resource_type_general.value.downcase
-      resource_type_friendly = (ResourceType::ResourceTypesLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+      resource_type_friendly = (ResourceType::ResourceTypesGeneralLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+
       ResourceType.create(
         resource_id: se_resource_id,
-        resource_type_friendly: resource_type_friendly
+        resource_type_general: se_resource_type,
+        resource_type: dcs_resource_type_value
       )
+
+      # resource_type_friendly = (ResourceType::ResourceTypesGeneralLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+      # ResourceType.create(
+      #   resource_id: se_resource_id,
+      #   resource_type_friendly: resource_type_friendly
+      # )
     end
 
     def add_sd_alternate_ident(dcs_alternate_ident)
