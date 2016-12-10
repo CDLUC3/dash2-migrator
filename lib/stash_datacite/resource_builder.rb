@@ -40,16 +40,7 @@ module StashDatacite
     private
 
     def se_resource
-      @se_resource ||= begin
-        se_resource = StashEngine::Resource.create(user_id: user_id)
-        se_resource_state = StashEngine::ResourceState.create(
-          user_id: user_id,
-          resource_state: 'in_progress',
-          resource_id: se_resource.id
-        )
-        se_resource.update(current_resource_state_id: se_resource_state.id)
-        se_resource
-      end
+      @se_resource ||= StashEngine::Resource.create(user_id: user_id)
     end
 
     def se_resource_id
@@ -164,12 +155,21 @@ module StashDatacite
     def set_sd_resource_type(dcs_resource_type)
       return nil unless dcs_resource_type
       dcs_resource_type_general = dcs_resource_type.resource_type_general
+      dcs_resource_type_value = dcs_resource_type.value
       se_resource_type = dcs_resource_type_general.value.downcase
-      resource_type_friendly = (ResourceType::ResourceTypesLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+      resource_type_friendly = (ResourceType::ResourceTypesGeneralLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+
       ResourceType.create(
         resource_id: se_resource_id,
-        resource_type_friendly: resource_type_friendly
+        resource_type_general: resource_type_friendly,
+        resource_type: dcs_resource_type_value
       )
+
+      # resource_type_friendly = (ResourceType::ResourceTypesGeneralLimited.values.include?(se_resource_type) ? se_resource_type : 'other')
+      # ResourceType.create(
+      #   resource_id: se_resource_id,
+      #   resource_type_friendly: resource_type_friendly
+      # )
     end
 
     def add_sd_alternate_ident(dcs_alternate_ident)

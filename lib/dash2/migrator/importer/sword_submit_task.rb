@@ -29,7 +29,7 @@ module Dash2
 
         def save_resource!
           se_resource.current_state = 'published'
-          se_resource.update_version(zipfile)
+          se_resource.version_zipfile=zipfile
           se_resource.save
         end
 

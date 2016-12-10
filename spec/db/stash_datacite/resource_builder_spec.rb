@@ -168,7 +168,8 @@ module StashDatacite
 
     it 'extracts the resource type' do
       resource_type = se_resource.resource_type
-      expect(resource_type.resource_type).to eq(Datacite::Mapping::ResourceTypeGeneral::DATASET.value.downcase)
+      expect(resource_type.resource_type).to eq('application/octet-stream')
+      expect(resource_type.resource_type_general).to eq(Datacite::Mapping::ResourceTypeGeneral::DATASET.value.downcase)
     end
 
     it 'extracts the alternate identifiers' do

@@ -40,6 +40,7 @@ module Dash2
 
           @tenant = double(StashEngine::Tenant)
           allow(tenant).to receive(:long_name).and_return('University of California, San Francisco')
+          allow(tenant).to receive(:short_name).and_return('UC San Francisco')
 
           @se_resource = double(StashEngine::Resource)
 
