@@ -1,0 +1,132 @@
+<st:stash_wrapper xsi:schemaLocation='http://dash.cdlib.org/stash_wrapper/ http://dash.cdlib.org/stash_wrapper/stash_wrapper.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:st='http://dash.cdlib.org/stash_wrapper/'>
+  <st:identifier type='DOI'>10.6078/D11S3N</st:identifier>
+  <st:stash_administrative>
+    <st:version>
+      <st:version_number>2</st:version_number>
+      <st:date>2017-02-26Z</st:date>
+    </st:version>
+    <st:license>
+      <st:name>Creative Commons Attribution 4.0 International (CC BY 4.0)</st:name>
+      <st:uri>https://creativecommons.org/licenses/by/4.0/</st:uri>
+    </st:license>
+    <st:embargo>
+      <st:type>none</st:type>
+      <st:period>none</st:period>
+      <st:start>2017-02-26Z</st:start>
+      <st:end>2017-02-26Z</st:end>
+    </st:embargo>
+    <st:inventory num_files='1'>
+      <st:file>
+        <st:pathname>SanFranciscoBay_Adapt2SeaLevelRise_CaseStudies.zip</st:pathname>
+        <st:size unit='B'>10135738</st:size>
+        <st:mime_type>application/zip</st:mime_type>
+      </st:file>
+    </st:inventory>
+  </st:stash_administrative>
+  <st:stash_descriptive>
+    <resource xsi:schemaLocation='http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns='http://datacite.org/schema/kernel-4'>
+      <identifier identifierType='DOI'>10.6078/D11S3N</identifier>
+      <creators>
+        <creator>
+          <creatorName>Hirschfeld, Daniella</creatorName>
+          <nameIdentifier nameIdentifierScheme='ORCID' schemeURI='http://orcid.org'>0000-0001-9664-7594</nameIdentifier>
+          <affiliation>UC Berkeley</affiliation>
+        </creator>
+        <creator>
+          <creatorName>Hill, Kristina</creatorName>
+          <affiliation>UC Berkeley</affiliation>
+        </creator>
+        <creator>
+          <creatorName>Plane, Ellen</creatorName>
+          <affiliation>UC Berkeley</affiliation>
+        </creator>
+      </creators>
+      <titles>
+        <title>SanFranciscoBay_Adapt2SeaLevelRise_CaseStudies</title>
+      </titles>
+      <publisher>UC Berkeley</publisher>
+      <publicationYear>2017</publicationYear>
+      <subjects>
+        <subject>Climate change</subject>
+        <subject>Adaptation</subject>
+        <subject>Sea level rise</subject>
+        <subject>Case Study</subject>
+        <subject>Physical Plans</subject>
+      </subjects>
+      <fundingReferences>
+        <fundingReference>
+          <funderName>McQuown Fellowship</funderName>
+        </fundingReference>
+      </fundingReferences>
+      <language>en</language>
+      <resourceType resourceTypeGeneral='Other'/>
+      <relatedIdentifiers>
+        <relatedIdentifier relationType='Cites' relatedIdentifierType='URL'>http://www.sfei.org/data/sf-bay-shore-inventory-gis-data#sthash.Sofh5BLG.dpbs</relatedIdentifier>
+        <relatedIdentifier relationType='Cites' relatedIdentifierType='DOI'>
+          Hill, K. (2015), Coastal infrastructure: a typology for the next
+          century of adaptation to sea-level rise. Frontiers in Ecology and the
+          Environment, 13: 468–476. doi:10.1890/150088
+        </relatedIdentifier>
+      </relatedIdentifiers>
+      <sizes>
+        <size>10135738 bytes</size>
+      </sizes>
+      <version>2</version>
+      <rightsList>
+        <rights rightsURI='https://creativecommons.org/licenses/by/4.0/'>Creative Commons Attribution 4.0 International (CC BY 4.0)</rights>
+      </rightsList>
+      <descriptions>
+        <description descriptionType='Abstract'>
+          As awareness of climate change increases more projects are beginging
+          to include sea level rise in their planning and design. To better
+          understand cutting edge examples of sea level rise adaptation we
+          examined the current conditions and projected future changes from nine
+          physical sea level ries adaptation projects in the San Francisco Bay.
+        </description>
+        <description descriptionType='Methods'>
+          Our analysis is based on four primary steps. First for each case study
+          we digitized a project boundary based on critical reports for that
+          specific case study. The read me file contains details on the reports
+          used for each case study. Second, for the current conditions, we
+          reclassified the shoreline infrastructure data from San Francisco
+          Estuary Institute (SFEI). We used the following dictionary to
+          reclassify the data in terms of the Landform / Wall value:
+          {&apos;Berm&apos;: &apos;Landform&apos;, &apos;Channel or
+          Opening&apos;: &apos;Landform&apos;, &apos;Shoreline Protection
+          Structure&apos;: &apos;Landform&apos;,&apos;Embankment&apos;:
+          &apos;Landform&apos;, &apos;Engineered Levee&apos;:
+          &apos;Landform&apos;, &apos;Floodwall&apos;: &apos;Wall&apos;,
+          &apos;Natural Shoreline&apos;:
+          &apos;Landform&apos;,&apos;Transportation Structure&apos;:
+          &apos;Wall&apos;, &apos;Water Control Structure&apos;:
+          &apos;Wall&apos;, &apos;Wetland&apos;: &apos;Landform&apos;}. We used
+          the following dictionary to reclassify the data in terms of the Dynaic
+          / Static value {&apos;Berm&apos;: &apos;Static&apos;, &apos;Channel or
+          Opening&apos;: &apos;Static&apos;, &apos;Shoreline Protection
+          Structure&apos;: &apos;Static&apos;,&apos;Embankment&apos;:
+          &apos;Static&apos;, &apos;Engineered Levee&apos;: &apos;Static&apos;,
+          &apos;Floodwall&apos;: &apos;Static&apos;, &apos;Natural
+          Shoreline&apos;: &apos;Dynamic&apos;,&apos;Transportation
+          Structure&apos;: &apos;Static&apos;, &apos;Water Control
+          Structure&apos;: &apos;Dynamic&apos;, &apos;Wetland&apos;:
+          &apos;Dynamic&apos;}. Additionally, for some of the shoreline
+          protection structure sites we used google earth and site visits to
+          shift their categorization from landform to wall. Third we used the
+          boundaries to clip the current conditions to the project specific
+          areas. Finally using detailed analysis from each case studies report
+          we altered some of the current lines to reflect the proposed changes.
+        </description>
+      </descriptions>
+      <geoLocations>
+        <geoLocation>
+          <geoLocationBox>
+            <westBoundLongitude>-122.692566</westBoundLongitude>
+            <eastBoundLongitude>-121.401672</eastBoundLongitude>
+            <southBoundLatitude>37.208457</southBoundLatitude>
+            <northBoundLatitude>38.134557</northBoundLatitude>
+          </geoLocationBox>
+        </geoLocation>
+      </geoLocations>
+    </resource>
+  </st:stash_descriptive>
+</st:stash_wrapper>

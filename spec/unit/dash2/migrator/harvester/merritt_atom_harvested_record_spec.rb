@@ -333,6 +333,28 @@ module Dash2
           end
         end
 
+        describe 'version extraction' do
+          before(:each) do
+            entry_xml = File.read('spec/data/harvester/versions/entry.xml')
+            @entry = RSS::Parser.parse(entry_xml, false).items[0]
+            @record = MerrittAtomHarvestedRecord.new(user_provider, 'example', feed_uri, entry)
+
+            @mrt_mom_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-mom.txt"
+            stub_request(:get, mrt_mom_uri).to_return(body: File.read('spec/data/harvester/versions/mrt-mom.txt'))
+
+            stash_wrapper_uri = "https://#{config.username}:#{config.password}@merritt.cdlib.org/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2Fstash-wrapper.xml"
+            stub_request(:get, stash_wrapper_uri).to_return(body: File.read('spec/data/harvester/versions/stash-wrapper.xml'))
+          end
+
+          it 'extracts the Merritt version' do
+            expect(record.merritt_version).to eq(2)
+          end
+
+          it 'extracts the Stash version' do
+            expect(record.stash_version).to eq(2)
+          end
+        end
+
       end
 
     end

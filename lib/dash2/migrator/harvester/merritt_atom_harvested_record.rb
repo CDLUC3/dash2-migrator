@@ -40,6 +40,22 @@ module Dash2
           end
         end
 
+        def stash_version
+          @stash_version ||= begin
+            (wrapper_xml = content_for('producer/stash-wrapper.xml')) &&
+              (wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)) &&
+              wrapper.version.version_number
+          end
+        end
+
+        def merritt_version
+          @merritt_version ||= begin
+            (wrapper_uri = uri_for('producer/stash-wrapper.xml')) &&
+              (version_str = %r{.*/([0-9]+)/producer%2Fstash-wrapper.xml}.match(wrapper_uri.to_s)[1]) &&
+              version_str.to_i
+          end
+        end
+
         def user_uid
           user_provider.ensure_uid!(self)
         end

@@ -1,0 +1,39 @@
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dct="http://purl.org/dc/terms/">
+    <entry>
+        <id>http://n2t.net/ark:/b6078/d11s3n</id>
+        <link rel="alternate" type="application/zip" href="/d/ark%3A%2Fb6078%2Fd11s3n"/>
+        <dct:extent>10172876</dct:extent>
+        <title>SanFranciscoBay_Adapt2SeaLevelRise_CaseStudies</title>
+        <author>
+            <name>Hirschfeld, Daniella; Hill, Kristina; Plane, Ellen</name>
+        </author>
+        <updated>2017-02-26T13:34:20-08:00</updated>
+        <published>2017-02-25T23:50:37-08:00</published>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2Fmrt-oaidc.xml" rel="http://purl.org/dc/terms/hasPart"
+              title="producer/mrt-oaidc.xml" length="3320" type="application/xml"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-mom.txt" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-mom.txt" length="114" type="text/plain"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2Fmrt-dataone-manifest.txt"
+              rel="http://purl.org/dc/terms/hasPart" title="producer/mrt-dataone-manifest.txt" length="590"
+              type="text/plain"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-dc.xml" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-dc.xml" length="149" type="application/xml"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-ingest.txt" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-ingest.txt" length="1562" type="text/plain"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-owner.txt" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-owner.txt" length="19" type="text/plain"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2Fmrt-datacite.xml" rel="http://purl.org/dc/terms/hasPart"
+              title="producer/mrt-datacite.xml" length="5103" type="application/xml"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-object-map.ttl" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-object-map.ttl" length="3136" type="plain/turtle"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2Fstash-wrapper.xml" rel="http://purl.org/dc/terms/hasPart"
+              title="producer/stash-wrapper.xml" length="6762" type="application/xml"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/producer%2FSanFranciscoBay_Adapt2SeaLevelRise_CaseStudies.zip"
+              rel="http://purl.org/dc/terms/hasPart" title="producer/SanFranciscoBay_Adapt2SeaLevelRise_CaseStudies.zip"
+              length="10135738" type="application/zip"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-erc.txt" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-erc.txt" length="177" type="text/plain"/>
+        <link href="/d/ark%3A%2Fb6078%2Fd11s3n/2/system%2Fmrt-membership.txt" rel="http://purl.org/dc/terms/hasPart"
+              title="system/mrt-membership.txt" length="20" type="text/plain"/>
+    </entry>
+</feed>
