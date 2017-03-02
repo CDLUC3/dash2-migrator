@@ -17,8 +17,6 @@ ActiveRecord::Migrator.up 'db/migrate'
 RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.strategy = :deletion
-    # DatabaseCleaner.strategy = :transaction
-    # DatabaseCleaner.clean_with(:truncation)
   end
   config.after(:each) do
     DatabaseCleaner.clean

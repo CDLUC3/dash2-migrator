@@ -3,8 +3,9 @@
 # ############################################################
 # Check environment
 
-ENV['STASH_ENV'] ||= 'test'
-raise 'Production migration not implemented' if ENV['STASH_ENV'] == 'production'
+# ENV['STASH_ENV'] ||= 'test'
+# raise 'Production migration not implemented' if ENV['STASH_ENV'] == 'production'
+
 ENV['RAILS_ENV'] = ENV['STASH_ENV']
 
 # ############################################################
