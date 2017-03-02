@@ -1,8 +1,8 @@
 require 'stash/wrapper'
 require 'datacite/mapping'
 require 'stash_engine'
-require 'stash_datacite/dublin_core_builder'
-require 'stash_datacite/data_one_manifest_builder'
+# require 'stash_datacite/dublin_core_builder'
+# require 'stash_datacite/data_one_manifest_builder'
 require 'tmpdir'
 require 'fileutils'
 

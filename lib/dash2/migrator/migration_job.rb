@@ -1,5 +1,6 @@
 require 'active_support'
 require 'stash/wrapper/stash_wrapper_extensions'
+require 'stash/harvester_app'
 
 module Dash2
   module Migrator

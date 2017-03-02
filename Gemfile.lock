@@ -21,6 +21,15 @@ PATH
       stash-wrapper (~> 0.1, >= 0.1.5)
 
 PATH
+  remote: ../stash-merritt
+  specs:
+    stash-merritt (0.2.0)
+      rubyzip (~> 1.1)
+      stash_datacite
+      stash_engine
+      stash_ezid_datacite (~> 0.1)
+
+PATH
   remote: ../stash_engines/stash_datacite
   specs:
     stash_datacite (0.0.5)
@@ -365,6 +374,7 @@ DEPENDENCIES
   simplecov (~> 0.12)
   simplecov-console (~> 0.3.0)
   stash-harvester!
+  stash-merritt!
   stash-sword (~> 0.1, >= 0.1.5)
   stash-wrapper (~> 0.1, >= 0.1.11.1)
   stash_datacite!

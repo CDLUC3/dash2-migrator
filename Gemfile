@@ -12,6 +12,7 @@ gem 'stash-sword', '~> 0.1', '>= 0.1.5'
 
 gem 'simple-rss', '~> 1.3'
 
+gem 'stash-merritt', path: '../stash-merritt'
 gem 'stash-harvester', path: '../stash-harvester'
 gem 'stash_engine', path: '../stash_engines/stash_engine'
 gem 'stash_datacite', path: '../stash_engines/stash_datacite'
