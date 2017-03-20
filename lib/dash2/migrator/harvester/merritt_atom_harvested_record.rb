@@ -45,6 +45,9 @@ module Dash2
             (wrapper_xml = content_for('producer/stash-wrapper.xml')) &&
               (wrapper = Stash::Wrapper::StashWrapper.parse_xml(wrapper_xml)) &&
               wrapper.version.version_number
+          rescue XML::MappingError => e
+            log.error(e)
+            nil
           end
         end
 
@@ -84,6 +87,9 @@ module Dash2
             # end
 
             ark
+          rescue => e
+            log.error(e)
+            nil
           end
         end
 
@@ -171,7 +177,12 @@ module Dash2
         def content_for(title)
           return nil unless (uri = uri_for(title))
           begin
-            RestClient.get(uri.to_s).body
+            response = RestClient.get(uri.to_s)
+            content = response.body
+            if content.include?('HTTP/1.1 500')
+              raise RestClient::InternalServerError
+            end
+            content
           rescue => e
             log.error("Error fetching URI #{uri}: #{e}")
             raise

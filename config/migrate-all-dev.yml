@@ -1,0 +1,13 @@
+users_path: config/dash1_records_users.txt
+index:
+  db_config_path: config/database.yml
+sources:
+# UCLA
+  - tenant_path: config/tenants/ucla.yml
+    feed_uri: 'http://merritt-dev.cdlib.org/object/recent.atom?collection=ark:/99999/fk4jq1032'
+# UCOP
+  - tenant_path: config/tenants/ucop.yml
+    feed_uri: 'http://merritt-dev.cdlib.org/object/recent.atom?collection=ark:/99999/fk4pg1qtb'
+# UCB
+  - tenant_path: config/tenants/ucb.yml
+    feed_uri: 'http://merritt-dev.cdlib.org/object/recent.atom?collection=ark:/99999/fk4dz07dd'
