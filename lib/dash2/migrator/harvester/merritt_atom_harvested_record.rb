@@ -177,7 +177,8 @@ module Dash2
         def content_for(title)
           return nil unless (uri = uri_for(title))
           begin
-            response = RestClient.get(uri.to_s)
+            verify_ssl = (ENV['STASH_ENV'] == 'production')
+            response = RestClient::Request.execute(method: :get, :url => uri.to_s, verify_ssl: verify_ssl)
             content = response.body
             if content.include?('HTTP/1.1 500')
               raise RestClient::InternalServerError

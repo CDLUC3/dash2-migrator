@@ -36,7 +36,8 @@ module Dash2
         def parse_rss(uri)
           # RSS::Parser.parse() isn't smart enough to handle authenticated URIs
           # (blows up in https://github.com/ruby/ruby/blob/v2_2_3/lib/open-uri.rb#L260-L262)
-          feed_xml = RestClient.get(uri.to_s)
+          verify_ssl = (ENV['STASH_ENV'] == 'production')
+          feed_xml = RestClient::Request.execute(method: :get, :url => uri.to_s, verify_ssl: verify_ssl)
           RSS::Parser.parse(feed_xml, false)
         end
 
