@@ -35,8 +35,8 @@ module Dash2
         @identifier ||= StashEngine::Identifier.find_by(identifier: doi)
       end
 
-      def submitted_versions
-        ((resources = identifier.resources) && resources.submitted) || []
+      def versions
+        ((resources = identifier.resources) && resources.map(&:stash_version)) || []
       end
 
       def update!
@@ -46,11 +46,11 @@ module Dash2
         end
 
         log.info("#{doi} merritt and stash versions differ: #{last_merritt_version} vs #{last_stash_version}")
-        submitted_versions.each { |v| update(v) }
+        versions.each { |v| update(v) }
       end
 
       def update(db_version)
-        new_merritt_version = db_version.stash_version + offset
+        new_merritt_version = db_version.version + offset
         if db_version.merritt_version == new_merritt_version
           log.info("stash_version #{db_version.id}: merritt_version is already #{new_merritt_version}; skipping")
           return
