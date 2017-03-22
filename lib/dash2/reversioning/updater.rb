@@ -41,7 +41,7 @@ module Dash2
 
       def update!
         if offset.zero?
-          log.info("#{doi} merritt and stash versions are identical: #{last_merritt_version}; skipping")
+          log.info("#{doi} merritt and stash versions are identical (#{last_merritt_version}); skipping")
           return
         end
 

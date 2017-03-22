@@ -26,8 +26,8 @@ module Dash2
         @resources = [res0, res1, res2]
 
         # just to be sure
-        expect(versions.map(&:version)).to contain_exactly(1, 2, 3)
-        expect(versions.map(&:merritt_version)).to contain_exactly(1, 2, 3)
+        expect(versions.map(&:version)).to eq([1, 2, 3])
+        expect(versions.map(&:merritt_version)).to eq([1, 2, 3])
 
         allow(Dash2::Reversioning).to receive(:dry_run?).and_return(false)
       end
@@ -44,8 +44,47 @@ module Dash2
         updater = Updater.new(doi: doi, last_merritt_version: 5, last_stash_version: 2)
         updater.update!
         resources.each(&:reload)
-        expect(versions.map(&:version)).to contain_exactly(1, 2, 3)
-        expect(versions.map(&:merritt_version)).to contain_exactly(4, 5, 6)
+
+        expect(versions.map(&:version)).to eq([1, 2, 3])
+        expect(versions.map(&:merritt_version)).to eq([4, 5, 6])
+      end
+
+      it 'leaves correct versions alone' do
+        updater = Updater.new(doi: doi, last_merritt_version: 2, last_stash_version: 2)
+        updater.update!
+        resources.each(&:reload)
+
+        expect(versions.map(&:version)).to eq([1, 2, 3])
+        expect(versions.map(&:merritt_version)).to eq([1, 2, 3])
+      end
+
+      it 'ignores versions that already have the correct difference' do
+        v0 = versions[0]
+        v0.merritt_version = 4
+        v0.save!
+        expect(versions.map(&:merritt_version)).to eq([4, 2, 3]) # just to be sure
+
+        updater = Updater.new(doi: doi, last_merritt_version: 5, last_stash_version: 2)
+        updater.update!
+        resources.each(&:reload)
+
+        expect(versions.map(&:version)).to eq([1, 2, 3])
+        expect(versions.map(&:merritt_version)).to eq([4, 5, 6])
+      end
+
+      describe 'dry run' do
+        before(:each) do
+          allow(Dash2::Reversioning).to receive(:dry_run?).and_return(true)
+        end
+
+        it 'leaves the DB alone' do
+          updater = Updater.new(doi: doi, last_merritt_version: 5, last_stash_version: 2)
+          updater.update!
+          resources.each(&:reload)
+
+          expect(versions.map(&:version)).to eq([1, 2, 3])
+          expect(versions.map(&:merritt_version)).to eq([1, 2, 3])
+        end
       end
 
     end
