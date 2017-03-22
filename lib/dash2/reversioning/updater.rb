@@ -40,6 +40,11 @@ module Dash2
       end
 
       def update!
+        unless identifier
+          log.info("No identifier record for #{doi} found in database; skipping")
+          return
+        end
+
         if offset.zero?
           log.info("#{doi} merritt and stash versions are identical (#{last_merritt_version}); skipping")
           return
