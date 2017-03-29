@@ -28,7 +28,15 @@ module Dash2
       end
 
       def offset
-        @offset ||= last_merritt_version - last_stash_version
+        @offset ||= begin
+          unless last_stash_version
+            raise "No Stash version for dataset #{doi}; Merritt version was: #{last_merritt_version}"
+          end
+          unless last_merritt_version
+            raise "No Merritt version for dataset #{doi}; Stash version was: #{last_stash_version}"
+          end
+          last_merritt_version - last_stash_version
+        end
       end
 
       def identifier

@@ -22,7 +22,7 @@ module Dash2
     end
 
     def self.dry_run?
-      true
+      env_name == 'production'
     end
   end
 end

@@ -33,6 +33,10 @@ module Dash2
         harvest_task.harvest_records.each do |record|
           ark = record.ark
           next unless ark
+
+          log.warn("Unable to determine Merritt version record #{ark} (doi:#{record.doi}); stash-wrapper.xml missing?") unless record.stash_version
+          next unless record.stash_version
+
           Updater.from_record(record).update!
         end
       end

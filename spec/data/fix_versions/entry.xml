@@ -1,0 +1,77 @@
+<entry>
+    <author>
+        <name>JanakiRam</name>
+    </author>
+    <id>http://n2t.net/ark:/90135/q1qz27wh</id>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh"
+          rel="alternate"
+          type="application/zip"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-mom.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-mom.txt"
+          length="125"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/producer%2Fmrt-dataone-manifest.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="producer/mrt-dataone-manifest.txt"
+          length="445"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-dc.xml"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="application/xml"
+          title="system/mrt-dc.xml"
+          length="149"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-ingest.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-ingest.txt"
+          length="1715"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/producer%2Fmrt-erc.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="producer/mrt-erc.txt"
+          length="76"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-owner.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-owner.txt"
+          length="19"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-delete.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-delete.txt"
+          length="0"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-object-map.ttl"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="plain/turtle"
+          title="system/mrt-object-map.ttl"
+          length="3635"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/producer%2Fmrt-eml.xml"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="application/xml"
+          title="producer/mrt-eml.xml"
+          length="10425"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-erc.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-erc.txt"
+          length="120"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/producer%2FDI-DirInfo.csv"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/csv"
+          title="producer/DI-DirInfo.csv"
+          length="4374245"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-membership.txt"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="text/plain"
+          title="system/mrt-membership.txt"
+          length="20"/>
+    <link href="/d/ark%3A%2F90135%2Fq1qz27wh/2/system%2Fmrt-dataone-map.rdf"
+          rel="http://purl.org/dc/terms/hasPart"
+          type="application/rdf+xml"
+          title="system/mrt-dataone-map.rdf"
+          length="2645"/>
+    <published>2014-01-20T04:10:32-08:00</published>
+    <title>DirectoryInfo</title>
+    <updated>2016-11-01T11:25:58-07:00</updated>
+</entry>
