@@ -6,17 +6,18 @@ gem 'mysql2', '~> 0.3'
 
 gem 'config-factory', '~> 0.0', '>= 0.0.9'
 gem 'datacite-mapping', '~> 0.2', '>= 0.2.4'
-gem 'stash-wrapper', '~> 0.1', '>= 0.1.11.1'
 gem 'xml-mapping_extensions', '~> 0.4', '>= 0.4.6'
-gem 'stash-sword', '~> 0.1', '>= 0.1.5'
 
 gem 'simple-rss', '~> 1.3'
 
-gem 'stash-merritt', path: '../stash-merritt'
-gem 'stash-harvester', path: '../stash-harvester'
-gem 'stash_engine', path: '../stash_engines/stash_engine'
-gem 'stash_datacite', path: '../stash_engines/stash_datacite'
-gem 'stash_ezid_datacite', git: 'https://github.com/CDLUC3/stash_ezid_datacite.git'
+path '../stash' do
+  gem 'stash-harvester'
+  gem 'stash-merritt'
+  gem 'stash-sword'
+  gem 'stash-wrapper'
+  gem 'stash_datacite'
+  gem 'stash_engine'
+end
 
 # Development
 
